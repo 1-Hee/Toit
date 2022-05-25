@@ -39,7 +39,8 @@ class ToitModifyActivity : AppCompatActivity() {
 
         val helper =DBHelper(this)
         val sql = """
-            select rec_subject, rec_curr, rec_date1, rec_date2, rec_time, rec_impo_stars, rec_urg_stars, rec_memo
+            select rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
+            rec_impo_stars, rec_urg_stars, rec_memo
             from RecordTable
             where rec_idx=?
         """.trimIndent()
@@ -50,29 +51,32 @@ class ToitModifyActivity : AppCompatActivity() {
         c1.moveToNext()
 
         val idx1 = c1.getColumnIndex("rec_subject")
-        val idx2 = c1.getColumnIndex("rec_date1")
-        val idx3 = c1.getColumnIndex("rec_date2")
-        val idx4 = c1.getColumnIndex("rec_time")
-        val idx5 = c1.getColumnIndex("rec_impo_stars")
-        val idx6 = c1.getColumnIndex("rec_urg_stars")
-        val idx7 = c1.getColumnIndex("rec_memo")
-        val idx8 = c1.getColumnIndex("rec_curr")
+        val idx2 = c1.getColumnIndex("rec_curr")
+        val idx3 = c1.getColumnIndex("rec_date1")
+        val idx4 = c1.getColumnIndex("rec_date2")
+        val idx5 = c1.getColumnIndex("rec_time1")
+        val idx6 = c1.getColumnIndex("rec_time2")
+        val idx7 = c1.getColumnIndex("rec_impo_stars")
+        val idx8 = c1.getColumnIndex("rec_urg_stars")
+        val idx9 = c1.getColumnIndex("rec_memo")
 
         var rec_subject = c1.getString(idx1)
-        val rec_date1 = c1.getString(idx2)
-        val rec_date2 = c1.getString(idx3)
-        val rec_time = c1.getString(idx4)
-        val rec_impo_stars = c1.getFloat(idx5)
-        val rec_urg_stars = c1.getFloat(idx6)
-        val rec_memo = c1.getString(idx7)
-        val rec_curr = c1.getString(idx8)
+        val rec_curr = c1.getString(idx2)
+        val rec_date1 = c1.getString(idx3)
+        val rec_date2 = c1.getString(idx4)
+        val rec_time1 = c1.getString(idx5)
+        val rec_time2 = c1.getString(idx6)
+        val rec_impo_stars = c1.getFloat(idx7)
+        val rec_urg_stars = c1.getFloat(idx8)
+        val rec_memo = c1.getString(idx9)
 
         helper.writableDatabase.close()
 
         b.modiInputText.setText(rec_subject)
         b.modiInputDate1.setText(rec_date1)
         b.modiInputDate2.setText(rec_date2)
-        b.modiInputTime.setText(rec_time)
+        b.modiInputTime1.setText(rec_time1)
+        b.modiInputTime2.setText(rec_time2)
         b.modiRatingBar1.rating = rec_impo_stars
         b.modiRatingBar2.rating = rec_urg_stars
         b.modiMemo.setText(rec_memo)
@@ -81,7 +85,17 @@ class ToitModifyActivity : AppCompatActivity() {
         b.modiInputDate1.setOnClickListener { showDateRangePicker() }
         b.modiInputDate2.setOnClickListener { showDateRangePicker() }
 
-        b.modiInputTime.setOnClickListener{
+        b.modiInputTime1.setOnClickListener{
+            TimePickerDialog(
+                this@ToitModifyActivity,
+                myTimePicker,
+                myTimer[Calendar.HOUR],
+                myTimer[Calendar.MINUTE],
+                false
+            ).show()
+        }
+
+        b.modiInputTime2.setOnClickListener{
             TimePickerDialog(
                 this@ToitModifyActivity,
                 myTimePicker,
@@ -103,14 +117,15 @@ class ToitModifyActivity : AppCompatActivity() {
             val rec_subject = b.modiInputText.text.toString()
             val rec_date1 = b.modiInputDate1.text.toString()
             val rec_date2 = b.modiInputDate2.text.toString()
-            val rec_time = b.modiInputTime.text.toString()
+            val rec_time1 = b.modiInputTime1.text.toString()
+            val rec_time2 = b.modiInputTime2.text.toString()
             val rec_impo_stars = b.modiRatingBar1.rating
             val rec_urg_stars = b.modiRatingBar2.rating
             val rec_memo = b.modiMemo.text.toString()
             val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
             val rec_curr = sdf.format(Date())
             val arg1 = arrayOf(
-                rec_subject, rec_curr, rec_date1, rec_date2, rec_time,
+                rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
                 rec_impo_stars, rec_urg_stars, rec_memo, rec_idx.toString()
             )
 
@@ -151,7 +166,8 @@ class ToitModifyActivity : AppCompatActivity() {
     fun updateTime() {
         val myFormat = "a h:mm" // 출력형식  00:00 PM
         val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
-        b.modiInputTime.setText(sdf.format(myTimer.time))
+        b.modiInputTime1.setText(sdf.format(myTimer.time))
+        b.modiInputDate2.setText(sdf.format(myTimer.time))
     }
 
     // 툴바의 홈버튼 누르면 홈으로 돌아가게 하는 메서드

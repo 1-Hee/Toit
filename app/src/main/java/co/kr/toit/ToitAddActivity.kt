@@ -51,7 +51,8 @@ class ToitAddActivity : AppCompatActivity() {
             val rec_curr = sdf3.format(Date())
             val rec_date1 = b.addInputDate1.text
             val rec_date2 = b.addInputDate2.text
-            val rec_time = b.addInputTime.text
+            val rec_time1 = b.addInputTime1.text
+            val rec_time2 = b.addInputTime2.text
             val rec_impo_stars = b.addRatingBar1.rating
             val rec_urg_stars = b.addRatingBar2.rating
             val rec_memo = b.addInputMemo.text
@@ -59,7 +60,7 @@ class ToitAddActivity : AppCompatActivity() {
 
             // 쿼리문
             val sql = """
-                    insert into Recordtable (rec_subject, rec_curr, rec_date1, rec_date2, rec_time, 
+                    insert into Recordtable (rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
                     rec_impo_stars, rec_urg_stars, rec_memo)
                     values(?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent()
@@ -69,7 +70,7 @@ class ToitAddActivity : AppCompatActivity() {
 
             // ? 에 설정될 값
             val arg1 = arrayOf(
-                rec_subject, rec_curr, rec_date1, rec_date2, rec_time,
+                rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
                 rec_impo_stars, rec_urg_stars, rec_memo
             )
 
@@ -83,7 +84,17 @@ class ToitAddActivity : AppCompatActivity() {
         b.addInputDate1.setOnClickListener { showDateRangePicker() }
         b.addInputDate2.setOnClickListener { showDateRangePicker() }
 
-        b.addInputTime.setOnClickListener {
+        b.addInputTime1.setOnClickListener {
+            TimePickerDialog(
+                this@ToitAddActivity,
+                myTimePicker,
+                myTimer[Calendar.HOUR],
+                myTimer[Calendar.MINUTE],
+                false
+            ).show()
+        }
+
+        b.addInputTime2.setOnClickListener {
             TimePickerDialog(
                 this@ToitAddActivity,
                 myTimePicker,
@@ -106,13 +117,15 @@ class ToitAddActivity : AppCompatActivity() {
         b.addInputDate1.setText(sdf1.format(myCalendar.time))
         b.addInputDate2.setText(sdf1.format(myCalendar.time))
         b.addEditdate.text = sdf1.format(myCalendar.time)
-        b.addInputTime.setText(sdf2.format(myTimer.time))
+        b.addInputTime1.setText(sdf2.format(myTimer.time))
+        b.addInputTime2.setText(sdf2.format(myTimer.time))
     }
 
     fun updateTime() {
         val myFormat = "a h:mm a" // 출력형식  00:00 PM
         val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
-        b.addInputTime.setText(sdf.format(myTimer.time))
+        b.addInputTime1.setText(sdf.format(myTimer.time))
+        b.addInputTime2.setText(sdf.format(myTimer.time))
     }
 
     fun showDateRangePicker() {

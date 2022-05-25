@@ -16,7 +16,8 @@ class DBHelper : SQLiteOpenHelper {
             rec_curr date not null,
             rec_date1 date not null,
             rec_date2 date not null,
-            rec_time time not null,
+            rec_time1 time not null,
+            rec_time2 time not null,
             rec_impo_stars float not null,
             rec_urg_stars float not null,            
             rec_memo text)
