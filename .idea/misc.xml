@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable-v24/custom_rating_body1.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable-v24/custom_rating_body2.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable-v24/custom_rating_false2.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable-v24/custom_rating_true2.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable/custom_rating_body.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable/custom_rating_false.xml" value="0.103" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable/custom_rating_false1.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable/custom_rating_true.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable/custom_rating_true1.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/drawable/rating_false.xml" value="0.103" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/layout/activity_memo_edit.xml" value="0.22" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/layout/activity_memo_modify.xml" value="0.1203125" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/layout/activity_toit_add.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/layout/activity_toit_modify.xml" value="0.1203125" />
+        <entry key="..\:/Users/SAMSUNG/.0ktApps/Kt_Apps_for_test/ToIt/app/src/main/res/layout/main_recycler_row.xml" value="0.22" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
