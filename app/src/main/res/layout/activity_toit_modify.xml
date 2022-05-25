@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/modi_text1"
@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/modi_text2"
@@ -115,15 +115,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="5dp">
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/modi_text3"
@@ -149,7 +141,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/modi_text4"
@@ -175,7 +167,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/modi_text5"
@@ -198,7 +190,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <Button
             android:id="@+id/modi_save_btn"
@@ -220,7 +212,8 @@
         android:id="@+id/modi_editdate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="20dp"
         android:textAlignment="viewEnd"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textSize="10sp" />
 </LinearLayout>

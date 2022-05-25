@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     val subject_list = ArrayList<String>()
     val date2_list = ArrayList<String>()
-    val time_list = ArrayList<String>()
+    val time2_list = ArrayList<String>()
     val idx_list = ArrayList<Int>()
 
 
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         // ArrayList를 비워준다 why? 안비워주면 다시 돌아올때마다 누적되기 때문
         subject_list.clear()
         date2_list.clear()
-        time_list.clear()
+        time2_list.clear()
         idx_list.clear()
 
         //데이터베이스 오픈
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         //쿼리문
         val sql = """
-            select rec_subject, rec_date2, rec_time, rec_idx
+            select rec_subject, rec_date2, rec_time2, rec_idx
             from Recordtable
             order by rec_idx desc
         """.trimIndent()
@@ -64,20 +64,20 @@ class MainActivity : AppCompatActivity() {
         while (c1.moveToNext()){
             // 컬럼 index를 가져온다
             val idx1 = c1.getColumnIndex("rec_subject")
-            val idx3 = c1.getColumnIndex("rec_date2")
+            val idx2 = c1.getColumnIndex("rec_date2")
+            val idx3 = c1.getColumnIndex("rec_time2")
             val idx4 = c1.getColumnIndex("rec_idx")
-            val idx5 = c1.getColumnIndex("rec_time")
 
             //데이터를 가져온다
             val rec_subject = c1.getString(idx1)
-            val rec_date2 = c1.getString(idx3)
+            val rec_date2 = c1.getString(idx2)
+            val rec_time2 = c1.getString(idx3)
             val rec_idx = c1.getInt(idx4)
-            val rec_time = c1.getString(idx5)
 
             // 데이터를 담는다
             subject_list.add(rec_subject)
             date2_list.add(rec_date2)
-            time_list.add(rec_time)
+            time2_list.add(rec_time2)
             idx_list.add(rec_idx)
 
             //RecyclerView에가 갱신하라고 함
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
             holder.recSubject.text = subject_list[position]
-            holder.recDeadline.text = "${date2_list[position]} ${time_list[position]}"
+            holder.recDeadline.text = "${date2_list[position]} ${time2_list[position]}"
         }
 
         override fun getItemCount(): Int {

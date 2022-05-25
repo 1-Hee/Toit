@@ -1,9 +1,11 @@
 package co.kr.toit
 
+import android.app.Dialog
 import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.core.util.Pair
 import co.kr.toit.databinding.ActivityToitModifyBinding
 import com.google.android.material.datepicker.CalendarConstraints
@@ -17,6 +19,7 @@ class ToitModifyActivity : AppCompatActivity() {
     lateinit var b : ActivityToitModifyBinding
 
     var myTimer : Calendar = Calendar.getInstance()
+    var switch = true
     val myTimePicker = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
         myTimer.set(Calendar.HOUR_OF_DAY, hour)
         myTimer.set(Calendar.MINUTE, minute)
@@ -86,31 +89,23 @@ class ToitModifyActivity : AppCompatActivity() {
         b.modiInputDate2.setOnClickListener { showDateRangePicker() }
 
         b.modiInputTime1.setOnClickListener{
-            TimePickerDialog(
-                this@ToitModifyActivity,
-                myTimePicker,
-                myTimer[Calendar.HOUR],
-                myTimer[Calendar.MINUTE],
-                false
-            ).show()
+            if(it.id==R.id.modi_input_time1) switch = true
+            Dialog()
         }
 
         b.modiInputTime2.setOnClickListener{
-            TimePickerDialog(
-                this@ToitModifyActivity,
-                myTimePicker,
-                myTimer[Calendar.HOUR],
-                myTimer[Calendar.MINUTE],
-                false
-            ).show()
+            if(it.id==R.id.modi_input_time2) switch = false
+            Dialog()
         }
 
         b.modiSaveBtn.setOnClickListener {
+
             val helper = DBHelper(this)
             val sql = """
                     update RecordTable
-                    set rec_subject = ?, rec_curr = ?, rec_date1 = ?, rec_date2 = ?, rec_time = ?, 
-                    rec_impo_stars = ?, rec_urg_stars= ?, rec_memo = ?
+                    set rec_subject = ?, rec_curr = ?, rec_date1 = ?, rec_date2 = ?, 
+                    rec_time1 = ?, rec_time2 = ?, rec_impo_stars = ?, rec_urg_stars= ?, 
+                    rec_memo = ?
                     where rec_idx = ?
                 """.trimIndent()
 
@@ -122,7 +117,7 @@ class ToitModifyActivity : AppCompatActivity() {
             val rec_impo_stars = b.modiRatingBar1.rating
             val rec_urg_stars = b.modiRatingBar2.rating
             val rec_memo = b.modiMemo.text.toString()
-            val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
+            val sdf = SimpleDateFormat("yyyy년 MM월 dd일 a h:mm", Locale.getDefault())
             val rec_curr = sdf.format(Date())
             val arg1 = arrayOf(
                 rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
@@ -166,9 +161,23 @@ class ToitModifyActivity : AppCompatActivity() {
     fun updateTime() {
         val myFormat = "a h:mm" // 출력형식  00:00 PM
         val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
-        b.modiInputTime1.setText(sdf.format(myTimer.time))
-        b.modiInputDate2.setText(sdf.format(myTimer.time))
+        if(switch){
+            b.modiInputTime1.setText(sdf.format(myTimer.time))
+        } else {
+            b.modiInputTime2.setText(sdf.format(myTimer.time))
+        }
     }
+
+    fun Dialog() {
+        TimePickerDialog(
+            this@ToitModifyActivity,
+            myTimePicker,
+            myTimer[Calendar.HOUR],
+            myTimer[Calendar.MINUTE],
+            false
+        ).show()
+    }
+
 
     // 툴바의 홈버튼 누르면 홈으로 돌아가게 하는 메서드
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
