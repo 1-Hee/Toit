@@ -141,6 +141,7 @@ class ToitModifyActivity : AppCompatActivity() {
 
         val dateRangePicker = MaterialDatePicker.Builder
             .dateRangePicker().setCalendarConstraints(constraintsBuilder.build())
+            .setTheme(R.style.DateDialog)
             .build()
 
 

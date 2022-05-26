@@ -11,15 +11,15 @@
         android:orientation="horizontal">
 
         <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/main_checkbox"
             style="@style/Widget.Material3.CompoundButton.CheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -27,16 +27,19 @@
                 android:id="@+id/rec_subject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="subject"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <TextView
-                android:id="@+id/rec_deadline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="timeline"
-                android:textAlignment="viewEnd"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="@style/starRatingBar1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:numStars="3"
+                android:rating="0"
+                android:stepSize="0.5" />
 
         </LinearLayout>
 

@@ -1,19 +1,17 @@
 package co.kr.toit
 
-import android.app.DatePickerDialog
-import android.app.DatePickerDialog.OnDateSetListener
+import android.app.Notification
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import co.kr.toit.databinding.ActivityToitAddBinding
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.datepicker.MaterialDatePicker.Builder.dateRangePicker
+import com.google.android.material.theme.MaterialComponentsViewInflater
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 
@@ -110,7 +108,7 @@ class ToitAddActivity : AppCompatActivity() {
 
         b.addInputDate1.setText(sdf1.format(myCalendar.time))
         b.addInputDate2.setText(sdf1.format(myCalendar.time))
-        b.addEditdate.text = sdf1.format(myCalendar.time) + sdf2.format(myTimer.time)
+        b.addEditdate.text = sdf1.format(myCalendar.time) + " " + sdf2.format(myTimer.time)
         b.addInputTime1.setText(sdf2.format(myTimer.time))
         b.addInputTime2.setText(sdf2.format(myTimer.time))
     }
@@ -128,9 +126,15 @@ class ToitAddActivity : AppCompatActivity() {
             CalendarConstraints.Builder()
                 .setValidator(DateValidatorPointForward.now())
 
+
         val dateRangePicker = MaterialDatePicker.Builder
-            .dateRangePicker().setCalendarConstraints(constraintsBuilder.build())
+            .dateRangePicker()
+            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+            .setCalendarConstraints(constraintsBuilder.build())
+            .setTheme(R.style.DateDialog)
             .build()
+
+
         dateRangePicker.show(supportFragmentManager, "support")
 
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->

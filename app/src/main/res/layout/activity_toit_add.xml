@@ -7,229 +7,240 @@
     android:orientation="vertical"
     tools:context=".ToitAddActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <TextView
-            android:id="@+id/add_text1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:fontFamily="sans-serif"
-            android:text="할 일"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/add_input_subject"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="할 일을 입력하세요"
-            android:inputType="textPersonName"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <TextView
-            android:id="@+id/add_text2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:fontFamily="sans-serif"
-            android:text="일정"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp" />
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-            <EditText
-                android:id="@+id/add_input_date1"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:cursorVisible="false"
-                android:ems="10"
-                android:focusable="false"
-                android:focusableInTouchMode="true"
-                android:hint="시작 날짜를 입력하세요"
-                android:inputType="date"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:layout_marginTop="40dp"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <EditText
-                android:id="@+id/add_input_time1"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/add_text1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:fontFamily="sans-serif"
+                    android:text="할 일"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="24sp" />
+
+                <EditText
+                    android:id="@+id/add_input_subject"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="할 일을 입력하세요"
+                    android:inputType="textPersonName"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:cursorVisible="false"
-                android:ems="10"
-                android:focusable="false"
-                android:focusableInTouchMode="true"
-                android:hint="시작 시간을 입력하세요"
-                android:inputType="time"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/add_text2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:fontFamily="sans-serif"
+                    android:text="일정"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="24sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/add_input_date1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:cursorVisible="false"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:focusableInTouchMode="true"
+                        android:hint="시작 날짜를 입력하세요"
+                        android:inputType="date"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                    <EditText
+                        android:id="@+id/add_input_time1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:cursorVisible="false"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:focusableInTouchMode="true"
+                        android:hint="시작 시간을 입력하세요"
+                        android:inputType="time"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/add_input_date2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:cursorVisible="false"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:focusableInTouchMode="true"
+                        android:hint="종료 날짜를 입력하세요"
+                        android:inputType="date"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                    <EditText
+                        android:id="@+id/add_input_time2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:cursorVisible="false"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:focusableInTouchMode="true"
+                        android:hint="종료 시간을 입력하세요"
+                        android:inputType="time"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/add_text3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:fontFamily="sans-serif"
+                    android:text="중요도"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="24sp" />
+
+                <RatingBar
+                    android:id="@+id/add_ratingBar1"
+                    style="@style/starRatingBar1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:numStars="5"
+                    android:rating="0"
+                    android:stepSize="0.5" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/add_text4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:fontFamily="sans-serif"
+                    android:text="긴급도"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="24sp" />
+
+                <RatingBar
+                    android:id="@+id/add_ratingBar2"
+                    style="@style/starRatingBar1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:numStars="5"
+                    android:rating="0"
+                    android:stepSize="0.5" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/edit_text5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:fontFamily="sans-serif"
+                    android:text="설명"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="24sp" />
+
+                <EditText
+                    android:id="@+id/add_input_memo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <Button
+                    android:id="@+id/add_save_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="저장하기" />
+
+                <Button
+                    android:id="@+id/add_close_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.5"
+                    android:text="닫기" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/add_editdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:textAlignment="viewEnd"
+                android:textSize="10sp" />
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/add_input_date2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:cursorVisible="false"
-                android:ems="10"
-                android:focusable="false"
-                android:focusableInTouchMode="true"
-                android:hint="종료 날짜를 입력하세요"
-                android:inputType="date"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-            <EditText
-                android:id="@+id/add_input_time2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:cursorVisible="false"
-                android:ems="10"
-                android:focusable="false"
-                android:focusableInTouchMode="true"
-                android:hint="종료 시간을 입력하세요"
-                android:inputType="time"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="20dp">
-
-        <TextView
-            android:id="@+id/add_text3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="10dp"
-            android:fontFamily="sans-serif"
-            android:text="중요도"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp" />
-
-        <RatingBar
-            android:id="@+id/add_ratingBar1"
-            style="@style/starRatingBar1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:numStars="5"
-            android:rating="0"
-            android:stepSize="0.5" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="20dp">
-
-        <TextView
-            android:id="@+id/add_text4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="10dp"
-            android:fontFamily="sans-serif"
-            android:text="긴급도"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp" />
-
-        <RatingBar
-            android:id="@+id/add_ratingBar2"
-            style="@style/starRatingBar2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:numStars="5"
-            android:rating="0"
-            android:stepSize="0.5" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="20dp">
-
-        <TextView
-            android:id="@+id/edit_text5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:fontFamily="sans-serif"
-            android:text="설명"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/add_input_memo"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_weight="1"
-            android:ems="10"
-            android:gravity="start|top"
-            android:inputType="textMultiLine" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="20dp">
-
-        <Button
-            android:id="@+id/add_save_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:text="저장하기" />
-
-        <Button
-            android:id="@+id/add_close_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2.5"
-            android:text="닫기" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/add_editdate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:textAlignment="viewEnd"
-        android:textSize="10sp" />
+    </ScrollView>
 
 </LinearLayout>
