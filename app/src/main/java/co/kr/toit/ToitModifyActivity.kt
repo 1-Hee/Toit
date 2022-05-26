@@ -1,16 +1,10 @@
 package co.kr.toit
 
-import android.app.Dialog
 import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.format.Time
 import android.view.MenuItem
-import android.view.View
-import androidx.core.util.Pair
 import co.kr.toit.databinding.ActivityToitModifyBinding
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.*
@@ -110,19 +104,14 @@ class ToitModifyActivity : AppCompatActivity() {
                     where rec_idx = ?
                 """.trimIndent()
 
-            val rec_subject = b.modiInputText.text.toString()
-            val rec_date1 = b.modiInputDate1.text.toString()
-            val rec_date2 = b.modiInputDate2.text.toString()
-            val rec_time1 = b.modiInputTime1.text.toString()
-            val rec_time2 = b.modiInputTime2.text.toString()
-            val rec_impo_stars = b.modiRatingBar1.rating
-            val rec_urg_stars = b.modiRatingBar2.rating
-            val rec_memo = b.modiMemo.text.toString()
             val sdf = SimpleDateFormat("yyyy년 MM월 dd일 a h:mm", Locale.getDefault())
             val rec_curr = sdf.format(Date())
             val arg1 = arrayOf(
-                rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
-                rec_impo_stars, rec_urg_stars, rec_memo, rec_idx.toString()
+                b.modiInputText.text.toString(), rec_curr,
+                b.modiInputDate1.text.toString(), b.modiInputDate2.text.toString(),
+                b.modiInputTime1.text.toString(), b.modiInputTime2.text.toString(),
+                b.modiRatingBar1.rating, b.modiRatingBar2.rating,
+                b.modiMemo.text.toString(), rec_idx.toString()
             )
 
             helper.writableDatabase.execSQL(sql, arg1)
@@ -139,9 +128,7 @@ class ToitModifyActivity : AppCompatActivity() {
             .setTheme(R.style.DateDialog)
             .build()
 
-
         dateRangePicker.show(supportFragmentManager, "support")
-
 
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
             val start_date = datePicked.first

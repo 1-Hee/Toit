@@ -1,16 +1,11 @@
 package co.kr.toit
 
-import android.app.Notification
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import co.kr.toit.databinding.ActivityToitAddBinding
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.theme.MaterialComponentsViewInflater
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -74,8 +69,10 @@ class ToitAddActivity : AppCompatActivity() {
 
             // ? 에 설정될 값
             val arg1 = arrayOf(
-                b.addInputSubject.text, sdf3.format(Date()), b.addInputDate1.text, b.addInputDate2.text,
-                b.addInputTime1.text, b.addInputTime2.text, b.addRatingBar1.rating, b.addRatingBar2.rating,
+                b.addInputSubject.text, sdf3.format(Date()),
+                b.addInputDate1.text, b.addInputDate2.text,
+                b.addInputTime1.text, b.addInputTime2.text,
+                b.addRatingBar1.rating, b.addRatingBar2.rating,
                 b.addInputMemo.text
             )
 

@@ -136,8 +136,7 @@ class MainActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
 
             holder.recSubject.text = subject_list[position]
-            holder.mainTimer.text = time2_list[position]
-
+            holder.mainTimer.text = ""
         }
 
         override fun getItemCount(): Int {
