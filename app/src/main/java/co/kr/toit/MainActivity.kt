@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
 
     private var TimerTask : Timer? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityMainBinding.inflate(layoutInflater)
@@ -136,7 +135,27 @@ class MainActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
 
             holder.recSubject.text = subject_list[position]
-            holder.mainTimer.text = ""
+
+            val long_now = System.currentTimeMillis()
+            val TransDate = Date(long_now)
+            val DateFormat1 = SimpleDateFormat("a h:mm", Locale("ko", "KR"))
+            val DateFormat2 = SimpleDateFormat("yyyy년 MM월 dd일", Locale("ko", "KR"))
+            val TimeValue = DateFormat1.format(TransDate).toString()
+            val DateValue = DateFormat2.format(TransDate).toString()
+
+
+            var result = ""
+
+
+            if(DateValue.equals(date2_list[position])){
+                result = "같네요"
+            } else {
+                result = "다르네요"
+                // DateValue.toString() + date2_list[position]
+            }
+
+
+            holder.mainTimer.text = result
         }
 
         override fun getItemCount(): Int {
