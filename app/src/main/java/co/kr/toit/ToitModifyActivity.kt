@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.format.Time
 import android.view.MenuItem
 import android.view.View
 import androidx.core.util.Pair
@@ -19,12 +20,12 @@ class ToitModifyActivity : AppCompatActivity() {
     lateinit var b : ActivityToitModifyBinding
 
     var myTimer : Calendar = Calendar.getInstance()
-    var switch = true
     val myTimePicker = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
         myTimer.set(Calendar.HOUR_OF_DAY, hour)
         myTimer.set(Calendar.MINUTE, minute)
         updateTime()
     }
+    var TimerSwitch = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,13 +90,13 @@ class ToitModifyActivity : AppCompatActivity() {
         b.modiInputDate2.setOnClickListener { showDateRangePicker() }
 
         b.modiInputTime1.setOnClickListener{
-            if(it.id==R.id.modi_input_time1) switch = true
-            Dialog()
+            TimerSwitch = true
+            ShowDialog()
         }
 
         b.modiInputTime2.setOnClickListener{
-            if(it.id==R.id.modi_input_time2) switch = false
-            Dialog()
+            TimerSwitch = false
+            ShowDialog()
         }
 
         b.modiSaveBtn.setOnClickListener {
@@ -156,14 +157,14 @@ class ToitModifyActivity : AppCompatActivity() {
     fun updateTime() {
         val myFormat = "a h:mm" // 출력형식  00:00 PM
         val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
-        if(switch){
+        if(TimerSwitch){
             b.modiInputTime1.setText(sdf.format(myTimer.time))
         } else {
             b.modiInputTime2.setText(sdf.format(myTimer.time))
         }
     }
 
-    fun Dialog() {
+    fun ShowDialog() {
         TimePickerDialog(
             this@ToitModifyActivity,
             myTimePicker,

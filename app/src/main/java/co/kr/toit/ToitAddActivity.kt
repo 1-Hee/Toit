@@ -26,6 +26,8 @@ class ToitAddActivity : AppCompatActivity() {
         updateTime()
     }
 
+    var TimerSwitch = true
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,23 +49,13 @@ class ToitAddActivity : AppCompatActivity() {
         b.addInputDate2.setOnClickListener { showDateRangePicker() }
 
         b.addInputTime1.setOnClickListener {
-            TimePickerDialog(
-                this@ToitAddActivity,
-                myTimePicker,
-                myTimer[Calendar.HOUR],
-                myTimer[Calendar.MINUTE],
-                false
-            ).show()
+            TimerSwitch = true
+            ShowDiallog()
         }
 
         b.addInputTime2.setOnClickListener {
-            TimePickerDialog(
-                this@ToitAddActivity,
-                myTimePicker,
-                myTimer[Calendar.HOUR],
-                myTimer[Calendar.MINUTE],
-                false
-            ).show()
+            TimerSwitch = false
+            ShowDiallog()
         }
 
         b.addSaveBtn.setOnClickListener {
@@ -98,6 +90,16 @@ class ToitAddActivity : AppCompatActivity() {
 
     }
 
+    fun ShowDiallog(){
+        TimePickerDialog(
+            this@ToitAddActivity,
+            myTimePicker,
+            myTimer[Calendar.HOUR],
+            myTimer[Calendar.MINUTE],
+            false
+        ).show()
+    }
+
 
     fun TimeDateInit() {
         val dateDefault = "yyyy년 MM월 dd일"
@@ -116,8 +118,11 @@ class ToitAddActivity : AppCompatActivity() {
     fun updateTime() {
         val myFormat = "a h:mm" // 출력형식  00:00 PM
         val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
-        b.addInputTime1.setText(sdf.format(myTimer.time))
-        b.addInputTime2.setText(sdf.format(myTimer.time))
+        if(TimerSwitch){
+            b.addInputTime1.setText(sdf.format(myTimer.time))
+        } else {
+            b.addInputTime2.setText(sdf.format(myTimer.time))
+        }
     }
 
     fun showDateRangePicker() {
