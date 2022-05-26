@@ -67,7 +67,7 @@ class ToitAddActivity : AppCompatActivity() {
         }
 
         b.addSaveBtn.setOnClickListener {
-            val sdf3 = SimpleDateFormat("yyyy년 MM월 dd일 a h:mm", Locale.getDefault())
+            val sdf3 = SimpleDateFormat("yyyy년 MM월 dd일 h:mm a", Locale.getDefault())
 
             // 쿼리문
             val sql = """
@@ -114,7 +114,7 @@ class ToitAddActivity : AppCompatActivity() {
     }
 
     fun updateTime() {
-        val myFormat = "a h:mm a" // 출력형식  00:00 PM
+        val myFormat = "a h:mm" // 출력형식  00:00 PM
         val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
         b.addInputTime1.setText(sdf.format(myTimer.time))
         b.addInputTime2.setText(sdf.format(myTimer.time))
@@ -122,15 +122,9 @@ class ToitAddActivity : AppCompatActivity() {
 
     fun showDateRangePicker() {
 
-        val constraintsBuilder =
-            CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointForward.now())
-
-
         val dateRangePicker = MaterialDatePicker.Builder
             .dateRangePicker()
             .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .setCalendarConstraints(constraintsBuilder.build())
             .setTheme(R.style.DateDialog)
             .build()
 

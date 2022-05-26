@@ -133,14 +133,8 @@ class ToitModifyActivity : AppCompatActivity() {
     }
 
     fun showDateRangePicker() {
-
-        val constraintsBuilder =
-            CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointForward.now())
-
-
         val dateRangePicker = MaterialDatePicker.Builder
-            .dateRangePicker().setCalendarConstraints(constraintsBuilder.build())
+            .dateRangePicker()
             .setTheme(R.style.DateDialog)
             .build()
 
