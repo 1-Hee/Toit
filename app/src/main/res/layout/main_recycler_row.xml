@@ -39,21 +39,22 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:orientation="vertical">
+                android:layout_gravity="right"
+                android:orientation="vertical"
+                android:padding="5dp">
 
                 <RatingBar
                     android:id="@+id/main_indicator"
                     style="@style/mainTimer1"
                     android:layout_width="wrap_content"
-                    android:layout_height="21dp"
-                    android:layout_gravity="center"
+                    android:layout_height="14dp"
+                    android:layout_gravity="right"
                     android:layout_marginBottom="5dp"
                     android:clickable="true"
+                    android:isIndicator="true"
                     android:numStars="3"
                     android:rating="2.5"
-                    android:stepSize="0.5"
-                    android:isIndicator="true"/>
+                    android:stepSize="0.5" />
 
                 <TextView
                     android:id="@+id/main_deadline"

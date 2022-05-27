@@ -16,8 +16,17 @@
         <item name = "android:windowNoTitle">true</item>
     </style>
 
+    <style name="CustomToolbar" parent="@android:style/Theme.Light">
+        <item name="android:windowTitleSize">10dp</item>
+    </style>
+
+
     <style name="starRatingBar1" parent="@android:style/Widget.RatingBar">
         <item name="android:progressDrawable">@drawable/custom_rating_body1</item>
+    </style>
+
+    <style name="mainTimer1" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/timer_body1</item>
     </style>
 
     <style name="DateDialog" parent="ThemeOverlay.MaterialComponents.MaterialCalendar"></style>

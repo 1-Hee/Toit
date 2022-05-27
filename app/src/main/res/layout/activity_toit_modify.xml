@@ -7,6 +7,15 @@
     android:orientation="vertical"
     tools:context=".ToitModifyActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/modi_toolbar"
+        style="@style/CustomToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -139,8 +148,9 @@
                     android:id="@+id/modi_ratingBar2"
                     style="@style/starRatingBar1"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:numStars="5"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:numStars="10"
                     android:rating="0"
                     android:stepSize="0.5" />
             </LinearLayout>
@@ -165,8 +175,9 @@
                     android:id="@+id/modi_ratingBar1"
                     style="@style/starRatingBar1"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:numStars="5"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:numStars="10"
                     android:rating="0"
                     android:stepSize="0.5" />
             </LinearLayout>

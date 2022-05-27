@@ -8,7 +8,7 @@
         android:drawable="@drawable/timer_false"
         />
     <item android:id="@android:id/progress"
-        android:drawable="@drawable/timer_true1"
+        android:drawable="@drawable/timer_true"
         />
 
 </layer-list>

@@ -4,9 +4,13 @@ import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.core.util.Pair
 import co.kr.toit.databinding.ActivityToitModifyBinding
+import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 class ToitModifyActivity : AppCompatActivity() {
@@ -26,7 +30,8 @@ class ToitModifyActivity : AppCompatActivity() {
         b = ActivityToitModifyBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        title = "To do 편집하기"
+        setSupportActionBar(b.modiToolbar)
+        title = ""
 
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -123,6 +128,7 @@ class ToitModifyActivity : AppCompatActivity() {
     }
 
     fun showDateRangePicker() {
+
         val dateRangePicker = MaterialDatePicker.Builder
             .dateRangePicker()
             .setTheme(R.style.DateDialog)

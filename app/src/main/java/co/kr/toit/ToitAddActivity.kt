@@ -29,8 +29,9 @@ class ToitAddActivity : AppCompatActivity() {
         b = ActivityToitAddBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        title = "To do 생성하기"
 
+        setSupportActionBar(b.addToolbar)
+        title = ""
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

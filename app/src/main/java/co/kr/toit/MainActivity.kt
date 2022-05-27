@@ -36,7 +36,10 @@ class MainActivity : AppCompatActivity() {
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        title = "To Do List"
+        setSupportActionBar(b.mainToolbar)
+        title = ""
+
+
 
         //Recycler View 셋팅
         val main_recycler_adapter = MainRecylcerAdapter()
@@ -114,6 +117,7 @@ class MainActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+
             mainRecyclerBinding.root.layoutParams = layoutParams
 
             // 항목 View에 이벤트를 설정
