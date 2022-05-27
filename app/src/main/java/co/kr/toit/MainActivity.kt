@@ -1,10 +1,13 @@
 package co.kr.toit
 
 import android.content.Intent
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import co.kr.toit.databinding.ActivityMainBinding
@@ -25,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     val date2_list = ArrayList<String>()
     val time2_list = ArrayList<String>()
     var StarIdx = 0.0f
+    var vis = false
 
     private var TimerTask : Timer? = null
 
@@ -37,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         title = ""
 
 
-
         //Recycler View 셋팅
         val main_recycler_adapter = MainRecylcerAdapter()
         b.memoRecycler.adapter = main_recycler_adapter
@@ -47,13 +50,25 @@ class MainActivity : AppCompatActivity() {
             val memo_add_intent = Intent(this, ToitAddActivity::class.java)
             startActivity(memo_add_intent)
         }
+        b.mainFb1.setOnLongClickListener {
+            if(vis){
+                vis = false
+                b.memoRecycler.adapter?.notifyDataSetChanged()
+            } else {
+                vis = true
+                b.memoRecycler.adapter?.notifyDataSetChanged()
+            }
+            return@setOnLongClickListener(true)
+        }
+
 
         TimerTask = timer(period = 60000){
-
             runOnUiThread {
                 b.memoRecycler.adapter?.notifyDataSetChanged()
             }
         }
+
+
     }
 
     override fun onResume() {
@@ -149,6 +164,14 @@ class MainActivity : AppCompatActivity() {
             holder.mainTimer.text = FinalText
             holder.mainIndiCater.rating = StarIdx
 
+            if(vis){
+                holder.checkbox.visibility = View.VISIBLE
+            }else {
+                holder.checkbox.visibility = View.GONE
+            }
+
+
+
         }
 
         override fun getItemCount(): Int {
@@ -162,6 +185,7 @@ class MainActivity : AppCompatActivity() {
             val recSubject = mainRecyclerBinding.recSubject
             val mainIndiCater = mainRecyclerBinding.mainIndicator
             val mainTimer = mainRecyclerBinding.mainDeadline
+            val checkbox = mainRecyclerBinding.mainCheckbox
 
             override fun onClick(p0: View?) {
                 val rec_idx = idx_list[adapterPosition]
@@ -170,6 +194,7 @@ class MainActivity : AppCompatActivity() {
                 memoModifyActivity.putExtra("rec_idx", rec_idx)
                 startActivity(memoModifyActivity)
             }
+
         }
     }
 
