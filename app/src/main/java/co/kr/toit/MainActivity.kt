@@ -148,7 +148,6 @@ class MainActivity : AppCompatActivity() {
             holder.mainTimer.text = FinalText
             holder.mainIndiCater.rating = StarIdx
 
-
         }
 
         override fun getItemCount(): Int {
