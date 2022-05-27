@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.format.Time
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IntegerRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import co.kr.toit.databinding.ActivityMainBinding
@@ -143,14 +144,119 @@ class MainActivity : AppCompatActivity() {
             val TimeValue = DateFormat1.format(TransDate).toString()
             val DateValue = DateFormat2.format(TransDate).toString()
 
-
+            // 최종 표시될 텍스트를 받을 변수
             var result = ""
 
+            // 시간 차이를 담을 변수
+            var Hdiff = 0
+            var Mdiff = 0
 
-            if(DateValue.equals(date2_list[position])){
-                result = "같네요"
+            // 시간 값들을 담을 변수
+            var temp1 = ""
+            var temp2 = ""
+            var temp3 = ""
+            var temp4 = ""
+
+
+            if(DateValue.equals(date2_list[position])){// 날짜가 같은지 필터링
+                // 시간에 대해서만 연산 필요. 시간이 같은지는 연산을 통해 값으로 필터링
+                //오전 3:00 의 형식 3 56
+                //오전 12:00 의 형식 34 67
+                var Judge = true
+
+                if(TimeValue[1].equals(time2_list[position][1])){ // 오전 오후가 같은지
+                    if(TimeValue.length == time2_list[position].length){ // 둘의 자릿수가 같은지
+
+                        if(TimeValue.length == 8){
+                            temp1 = time2_list[position][3].toString()+time2_list[position][4].toString()
+                            temp2 = TimeValue[3].toString()+TimeValue[4].toString()
+                            Hdiff = Integer.parseInt(temp1) - Integer.parseInt(temp2)
+
+                            temp3 = time2_list[position][6].toString()+time2_list[position][7].toString()
+                            temp4 = TimeValue[6].toString()+TimeValue[7].toString()
+                            Mdiff = Integer.parseInt(temp3) - Integer.parseInt(temp4)
+
+                        }else {
+                            temp1 = time2_list[position][3].toString()
+                            temp2 = TimeValue[3].toString()
+                            Hdiff = Integer.parseInt(temp1) - Integer.parseInt(temp2)
+
+                            temp3 = time2_list[position][5].toString()+time2_list[position][6].toString()
+                            temp4 = TimeValue[5].toString()+TimeValue[6].toString()
+                            Mdiff = Integer.parseInt(temp3) - Integer.parseInt(temp4)
+                        }
+
+                    }else if(TimeValue.length>time2_list[position].length){
+                        Judge = false
+                    } else {
+                        // time2_list의 값, 즉 sql 값이 크니까 시간이 남은 것으로 시간 계산
+                        val temp = time2_list[position][3].toString()+time2_list[position][4].toString()
+                        Hdiff = Integer.parseInt(temp)-Integer.parseInt(TimeValue[3].toString())
+
+                        temp3 = time2_list[position][5].toString()+time2_list[position][6].toString()
+                        temp4 = TimeValue[5].toString()+TimeValue[6].toString()
+                        Mdiff = Integer.parseInt(temp3) - Integer.parseInt(temp4)
+                    }
+
+                } else{
+                    if(TimeValue[1].toString().equals("후")){
+                    // 여기서는 현재시간 : 오후 vs 저장시간 : 오전 / 현재시간 : 오전 vs 저장시간 : 오후
+                    // 두 가지 경우의 수만 들어오는데 전자는 시간 오버임 (날짜도 같으므로)
+                        result = "기한만료"
+                    }else {
+                        // 현재시간 오전 vs 저장시간 후
+                        if(TimeValue.length == time2_list[position].length){
+                            temp1 = time2_list[position][3].toString()+time2_list[position][4].toString()
+                            temp2 = TimeValue[3].toString()+TimeValue[4].toString()
+                            Hdiff = Integer.parseInt(temp1)-Integer.parseInt(temp2)+12
+
+                            temp3 = time2_list[position][6].toString()+time2_list[position][7].toString()
+                            temp4 = TimeValue[6].toString()+TimeValue[7].toString()
+                            Mdiff = Integer.parseInt(temp3)-Integer.parseInt(temp4)
+
+                        }else if (TimeValue.length > time2_list[position].length){
+                            temp1 = time2_list[position][3].toString()
+                            temp2 = TimeValue[3].toString()+TimeValue[4].toString()
+                            Hdiff = Integer.parseInt(temp1)-Integer.parseInt(temp2)+12
+
+                            temp3 = time2_list[position][5].toString()+time2_list[position][6].toString()
+                            temp4 = TimeValue[6].toString()+TimeValue[7].toString()
+                            Mdiff = Integer.parseInt(temp3)-Integer.parseInt(temp4)
+
+                        }else {
+                            temp1 = time2_list[position][3].toString()+time2_list[position][4].toString()
+                            temp2 = TimeValue[3].toString()
+                            Hdiff = Integer.parseInt(temp1)-Integer.parseInt(temp2)+12
+
+                            temp3 = time2_list[position][6].toString()+time2_list[position][7].toString()
+                            temp4 = TimeValue[5].toString()+TimeValue[6].toString()
+                            Mdiff = Integer.parseInt(temp3)-Integer.parseInt(temp4)
+                        }
+                    }
+                }
+                if(Judge){
+                    if(Hdiff>0 && Mdiff < 0){
+                        Mdiff += 60
+                        Hdiff -= 1
+                    }
+
+                    if(Mdiff<0){
+                        result = "기한 만료"
+                    }else {
+                        if(Hdiff>0){
+                            result = "${Hdiff}시간 ${Mdiff}분"
+                        }else {
+                            result = "${Mdiff}분 남음"
+                        }
+                    }
+
+                }else {
+                    result = "기한 만료"
+                }
+
             } else {
-                result = "다르네요"
+                // 현재보다 date2_list의 값이 큰지 작은지 대소 구분 필요.
+                result = "날짜가 다르네요"
                 // DateValue.toString() + date2_list[position]
             }
 
