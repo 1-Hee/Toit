@@ -1,9 +1,11 @@
 package co.kr.toit
 
 import android.app.TimePickerDialog
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.core.util.Pair
 import co.kr.toit.databinding.ActivityToitModifyBinding
 import com.google.android.material.datepicker.CalendarConstraints
@@ -32,6 +34,15 @@ class ToitModifyActivity : AppCompatActivity() {
 
         setSupportActionBar(b.modiToolbar)
         title = ""
+
+
+        // 상태창 색깔 코드로 바꾸기
+        if (Build.VERSION.SDK_INT >= 21) {
+            val window = this.window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            window.statusBarColor = this.resources.getColor(R.color.SecondaryColor) 
+        }
 
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

@@ -12,7 +12,7 @@
         android:id="@+id/main_toolbar"
         style="@style/CustomToolbar"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme" />
@@ -33,9 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:layout_margin="16dp"
+            android:layout_margin="30dp"
             android:clickable="true"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:srcCompat="@drawable/plus_symbol" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

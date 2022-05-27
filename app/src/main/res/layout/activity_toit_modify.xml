@@ -5,14 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#EEF3F9"
     tools:context=".ToitModifyActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/modi_toolbar"
         style="@style/CustomToolbar"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:background="?attr/colorPrimary"
+        android:layout_height="wrap_content"
+        android:background="@color/SecondaryColor"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme" />
 
@@ -209,21 +210,25 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/modi_save_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
+                    android:textColor="@color/white"
                     android:layout_weight="2.5"
+
                     android:text="저장하기" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/modi_close_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white"
                     android:layout_weight="1"
                     android:text="닫기" />
             </LinearLayout>

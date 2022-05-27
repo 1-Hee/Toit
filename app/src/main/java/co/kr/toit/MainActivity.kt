@@ -11,10 +11,7 @@ import co.kr.toit.databinding.ActivityMainBinding
 import co.kr.toit.databinding.MainRecyclerRowBinding
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.Month
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timer
