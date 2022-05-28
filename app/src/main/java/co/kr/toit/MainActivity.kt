@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.IntegerRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +15,8 @@ import co.kr.toit.databinding.ActivityMainBinding
 import co.kr.toit.databinding.MainRecyclerRowBinding
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
@@ -156,7 +159,7 @@ class MainActivity : AppCompatActivity() {
             var FinalText = ""
 
             if(DateValue.equals(date2_list[position])){// 날짜가 같은지 필터링
-                FinalText = CaculateTime(time2_list[position], TimeValue)
+                FinalText = newCalculateTime(time2_list[position], TimeValue)
             } else {
                 FinalText = CalculateDate(date2_list[position], DateValue)
             }
@@ -255,116 +258,68 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun CaculateTime(SavedTime:String, CurrentTime:String):String{
+    fun newCalculateTime(SavedTime: String, CurrentTime: String):String{
+
+        var tempH1 = ""
+        var tempH2 = ""
+        var tempM1 = ""
+        var tempM2 = ""
+        var diffH = 0
+        var diffM = 0
+
+        var addIndx1 = 0
+        var addIndx2 = 0
+
         var result = ""
 
-        // 시간 차이를 담을 변수
-        var Hdiff = 0
-        var Mdiff = 0
+        if(SavedTime[1].equals("후")){ addIndx1 = 12 }
+        if(CurrentTime[1].equals("후")){ addIndx2 = 12 }
 
-        // 시간 값들을 담을 변수
-        var temp1 = ""
-        var temp2 = ""
-        var temp3 = ""
-        var temp4 = ""
-
-        var Judge = true
-
-        if(CurrentTime[1].equals(SavedTime[1])){ // 오전 오후가 같은지
-            if(CurrentTime.length == SavedTime.length){ // 둘의 자릿수가 같은지
-
-                if(CurrentTime.length == 8){
-                    temp1 = SavedTime[3].toString()+SavedTime[4].toString()
-                    temp2 = CurrentTime[3].toString()+CurrentTime[4].toString()
-                    Hdiff = Integer.parseInt(temp1) - Integer.parseInt(temp2)
-
-                    temp3 = SavedTime[6].toString()+SavedTime[7].toString()
-                    temp4 = CurrentTime[6].toString()+CurrentTime[7].toString()
-                    Mdiff = Integer.parseInt(temp3) - Integer.parseInt(temp4)
-
-                }else {
-                    temp1 = SavedTime[3].toString()
-                    temp2 = CurrentTime[3].toString()
-                    Hdiff = Integer.parseInt(temp1) - Integer.parseInt(temp2)
-
-                    temp3 = SavedTime[5].toString()+SavedTime[6].toString()
-                    temp4 = CurrentTime[5].toString()+CurrentTime[6].toString()
-                    Mdiff = Integer.parseInt(temp3) - Integer.parseInt(temp4)
-                }
-
-            }else if(CurrentTime.length>SavedTime.length){
-                Judge = false
-            } else {
-                // time2_list의 값, 즉 sql 값이 크니까 시간이 남은 것으로 시간 계산
-                val temp = SavedTime[3].toString()+SavedTime[4].toString()
-                Hdiff = Integer.parseInt(temp)-Integer.parseInt(CurrentTime[3].toString())
-
-                temp3 = SavedTime[6].toString()+SavedTime[7].toString()
-                temp4 = CurrentTime[5].toString()+CurrentTime[6].toString()
-                Mdiff = Integer.parseInt(temp3) - Integer.parseInt(temp4)
-            }
-
-        } else{
-            if(CurrentTime[1].toString().equals("후")){
-                // 여기서는 현재시간 : 오후 vs 저장시간 : 오전 / 현재시간 : 오전 vs 저장시간 : 오후
-                // 두 가지 경우의 수만 들어오는데 전자는 시간 오버임 (날짜도 같으므로)
-                Judge = false
-            }else {
-                // 현재시간 오전 vs 저장시간 후
-                if(CurrentTime.length == SavedTime.length){
-                    if(CurrentTime.length==8){
-
-                    }else {
-                        temp1 = SavedTime[3].toString()+SavedTime[4].toString()
-                        temp2 = CurrentTime[3].toString()+CurrentTime[4].toString()
-                        Hdiff = Integer.parseInt(temp1)-Integer.parseInt(temp2)+12
-
-                        temp3 = SavedTime[6].toString()+SavedTime[7].toString()
-                        temp4 = CurrentTime[6].toString()+CurrentTime[7].toString()
-                        Mdiff = Integer.parseInt(temp3)-Integer.parseInt(temp4)
-                    }
-
-                }else if (CurrentTime.length > SavedTime.length){
-                    temp1 = SavedTime[3].toString()
-                    temp2 = CurrentTime[3].toString()+CurrentTime[4].toString()
-                    Hdiff = Integer.parseInt(temp1)-Integer.parseInt(temp2)+12
-
-                    temp3 = SavedTime[5].toString()+SavedTime[6].toString()
-                    temp4 = CurrentTime[6].toString()+CurrentTime[7].toString()
-                    Mdiff = Integer.parseInt(temp3)-Integer.parseInt(temp4)
-
-                }else {
-                    temp1 = SavedTime[3].toString()+SavedTime[4].toString()
-                    temp2 = CurrentTime[3].toString()
-                    Hdiff = Integer.parseInt(temp1)-Integer.parseInt(temp2)+12
-
-                    temp3 = SavedTime[6].toString()+SavedTime[7].toString()
-                    temp4 = CurrentTime[5].toString()+CurrentTime[6].toString()
-                    Mdiff = Integer.parseInt(temp3)-Integer.parseInt(temp4)
-                }
-            }
-        }
-        if(Judge){
-            if(Hdiff>0 && Mdiff < 0){
-                Mdiff += 60
-                Hdiff -= 1
-            }
-            if(Mdiff<0){
-                result = "기한 만료"
-                StarIdx = 0.0f
-
-            }else {
-                StarIdx = 0.5f
-                if(Hdiff>0){
-                    result = "${Hdiff}시간 ${Mdiff}분"
-                }else {
-                    result = "${Mdiff}분 남음"
-                }
-            }
-
+        if(SavedTime.length==8){
+            tempH1 = SavedTime[3].toString() + SavedTime[4].toString()
+            tempM1 = SavedTime[6].toString() + SavedTime[7].toString()
         }else {
+            tempH1 = "0"+SavedTime[3].toString()
+            tempM1 = SavedTime[5].toString() + SavedTime[6].toString()
+        }
+
+        if(CurrentTime.length==8){
+            tempH2 = CurrentTime[3].toString() + CurrentTime[4].toString()
+            tempM2 = CurrentTime[6].toString() + CurrentTime[7].toString()
+        }else {
+            tempH2 = "0"+CurrentTime[3].toString()
+            tempM2 = CurrentTime[5].toString() + CurrentTime[6].toString()
+        }
+
+        if(addIndx1>0){
+            val temp = Integer.parseInt(tempH1)+addIndx1
+            tempH1 = temp.toString()
+        }
+
+        if(addIndx2>0){
+            val temp = Integer.parseInt(tempH2)+addIndx2
+            tempH2 = temp.toString()
+        }
+
+        diffH = Integer.parseInt(tempH1)-Integer.parseInt(tempH2)
+        diffM = Integer.parseInt(tempM1)-Integer.parseInt(tempM2)
+
+        if(diffH>0 && diffM < 0){
+            diffM += 60
+            diffH -= 1
+        }
+
+        if(diffM<0){
             result = "기한 만료"
             StarIdx = 0.0f
+
+        }else {
+            StarIdx = 0.5f
+            if(diffH>0){
+                result = "${diffH}시간 ${diffM}분"
+            }else {
+                result = "${diffM}분 남음"
+            }
         }
 
         return result
