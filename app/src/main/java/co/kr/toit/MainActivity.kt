@@ -9,12 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import co.kr.toit.databinding.ActivityMainBinding
 import co.kr.toit.databinding.FragmentMainBinding
+import com.google.android.material.tabs.TabLayoutMediator
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -25,64 +28,39 @@ import kotlin.concurrent.timer
 class MainActivity : AppCompatActivity() {
 
     lateinit var b : ActivityMainBinding
-    private var TimerTask : Timer? = null
 
     val fg1 = MainFragment()
     val fg2 = SecondFragment()
     val fg3 = ThirdFragment()
-    var restart = true;
+    val fragment_list = arrayOf(fg1, fg2, fg3)
+    val fragment_title = arrayOf("일일 스케줄", "월간 스케줄", "나의 통계")
 
-    var position = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        Log.d("test_app", "OnCreate")
-
         setSupportActionBar(b.mainToolbar)
-        title = ""
+        title = resources.getString(R.string.app_name)
 
-        b.mainFragBtn.setOnClickListener {
+        val viewPagerAdapter = object : FragmentStateAdapter(this){
+            override fun getItemCount(): Int {
+                return fragment_list.size
+            }
 
-            val tran = supportFragmentManager.beginTransaction()
-            tran.replace(R.id.main_frame, fg1)
-            tran.commit()
-            position = 0
+            override fun createFragment(position: Int): Fragment {
+                return fragment_list[position]
+            }
         }
 
-        b.secondFragBtn.setOnClickListener {
-            val tran = supportFragmentManager.beginTransaction()
-            tran.replace(R.id.main_frame, fg2)
-            tran.commit()
-            position = 1
-        }
+        b.mainContainer.adapter = viewPagerAdapter
 
-        b.thirdFragBtn.setOnClickListener {
-            val tran = supportFragmentManager.beginTransaction()
-            tran.replace(R.id.main_frame, fg3)
-            tran.commit()
-            position = 2
-        }
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val tran = supportFragmentManager.beginTransaction()
-        tran.replace(R.id.main_frame, fg1)
-        tran.commit()
-        position = 0
+        TabLayoutMediator(b.mainTab, b.mainContainer) { tab, position ->
+            tab.text = fragment_title[position]
+        }.attach()
 
 
-        Log.d("test_app", "OnResume")
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Log.d("test_app", "OnRestart")
     }
 
     override fun onStop() {

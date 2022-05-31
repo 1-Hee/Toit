@@ -17,42 +17,31 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme" />
 
-    <LinearLayout
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/main_tab"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/main_frag_btn"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:text="홈메인" />
+            android:text="Monday" />
 
-        <Button
-            android:id="@+id/second_frag_btn"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:text="두번째" />
+            android:text="Tuesday" />
 
-        <Button
-            android:id="@+id/third_frag_btn"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="세번째" />
-    </LinearLayout>
+            android:text="Wednesday" />
+    </com.google.android.material.tabs.TabLayout>
 
-    <FrameLayout
-        android:id="@+id/main_frame"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/main_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/container"

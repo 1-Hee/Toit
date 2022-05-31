@@ -57,8 +57,8 @@ class MainFragment : Fragment() {
 
 
         fb1.setOnClickListener {
-            val memo_add_intent = Intent(mainActivity, ToitAddActivity::class.java)
-            startActivity(memo_add_intent)
+            val Add_intent = Intent(mainActivity, ToitAddActivity::class.java)
+            startActivity(Add_intent)
         }
 
         fb1.setOnLongClickListener {
@@ -114,10 +114,6 @@ class MainFragment : Fragment() {
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-
-    }
 
     inner class MainFragmentRecyclerAdapter : RecyclerView.Adapter<MainFragmentRecyclerAdapter.ViewHolderClass>(){
 
