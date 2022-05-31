@@ -1,6 +1,7 @@
 package co.kr.toit
 
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,6 +19,7 @@ import java.util.*
 class ToitModifyActivity : AppCompatActivity() {
 
     lateinit var b : ActivityToitModifyBinding
+    val fg1 = MainFragment()
 
     var myTimer : Calendar = Calendar.getInstance()
     val myTimePicker = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
@@ -48,6 +50,7 @@ class ToitModifyActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         b.modiCloseBtn.setOnClickListener {
+            reload()
             finish()
         }
 
@@ -133,9 +136,16 @@ class ToitModifyActivity : AppCompatActivity() {
             helper.writableDatabase.execSQL(sql, arg1)
             helper.writableDatabase.close()
 
+            reload()
             finish()
+
         }
 
+    }
+
+    private fun reload() {
+        val mainActivity = Intent(this, MainActivity::class.java)
+        startActivity(mainActivity)
     }
 
     fun showDateRangePicker() {
@@ -183,6 +193,7 @@ class ToitModifyActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
+                reload()
                 finish()
             }
         }

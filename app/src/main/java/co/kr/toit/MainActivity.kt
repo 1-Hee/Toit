@@ -4,6 +4,7 @@ import android.content.Intent
 import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     val fg1 = MainFragment()
     val fg2 = SecondFragment()
     val fg3 = ThirdFragment()
+    var restart = true;
 
     var position = 0
 
@@ -37,10 +39,13 @@ class MainActivity : AppCompatActivity() {
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+        Log.d("test_app", "OnCreate")
+
         setSupportActionBar(b.mainToolbar)
         title = ""
 
         b.mainFragBtn.setOnClickListener {
+
             val tran = supportFragmentManager.beginTransaction()
             tran.replace(R.id.main_frame, fg1)
             tran.commit()
@@ -61,23 +66,30 @@ class MainActivity : AppCompatActivity() {
             position = 2
         }
 
-        // 타이머 있던 곳,
-        // 타이머는 없애야 할듯, 타이머 작동하는 동안에
-        // 프래그먼트의 재구성이 전혀 안되서 버벅거리는 듯하고, 업데이트가 안됨 (나중에 시간지나서 되긴 하는데 너무 느림)
-
-
-        // 문제점
-        // 현재 시스템의 흐름
-        // 메인 액티비티 -> 프래그먼트1 -> 서브 액티비티 -> 메인 액티비티
-
-
     }
 
     override fun onResume() {
         super.onResume()
+
         val tran = supportFragmentManager.beginTransaction()
         tran.replace(R.id.main_frame, fg1)
         tran.commit()
+        position = 0
+
+
+        Log.d("test_app", "OnResume")
     }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d("test_app", "OnRestart")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("test_app", "OnStop")
+        finish()
+    }
+
 
 }

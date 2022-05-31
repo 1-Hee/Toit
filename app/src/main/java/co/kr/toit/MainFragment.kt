@@ -2,6 +2,7 @@ package co.kr.toit
 
 import android.content.Context
 import android.content.Intent
+import android.icu.number.IntegerWidth
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -72,12 +73,6 @@ class MainFragment : Fragment() {
             return@setOnLongClickListener (true)
         }
 
-        return view
-    }
-
-    override fun onResume() {
-        super.onResume()
-
         subject_list.clear()
         idx_list.clear()
         date2_list.clear()
@@ -115,6 +110,13 @@ class MainFragment : Fragment() {
 
             fragmentMainBinding.mainFragRecycler.adapter?.notifyDataSetChanged()
         }
+
+        return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+
     }
 
     inner class MainFragmentRecyclerAdapter : RecyclerView.Adapter<MainFragmentRecyclerAdapter.ViewHolderClass>(){
@@ -148,7 +150,7 @@ class MainFragment : Fragment() {
 
             var FinalText = ""
 
-            if(DateValue.equals(date2_list[position])){// 날짜가 같은지 필터링
+            if(DateValue == date2_list[position]){// 날짜가 같은지 필터링
                 FinalText = newCalculateTime(time2_list[position], TimeValue)
             } else {
                 FinalText = CalculateDate(date2_list[position], DateValue)
@@ -255,15 +257,10 @@ class MainFragment : Fragment() {
         var diffH = 0
         var diffM = 0
 
-        var addIndx1 = 0
-        var addIndx2 = 0
-
         var result = ""
-        val judge = "후"
+        StarIdx = 1.0f
 
-        if(SavedTime[1].toString().equals(judge)){ addIndx1 = 12 }
-        if(CurrentTime[1].toString().equals(judge)){ addIndx2 = 12 }
-
+        // 가져온 시간을 먼저 숫자로 변환 변환
         if(SavedTime.length==8){
             tempH1 = SavedTime[3].toString() + SavedTime[4].toString()
             tempM1 = SavedTime[6].toString() + SavedTime[7].toString()
@@ -280,55 +277,40 @@ class MainFragment : Fragment() {
             tempM2 = CurrentTime[5].toString() + CurrentTime[6].toString()
         }
 
-        if(addIndx1>0){
-            val temp = Integer.parseInt(tempH1)+addIndx1
-            tempH1 = temp.toString()
+        if(SavedTime[1].equals("후")&&!tempH1[1].equals("2")){
+            tempH1 = (Integer.parseInt(tempH1)+12).toString()
         }
 
-        if(addIndx2>0){
-            val temp = Integer.parseInt(tempH2)+addIndx2
-            tempH2 = temp.toString()
+        if(CurrentTime[1].equals("후")&&!tempH2[1].equals("2")){
+            tempH2 = (Integer.parseInt(tempH2)+12).toString()
         }
 
         diffH = Integer.parseInt(tempH1)-Integer.parseInt(tempH2)
         diffM = Integer.parseInt(tempM1)-Integer.parseInt(tempM2)
 
-        if(diffH>0 && diffM < 0){
-            diffM += 60
-            diffH -= 1
-
-            if(diffM<=0){
-                result = "기한 만료"
-                StarIdx = 0.0f
-
-            }else {
-                StarIdx = 0.5f
-                if(diffH>0){
-                    result = "${diffH}시간 ${diffM}분"
-                }else {
-                    result = "${diffM}분 남음"
-                }
+        if(diffH>=0){
+            if(diffM<0) {
+                diffM += 60
+                diffH -= 1
             }
 
-        } else {
-
-            if(diffM<=0){
-                result = "기한 만료"
-                StarIdx = 0.0f
-
-            }else {
-                StarIdx = 0.5f
-                if(diffH>0){
+            if(diffH>=0){
+                if(diffH!=0){
                     result = "${diffH}시간 ${diffM}분"
-                }else {
+                } else {
                     result = "${diffM}분 남음"
                 }
+
+            } else {
+                result = "기한 만료"
+                StarIdx = 0.0f
             }
 
+        }else {
+            result = "기한 만료"
+            StarIdx = 0.0f
         }
-
 
         return result
     }
-
 }
