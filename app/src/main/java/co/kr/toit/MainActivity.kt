@@ -32,8 +32,9 @@ class MainActivity : AppCompatActivity() {
     val fg1 = MainFragment()
     val fg2 = SecondFragment()
     val fg3 = ThirdFragment()
-    val fragment_list = arrayOf(fg1, fg2, fg3)
-    val fragment_title = arrayOf("일일 스케줄", "월간 스케줄", "나의 통계")
+    val fg4 = FourthFragment()
+    val fragment_list = arrayOf(fg1, fg2, fg3, fg4)
+    val fragment_title = arrayOf("일일 스케줄", "주간 스케줄", "월간 스케줄", "나의 통계")
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
