@@ -108,6 +108,8 @@ class MainFragment : Fragment() {
             date2_list.add(rec_date2)
             time2_list.add(rec_time2)
 
+            helper.writableDatabase.close()
+
             fragmentMainBinding.mainFragRecycler.adapter?.notifyDataSetChanged()
         }
 

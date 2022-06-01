@@ -39,6 +39,7 @@ class ToitAddActivity : AppCompatActivity() {
         TimeDateInit()
 
         b.addCloseBtn.setOnClickListener {
+            reload()
             finish()
         }
 
@@ -82,11 +83,14 @@ class ToitAddActivity : AppCompatActivity() {
             // 저장
             helper.writableDatabase.execSQL(sql, arg1)
             helper.writableDatabase.close()
-
+            reload()
             finish()
         }
+    }
 
-
+    private fun reload() {
+        val mainActivity = Intent(this, MainActivity::class.java)
+        startActivity(mainActivity)
     }
 
     fun ShowDiallog(){
@@ -151,6 +155,7 @@ class ToitAddActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
+                reload()
                 finish()
             }
         }

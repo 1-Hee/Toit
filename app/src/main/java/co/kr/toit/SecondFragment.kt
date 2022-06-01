@@ -21,6 +21,10 @@ class SecondFragment :Fragment() {
         1,2,3,4,5,6,7
     )
 
+    val subject_list = ArrayList<String>()
+    val idx_list = ArrayList<Int>()
+    val date2_list = ArrayList<String>()
+
 
 
     lateinit var mainActivity: MainActivity
@@ -32,6 +36,7 @@ class SecondFragment :Fragment() {
         mainActivity = context as MainActivity
         fragmentSecondBinding = FragmentSecondBinding.inflate(layoutInflater)
 
+
     }
 
     override fun onCreateView(
@@ -40,6 +45,7 @@ class SecondFragment :Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        LoadSQLData()
 
         val view = inflater.inflate(R.layout.fragment_second, null)
         val gr = view.findViewById<GridView>(R.id.second_grid)
@@ -48,9 +54,47 @@ class SecondFragment :Fragment() {
             Toast.makeText(mainActivity, "$i 번째 누름", Toast.LENGTH_SHORT).show()
         }
 
-
-
         return view
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        LoadSQLData()
+
+    }
+
+    private fun LoadSQLData(){
+        //데이터베이스 오픈
+        val helper = DBHelper(mainActivity)
+
+        //쿼리문
+        val sql = """
+            select rec_subject, rec_idx, rec_date2
+            from Recordtable
+            order by rec_idx
+        """.trimIndent()
+
+        val c1 = helper.writableDatabase.rawQuery(sql, null)
+        while (c1.moveToNext()) {
+            // 컬럼 index를 가져온다
+            val idx1 = c1.getColumnIndex("rec_subject")
+            val idx2 = c1.getColumnIndex("rec_idx")
+            val idx3 = c1.getColumnIndex("rec_date2")
+
+            //데이터를 가져온다
+            val rec_subject = c1.getString(idx1)
+            val rec_idx = c1.getInt(idx2)
+            val rec_date2 = c1.getString(idx3)
+
+            // 데이터를 담는다
+            subject_list.add(rec_subject)
+            idx_list.add(rec_idx)
+            date2_list.add(rec_date2)
+
+        }
+
+    }
+
 
 }
