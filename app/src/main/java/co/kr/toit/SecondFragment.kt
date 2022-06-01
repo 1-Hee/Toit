@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import co.kr.toit.databinding.FragmentSecondBinding
 
 
@@ -20,6 +20,7 @@ class SecondFragment :Fragment() {
     private val CountNumberArray = intArrayOf(
         1,2,3,4,5,6,7
     )
+
 
     val subject_list = ArrayList<String>()
     val idx_list = ArrayList<Int>()
@@ -36,7 +37,6 @@ class SecondFragment :Fragment() {
         mainActivity = context as MainActivity
         fragmentSecondBinding = FragmentSecondBinding.inflate(layoutInflater)
 
-
     }
 
     override fun onCreateView(
@@ -45,22 +45,48 @@ class SecondFragment :Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        LoadSQLData()
-
         val view = inflater.inflate(R.layout.fragment_second, null)
         val gr = view.findViewById<GridView>(R.id.second_grid)
         gr.adapter = SecondAdapter(mainActivity, DayNameArray, CountNumberArray)
-        gr.setOnItemClickListener { adapterView, view, i, l ->
-            Toast.makeText(mainActivity, "$i 번째 누름", Toast.LENGTH_SHORT).show()
+
+
+
+        val spinner: Spinner = view.findViewById(R.id.second_spinner)
+        ArrayAdapter.createFromResource(
+            mainActivity,
+            R.array.planets_array,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            spinner.adapter = adapter
         }
+
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                Toast.makeText(mainActivity, "$p2 번째 누름", Toast.LENGTH_SHORT).show()
+
+
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+        }
+
+
 
         return view
     }
+
 
     override fun onResume() {
         super.onResume()
 
         LoadSQLData()
+
 
     }
 
