@@ -16,16 +16,14 @@ class ThirdFragment: Fragment() {
     lateinit var mainActivity: MainActivity
     lateinit var fragmentThirdBinding: FragmentThirdBinding
 
-    private var Images = intArrayOf(R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,
-        R.drawable.a5,R.drawable.a6,R.drawable.a7,
-        R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,
-        R.drawable.a5,R.drawable.a6,R.drawable.a7,
-        R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,
-        R.drawable.a5,R.drawable.a6,R.drawable.a7,
-        R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,
-        R.drawable.a5,R.drawable.a6,R.drawable.a7,
-        R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,
-        R.drawable.a5,R.drawable.a6,R.drawable.a7)
+    private val CountDailyArray = intArrayOf(
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7
+    )
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -41,7 +39,7 @@ class ThirdFragment: Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_third, null)
         val gr = view.findViewById<GridView>(R.id.third_grid)
-        gr.adapter = SecondAdapter(mainActivity, Images)
+        gr.adapter = ThirdAdapter(mainActivity, CountDailyArray)
         gr.setOnItemClickListener { adapterView, view, i, l ->
             Toast.makeText(mainActivity, "$i 번째 누름", Toast.LENGTH_SHORT).show()
         }
