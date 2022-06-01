@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     val fg4 = FourthFragment()
     val fragment_list = arrayOf(fg1, fg2, fg3, fg4)
     val fragment_title = arrayOf("일일 스케줄", "주간 스케줄", "월간 스케줄", "나의 통계")
+    private var Images = intArrayOf(R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,
+        R.drawable.a5,R.drawable.a6,R.drawable.a7)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
