@@ -282,16 +282,16 @@ class MainFragment : Fragment() {
         }
 
         if(diffH<0){
+            StarIdx = 0.0f
             return "시간 초과"
         }else {
+            StarIdx = 0.5f
             if(diffH>0){
                 return "${diffH}시간 ${diffM}분"
             }else {
                 return "${diffM}분 남음"
             }
         }
-
-        StarIdx = 0.5f
 
     }
 }

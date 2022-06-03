@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import co.kr.toit.databinding.FragmentSecondBinding
+import java.time.LocalDate
+import java.time.temporal.WeekFields
+import java.util.*
 
 
 class SecondFragment :Fragment() {
@@ -34,6 +36,10 @@ class SecondFragment :Fragment() {
     val idx_list = ArrayList<Int>()
     val date2_list = ArrayList<String>()
 
+    // 현재시간을 구함.
+    val CurrentDate : LocalDate = LocalDate.now()
+    val weekFields: WeekFields = WeekFields.of(Locale.getDefault())
+    val weekNumber: Int = CurrentDate.get(weekFields.weekOfWeekBasedYear())
 
 
     lateinit var mainActivity: MainActivity
@@ -78,19 +84,14 @@ class SecondFragment :Fragment() {
                         gr.numColumns = 7
                         gr.adapter = ThirdAdapter(mainActivity, CountDailyArray)
                     }
-
                 }
-
-
-
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
             }
-
         }
 
+        view.findViewById<TextView>(R.id.textView2).text = weekNumber.toString()
 
         return view
     }
@@ -104,7 +105,6 @@ class SecondFragment :Fragment() {
     }
 
     private fun LoadSQLData(){
-
 
     }
 
