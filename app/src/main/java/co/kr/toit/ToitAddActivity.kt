@@ -10,7 +10,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class ToitAddActivity : AppCompatActivity() {
     lateinit var b: ActivityToitAddBinding
 
@@ -32,7 +31,7 @@ class ToitAddActivity : AppCompatActivity() {
 
 
         setSupportActionBar(b.addToolbar)
-        title = ""
+        title = "메인 프로젝트 추가"
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -40,7 +39,6 @@ class ToitAddActivity : AppCompatActivity() {
 
         b.addCloseBtn.setOnClickListener {
             reload()
-            finish()
         }
 
         b.addInputDate1.setOnClickListener { showDateRangePicker() }
@@ -57,14 +55,14 @@ class ToitAddActivity : AppCompatActivity() {
         }
 
         b.addSaveBtn.setOnClickListener {
-            val sdf3 = SimpleDateFormat("yyyy년 MM월 dd일 h:mm a", Locale.getDefault())
+            val sdf3 = SimpleDateFormat("yyyy년 MM월 dd일 a h:mm ", Locale.getDefault())
 
             // 쿼리문
             val sql = """
-                    insert into Recordtable 
-                    (rec_subject, rec_curr, rec_date1, rec_date2, 
-                    rec_time1, rec_time2, rec_impo_stars, rec_urg_stars, rec_memo)
-                    values(?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    insert into MainTaskTable
+                    (main_task, main_edit_date, main_start_date, 
+                    main_start_time, main_end_date, main_end_time) 
+                    values(?, ?, ?, ?, ? ,?)
                 """.trimIndent()
 
             // 데이터베이스 오픈
@@ -72,25 +70,22 @@ class ToitAddActivity : AppCompatActivity() {
 
             // ? 에 설정될 값
             val arg1 = arrayOf(
-                b.addInputSubject.text, sdf3.format(Date()),
-                b.addInputDate1.text, b.addInputDate2.text,
-                b.addInputTime1.text, b.addInputTime2.text,
-                b.addRatingBar1.rating, b.addRatingBar2.rating,
-                b.addInputMemo.text
-            )
-
+                b.addMainTaskInputText.text.toString(), sdf3.format(Date()),
+                b.addInputDate1.text, b.addInputTime1.text, b.addInputDate2.text,
+                b.addInputTime2.text)
 
             // 저장
             helper.writableDatabase.execSQL(sql, arg1)
             helper.writableDatabase.close()
+
             reload()
-            finish()
         }
     }
 
     private fun reload() {
         val mainActivity = Intent(this, MainActivity::class.java)
         startActivity(mainActivity)
+        finish()
     }
 
     fun ShowDiallog(){
@@ -120,7 +115,7 @@ class ToitAddActivity : AppCompatActivity() {
 
     fun updateTime() {
         val myFormat = "a h:mm" // 출력형식  00:00 PM
-        val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
+        val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
         if(TimerSwitch){
             b.addInputTime1.setText(sdf.format(myTimer.time))
         } else {

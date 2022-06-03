@@ -34,7 +34,7 @@
                 android:padding="20dp">
 
                 <TextView
-                    android:id="@+id/add_text1"
+                    android:id="@+id/add_main_task_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
@@ -44,7 +44,7 @@
                     android:textSize="24sp" />
 
                 <EditText
-                    android:id="@+id/add_input_subject"
+                    android:id="@+id/add_main_task_input_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
@@ -61,7 +61,7 @@
                 android:padding="20dp">
 
                 <TextView
-                    android:id="@+id/add_text2"
+                    android:id="@+id/add_main_schedule_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
@@ -141,92 +141,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/add_text3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="10dp"
-                    android:fontFamily="sans-serif"
-                    android:text="중요도"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="24sp" />
-
-                <RatingBar
-                    android:id="@+id/add_ratingBar1"
-                    style="@style/starRatingBar1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:numStars="10"
-                    android:rating="0"
-                    android:stepSize="0.5" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/add_text4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="10dp"
-                    android:fontFamily="sans-serif"
-                    android:text="긴급도"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="24sp" />
-
-                <RatingBar
-                    android:id="@+id/add_ratingBar2"
-                    style="@style/starRatingBar1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:numStars="10"
-                    android:rating="0"
-                    android:stepSize="0.5" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/edit_text5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:fontFamily="sans-serif"
-                    android:text="설명"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="24sp" />
-
-                <EditText
-                    android:id="@+id/add_input_memo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="20dp">
 
@@ -250,9 +164,11 @@
                 android:id="@+id/add_editdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
+                android:padding="10dp"
                 android:textAlignment="viewEnd"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textSize="10sp" />
+
         </LinearLayout>
     </ScrollView>
 

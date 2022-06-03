@@ -1,29 +1,13 @@
 package co.kr.toit
 
-import android.content.Intent
-import android.opengl.Visibility
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import co.kr.toit.databinding.ActivityMainBinding
-import co.kr.toit.databinding.FragmentMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.concurrent.timer
 
 class MainActivity : AppCompatActivity() {
 

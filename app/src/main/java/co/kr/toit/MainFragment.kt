@@ -2,7 +2,6 @@ package co.kr.toit
 
 import android.content.Context
 import android.content.Intent
-import android.icu.number.IntegerWidth
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,8 @@ import co.kr.toit.databinding.MainRecyclerRowBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,8 +24,8 @@ class MainFragment : Fragment() {
 
     val subject_list = ArrayList<String>()
     val idx_list = ArrayList<Int>()
-    val date2_list = ArrayList<String>()
-    val time2_list = ArrayList<String>()
+    val date_list = ArrayList<String>()
+    val time_list = ArrayList<String>()
     var StarIdx = 0.0f
     var vis = false
 
@@ -75,38 +76,39 @@ class MainFragment : Fragment() {
 
         subject_list.clear()
         idx_list.clear()
-        date2_list.clear()
-        time2_list.clear()
+        date_list.clear()
+        time_list.clear()
 
         //데이터베이스 오픈
         val helper = DBHelper(mainActivity)
 
         //쿼리문
         val sql = """
-            select rec_subject, rec_idx, rec_date2, rec_time2
-            from Recordtable
-            order by rec_idx desc
+            select main_task, main_idx, main_end_date, main_end_time
+            from MainTaskTable
+            order by main_idx desc
         """.trimIndent()
 
         val c1 = helper.writableDatabase.rawQuery(sql, null)
+
         while (c1.moveToNext()) {
             // 컬럼 index를 가져온다
-            val idx1 = c1.getColumnIndex("rec_subject")
-            val idx2 = c1.getColumnIndex("rec_idx")
-            val idx3 = c1.getColumnIndex("rec_date2")
-            val idx4 = c1.getColumnIndex("rec_time2")
+            val idx1 = c1.getColumnIndex("main_task")
+            val idx2 = c1.getColumnIndex("main_idx")
+            val idx3 = c1.getColumnIndex("main_end_date")
+            val idx4 = c1.getColumnIndex("main_end_time")
 
             //데이터를 가져온다
-            val rec_subject = c1.getString(idx1)
-            val rec_idx = c1.getInt(idx2)
-            val rec_date2 = c1.getString(idx3)
-            val rec_time2 = c1.getString(idx4)
+            val main_task = c1.getString(idx1)
+            val main_idx = c1.getInt(idx2)
+            val end_date = c1.getString(idx3)
+            val end_time = c1.getString(idx4)
 
             // 데이터를 담는다
-            subject_list.add(rec_subject)
-            idx_list.add(rec_idx)
-            date2_list.add(rec_date2)
-            time2_list.add(rec_time2)
+            subject_list.add(main_task)
+            idx_list.add(main_idx)
+            date_list.add(end_date)
+            time_list.add(end_time)
 
             helper.writableDatabase.close()
 
@@ -114,6 +116,12 @@ class MainFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+
     }
 
 
@@ -148,10 +156,10 @@ class MainFragment : Fragment() {
 
             var FinalText = ""
 
-            if(DateValue == date2_list[position]){// 날짜가 같은지 필터링
-                FinalText = newCalculateTime(time2_list[position], TimeValue)
+            if(DateValue == date_list[position]){// 날짜가 같은지 필터링
+                FinalText = newCalculateTime(time_list[position], TimeValue)
             } else {
-                FinalText = CalculateDate(date2_list[position], DateValue)
+                FinalText = CalculateDate(date_list[position], DateValue)
             }
 
             holder.fragTimer.text = FinalText
@@ -179,11 +187,11 @@ class MainFragment : Fragment() {
 
             override fun onClick(p0: View?) {
 
-                val rec_idx = idx_list[adapterPosition]
+                val main_idx = idx_list[adapterPosition]
 
-                val memoModifyActivity = Intent(mainActivity.baseContext, ToitModifyActivity::class.java)
-                memoModifyActivity.putExtra("rec_idx", rec_idx)
-                startActivity(memoModifyActivity)
+                val toitModifyActivity = Intent(mainActivity.baseContext, ToitModifyActivity::class.java)
+                toitModifyActivity.putExtra("main_idx", main_idx)
+                startActivity(toitModifyActivity)
             }
         }
 
@@ -191,33 +199,17 @@ class MainFragment : Fragment() {
 
     fun CalculateDate(SavedDate:String, CurrentDate:String):String{
 
-        var tempY1 = ""
-        var tempY2 = ""
-        var tempM1 = ""
-        var tempM2 = ""
-        var tempD1 = ""
-        var tempD2 = ""
         var result = ""
 
-        //date2_list
-        tempY1 = SavedDate[0].toString()+SavedDate[1].toString()+
-                SavedDate[2].toString()+SavedDate[3].toString()
-        tempY2 = CurrentDate[0].toString() + CurrentDate[1].toString() +
-                CurrentDate[2].toString()+CurrentDate[3].toString()
+        val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
+        val date1 = LocalDate.parse(SavedDate, formatter)
+        val date2 = LocalDate.parse(CurrentDate, formatter)
 
-        tempM1 = SavedDate[6].toString()+SavedDate[7].toString()
-        tempM2 = CurrentDate[6].toString() + CurrentDate[7].toString()
 
-        tempD1 = SavedDate[10].toString()+SavedDate[11].toString()
-        tempD2 = CurrentDate[10].toString() + CurrentDate[11].toString()
+        val RawM = date2.until(date1, ChronoUnit.MONTHS)
+        val RawD = date2.until(date1, ChronoUnit.DAYS)
+        val diffY = date2.until(date1, ChronoUnit.YEARS)
 
-        val dateParse1 = LocalDate.parse(tempY1+"-"+tempM1+"-"+tempD1)
-        val dateParse2 = LocalDate.parse(tempY2+"-"+tempM2+"-"+tempD2)
-
-        val RawM = dateParse2.until(dateParse1, ChronoUnit.MONTHS)
-        val RawD = dateParse2.until(dateParse1, ChronoUnit.DAYS)
-
-        val diffY = dateParse2.until(dateParse1, ChronoUnit.YEARS)
         val diffM = RawM%12
         val diffD = RawD%365
 
@@ -246,69 +238,60 @@ class MainFragment : Fragment() {
 
     }
 
+
     fun newCalculateTime(SavedTime: String, CurrentTime: String):String{
 
-        var tempH1 = ""
-        var tempH2 = ""
-        var tempM1 = ""
-        var tempM2 = ""
-        var diffH = 0
-        var diffM = 0
+        val SavedTimeArr = SavedTime.split(' ')
+        val CurrentTimeArr = CurrentTime.split(' ')
 
-        var result = ""
-        StarIdx = 1.0f
+        val trans1 = LocalTime.parse(SavedTimeArr[1])
+        val trans2 = LocalTime.parse(CurrentTimeArr[1])
 
-        // 가져온 시간을 먼저 숫자로 변환 변환
-        if(SavedTime.length==8){
-            tempH1 = SavedTime[3].toString() + SavedTime[4].toString()
-            tempM1 = SavedTime[6].toString() + SavedTime[7].toString()
-        }else {
-            tempH1 = "0"+SavedTime[3].toString()
-            tempM1 = SavedTime[5].toString() + SavedTime[6].toString()
-        }
+        var SavedHour = trans1.hour
+        val SavedMin = trans1.minute
 
-        if(CurrentTime.length==8){
-            tempH2 = CurrentTime[3].toString() + CurrentTime[4].toString()
-            tempM2 = CurrentTime[6].toString() + CurrentTime[7].toString()
-        }else {
-            tempH2 = "0"+CurrentTime[3].toString()
-            tempM2 = CurrentTime[5].toString() + CurrentTime[6].toString()
-        }
+        var CurrentHour = trans2.hour
+        val CurrentMin = trans2.minute
 
-        if(SavedTime[1].equals("후")&&!tempH1[1].equals("2")){
-            tempH1 = (Integer.parseInt(tempH1)+12).toString()
-        }
-
-        if(CurrentTime[1].equals("후")&&!tempH2[1].equals("2")){
-            tempH2 = (Integer.parseInt(tempH2)+12).toString()
-        }
-
-        diffH = Integer.parseInt(tempH1)-Integer.parseInt(tempH2)
-        diffM = Integer.parseInt(tempM1)-Integer.parseInt(tempM2)
-
-        if(diffH>=0){
-            if(diffM<0) {
-                diffM += 60
-                diffH -= 1
+        if(SavedTimeArr[0]=="오전"){
+            if(SavedHour==12){
+                SavedHour = 0
             }
-
-            if(diffH>=0){
-                if(diffH!=0){
-                    result = "${diffH}시간 ${diffM}분"
-                } else {
-                    result = "${diffM}분 남음"
-                }
-
-            } else {
-                result = "기한 만료"
-                StarIdx = 0.0f
+        }else{
+            if(SavedHour!=12){
+                SavedHour+=12
             }
-
-        }else {
-            result = "기한 만료"
-            StarIdx = 0.0f
         }
 
-        return result
+        if(CurrentTimeArr[0]=="오전"){
+            if(CurrentHour==12){
+                CurrentHour = 0
+            }
+        }else{
+            if(CurrentHour!=12){
+                CurrentHour+=12
+            }
+        }
+
+        var diffH = SavedHour-CurrentHour
+        var diffM = SavedMin - CurrentMin
+
+        if(diffM<0){
+            diffH-=1
+            diffM+=60
+        }
+
+        if(diffH<0){
+            return "시간 초과"
+        }else {
+            if(diffH>0){
+                return "${diffH}시간 ${diffM}분"
+            }else {
+                return "${diffM}분 남음"
+            }
+        }
+
+        StarIdx = 0.5f
+
     }
 }

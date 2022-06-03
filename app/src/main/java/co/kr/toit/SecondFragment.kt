@@ -21,6 +21,14 @@ class SecondFragment :Fragment() {
         1,2,3,4,5,6,7
     )
 
+    private val CountDailyArray = intArrayOf(
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7,
+        1,2,3,4,5,6,7
+    )
+
 
     val subject_list = ArrayList<String>()
     val idx_list = ArrayList<Int>()
@@ -47,14 +55,11 @@ class SecondFragment :Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_second, null)
         val gr = view.findViewById<GridView>(R.id.second_grid)
-        gr.adapter = SecondAdapter(mainActivity, DayNameArray, CountNumberArray)
-
-
 
         val spinner: Spinner = view.findViewById(R.id.second_spinner)
         ArrayAdapter.createFromResource(
             mainActivity,
-            R.array.planets_array,
+            R.array.SecondSpinner,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
             // Specify the layout to use when the list of choices appears
@@ -62,20 +67,29 @@ class SecondFragment :Fragment() {
             // Apply the adapter to the spinner
             spinner.adapter = adapter
         }
-
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                Toast.makeText(mainActivity, "$p2 번째 누름", Toast.LENGTH_SHORT).show()
+                when(p2){
+                    0 -> {
+                        gr.numColumns = 1
+                        gr.adapter = SecondAdapter(mainActivity, DayNameArray, CountNumberArray)
+                    }
+                    1 -> {
+                        gr.numColumns = 7
+                        gr.adapter = ThirdAdapter(mainActivity, CountDailyArray)
+                    }
+
+                }
+
 
 
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
-
+                TODO("Not yet implemented")
             }
-        }
 
+        }
 
 
         return view
@@ -87,38 +101,10 @@ class SecondFragment :Fragment() {
 
         LoadSQLData()
 
-
     }
 
     private fun LoadSQLData(){
-        //데이터베이스 오픈
-        val helper = DBHelper(mainActivity)
 
-        //쿼리문
-        val sql = """
-            select rec_subject, rec_idx, rec_date2
-            from Recordtable
-            order by rec_idx
-        """.trimIndent()
-
-        val c1 = helper.writableDatabase.rawQuery(sql, null)
-        while (c1.moveToNext()) {
-            // 컬럼 index를 가져온다
-            val idx1 = c1.getColumnIndex("rec_subject")
-            val idx2 = c1.getColumnIndex("rec_idx")
-            val idx3 = c1.getColumnIndex("rec_date2")
-
-            //데이터를 가져온다
-            val rec_subject = c1.getString(idx1)
-            val rec_idx = c1.getInt(idx2)
-            val rec_date2 = c1.getString(idx3)
-
-            // 데이터를 담는다
-            subject_list.add(rec_subject)
-            idx_list.add(rec_idx)
-            date2_list.add(rec_date2)
-
-        }
 
     }
 

@@ -34,7 +34,7 @@
                 android:padding="20dp">
 
                 <TextView
-                    android:id="@+id/modi_text1"
+                    android:id="@+id/modi_main_task_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
@@ -42,7 +42,7 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
                 <EditText
-                    android:id="@+id/modi_input_text"
+                    android:id="@+id/modi_main_task_input_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
@@ -58,7 +58,7 @@
                 android:padding="20dp">
 
                 <TextView
-                    android:id="@+id/modi_text2"
+                    android:id="@+id/modi_main_schedule_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="일정"
@@ -129,83 +129,7 @@
                 </LinearLayout>
 
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/modi_text4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="10dp"
-                    android:text="긴급도"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="24sp" />
-
-                <RatingBar
-                    android:id="@+id/modi_ratingBar2"
-                    style="@style/starRatingBar1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:numStars="10"
-                    android:rating="0"
-                    android:stepSize="0.5" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/modi_text3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="10dp"
-                    android:text="중요도"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="24sp" />
-
-                <RatingBar
-                    android:id="@+id/modi_ratingBar1"
-                    style="@style/starRatingBar1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:numStars="10"
-                    android:rating="0"
-                    android:stepSize="0.5" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:id="@+id/modi_text5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:text="설명"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-                <EditText
-                    android:id="@+id/modi_memo"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:ems="10"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine" />
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

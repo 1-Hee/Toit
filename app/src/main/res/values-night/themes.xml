@@ -20,11 +20,6 @@
         <item name="android:windowTitleSize">10dp</item>
     </style>
 
-
-    <style name="starRatingBar1" parent="@android:style/Widget.RatingBar">
-        <item name="android:progressDrawable">@drawable/custom_rating_body1</item>
-    </style>
-
     <style name="mainTimer1" parent="@android:style/Widget.RatingBar">
         <item name="android:progressDrawable">@drawable/timer_body1</item>
     </style>

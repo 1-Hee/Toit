@@ -19,7 +19,6 @@ import java.util.*
 class ToitModifyActivity : AppCompatActivity() {
 
     lateinit var b : ActivityToitModifyBinding
-    val fg1 = MainFragment()
 
     var myTimer : Calendar = Calendar.getInstance()
     val myTimePicker = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
@@ -35,7 +34,7 @@ class ToitModifyActivity : AppCompatActivity() {
         setContentView(b.root)
 
         setSupportActionBar(b.modiToolbar)
-        title = ""
+        title = "메모 편집 창"
 
 
         // 상태창 색깔 코드로 바꾸기
@@ -56,48 +55,39 @@ class ToitModifyActivity : AppCompatActivity() {
 
         val helper =DBHelper(this)
         val sql = """
-            select rec_subject, rec_curr, rec_date1, rec_date2, rec_time1, rec_time2,
-            rec_impo_stars, rec_urg_stars, rec_memo
-            from RecordTable
-            where rec_idx=?
+            select main_task, main_edit_date, main_start_date,
+            main_start_time, main_end_date, main_end_time             
+            from MainTaskTable
+            where main_idx=?
         """.trimIndent()
 
-        val rec_idx = intent.getIntExtra("rec_idx", 0)
-        val args = arrayOf(rec_idx.toString())
+        val main_idx = intent.getIntExtra("main_idx", 0)
+        val args = arrayOf(main_idx.toString())
         val c1 = helper.writableDatabase.rawQuery(sql, args)
         c1.moveToNext()
 
-        val idx1 = c1.getColumnIndex("rec_subject")
-        val idx2 = c1.getColumnIndex("rec_curr")
-        val idx3 = c1.getColumnIndex("rec_date1")
-        val idx4 = c1.getColumnIndex("rec_date2")
-        val idx5 = c1.getColumnIndex("rec_time1")
-        val idx6 = c1.getColumnIndex("rec_time2")
-        val idx7 = c1.getColumnIndex("rec_impo_stars")
-        val idx8 = c1.getColumnIndex("rec_urg_stars")
-        val idx9 = c1.getColumnIndex("rec_memo")
-
-        var rec_subject = c1.getString(idx1)
-        val rec_curr = c1.getString(idx2)
-        val rec_date1 = c1.getString(idx3)
-        val rec_date2 = c1.getString(idx4)
-        val rec_time1 = c1.getString(idx5)
-        val rec_time2 = c1.getString(idx6)
-        val rec_impo_stars = c1.getFloat(idx7)
-        val rec_urg_stars = c1.getFloat(idx8)
-        val rec_memo = c1.getString(idx9)
+        val idx1 = c1.getColumnIndex("main_task")
+        val idx2 = c1.getColumnIndex("main_edit_date")
+        val idx3 = c1.getColumnIndex("main_start_date")
+        val idx4 = c1.getColumnIndex("main_start_time")
+        val idx5 = c1.getColumnIndex("main_end_date")
+        val idx6 = c1.getColumnIndex("main_end_time")
 
         helper.writableDatabase.close()
 
-        b.modiInputText.setText(rec_subject)
-        b.modiInputDate1.setText(rec_date1)
-        b.modiInputDate2.setText(rec_date2)
-        b.modiInputTime1.setText(rec_time1)
-        b.modiInputTime2.setText(rec_time2)
-        b.modiRatingBar1.rating = rec_impo_stars
-        b.modiRatingBar2.rating = rec_urg_stars
-        b.modiMemo.setText(rec_memo)
-        b.modiEditdate.text = rec_curr
+        val MainTask = c1.getString(idx1)
+        val EditDate = c1.getString(idx2)
+        val startDate = c1.getString(idx3)
+        val startTime = c1.getString(idx4)
+        val endDate = c1.getString(idx5)
+        val endTime = c1.getString(idx6)
+
+        b.modiMainTaskInputText.setText(MainTask)
+        b.modiEditdate.text = EditDate
+        b.modiInputDate1.setText(startDate)
+        b.modiInputTime1.setText(startTime)
+        b.modiInputDate2.setText(endDate)
+        b.modiInputTime2.setText(endTime)
 
         b.modiInputDate1.setOnClickListener { showDateRangePicker() }
         b.modiInputDate2.setOnClickListener { showDateRangePicker() }
@@ -116,21 +106,19 @@ class ToitModifyActivity : AppCompatActivity() {
 
             val helper = DBHelper(this)
             val sql = """
-                    update RecordTable
-                    set rec_subject = ?, rec_curr = ?, rec_date1 = ?, rec_date2 = ?, 
-                    rec_time1 = ?, rec_time2 = ?, rec_impo_stars = ?, rec_urg_stars= ?, 
-                    rec_memo = ?
-                    where rec_idx = ?
+                    update MainTaskTable
+                    set main_task = ?, main_edit_date = ?, 
+                    main_start_date = ?, main_start_time = ?,
+                    main_end_date = ?, main_end_time = ?
+                    where main_idx = ?
                 """.trimIndent()
 
             val sdf = SimpleDateFormat("yyyy년 MM월 dd일 a h:mm", Locale.getDefault())
-            val rec_curr = sdf.format(Date())
+
             val arg1 = arrayOf(
-                b.modiInputText.text.toString(), rec_curr,
-                b.modiInputDate1.text.toString(), b.modiInputDate2.text.toString(),
-                b.modiInputTime1.text.toString(), b.modiInputTime2.text.toString(),
-                b.modiRatingBar1.rating, b.modiRatingBar2.rating,
-                b.modiMemo.text.toString(), rec_idx.toString()
+                b.modiMainTaskInputText.text.toString(), sdf.format(Date()).toString(),
+                b.modiInputDate1.text, b.modiInputTime1.text,
+                b.modiInputDate2.text, b.modiInputTime2.text, main_idx.toString()
             )
 
             helper.writableDatabase.execSQL(sql, arg1)
@@ -138,7 +126,6 @@ class ToitModifyActivity : AppCompatActivity() {
 
             reload()
             finish()
-
         }
 
     }
@@ -193,7 +180,6 @@ class ToitModifyActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
-                reload()
                 finish()
             }
         }
