@@ -2,15 +2,18 @@ package co.kr.toit
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import co.kr.toit.databinding.FragmentSecondBinding
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class SecondFragment :Fragment() {
@@ -36,17 +39,40 @@ class SecondFragment :Fragment() {
     val idx_list = ArrayList<Int>()
     val date2_list = ArrayList<String>()
 
-    // 현재시간을 구함.
+    // 현재 주차를 구함
     val CurrentDate : LocalDate = LocalDate.now()
     val weekFields: WeekFields = WeekFields.of(Locale.getDefault())
     val weekNumber: Int = CurrentDate.get(weekFields.weekOfWeekBasedYear())
 
+    // 이번주의 날짜들을 담을 배열
+    val testArray = ArrayList<LocalDate>()
+
+    // 현재 주차를 기준으로 일주일 간의 날짜를 구하고 배열에 저장?
 
     lateinit var mainActivity: MainActivity
     lateinit var fragmentSecondBinding: FragmentSecondBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+
+
+        var answer = CurrentDate.get(weekFields.weekOfWeekBasedYear())
+        var current = CurrentDate
+
+        while(answer==weekNumber){
+            val temp = current.minusDays(1)
+            answer = temp.get(weekFields.weekOfWeekBasedYear())
+            if(weekNumber == answer){
+                current = temp
+            }
+        }
+        answer = current.get(weekFields.weekOfWeekBasedYear())
+
+        while(answer==weekNumber){
+            testArray.add(current)
+            current = current.plusDays(1)
+            answer = current.get(weekFields.weekOfWeekBasedYear())
+        }
 
         mainActivity = context as MainActivity
         fragmentSecondBinding = FragmentSecondBinding.inflate(layoutInflater)
@@ -91,8 +117,6 @@ class SecondFragment :Fragment() {
             }
         }
 
-        view.findViewById<TextView>(R.id.textView2).text = weekNumber.toString()
-
         return view
     }
 
@@ -105,6 +129,7 @@ class SecondFragment :Fragment() {
     }
 
     private fun LoadSQLData(){
+
 
     }
 
