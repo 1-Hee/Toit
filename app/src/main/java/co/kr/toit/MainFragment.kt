@@ -151,13 +151,14 @@ class MainFragment : Fragment() {
             val TransDate = Date(long_now)
             val DateFormat1 = SimpleDateFormat("a h:mm", Locale("ko", "KR"))
             val DateFormat2 = SimpleDateFormat("yyyy년 MM월 dd일", Locale("ko", "KR"))
+            // yyyy-mm-dd
             val TimeValue = DateFormat1.format(TransDate).toString()
             val DateValue = DateFormat2.format(TransDate).toString()
 
             var FinalText = ""
 
             if(DateValue == date_list[position]){// 날짜가 같은지 필터링
-                FinalText = newCalculateTime(time_list[position], TimeValue)
+//                FinalText = newCalculateTime(time_list[position], TimeValue)
             } else {
                 FinalText = CalculateDate(date_list[position], DateValue)
             }
@@ -204,7 +205,6 @@ class MainFragment : Fragment() {
         val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
         val date1 = LocalDate.parse(SavedDate, formatter)
         val date2 = LocalDate.parse(CurrentDate, formatter)
-
 
         val RawM = date2.until(date1, ChronoUnit.MONTHS)
         val RawD = date2.until(date1, ChronoUnit.DAYS)

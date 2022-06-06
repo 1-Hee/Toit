@@ -72,7 +72,8 @@ class ToitAddActivity : AppCompatActivity() {
             val arg1 = arrayOf(
                 b.addMainTaskInputText.text.toString(), sdf3.format(Date()),
                 b.addInputDate1.text, b.addInputTime1.text, b.addInputDate2.text,
-                b.addInputTime2.text)
+                b.addInputTime2.text
+            )
 
             // 저장
             helper.writableDatabase.execSQL(sql, arg1)

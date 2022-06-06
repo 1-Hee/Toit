@@ -124,14 +124,9 @@ class SecondFragment :Fragment() {
     override fun onResume() {
         super.onResume()
 
-        LoadSQLData()
 
     }
 
-    private fun LoadSQLData(){
-
-
-    }
 
 
 }
