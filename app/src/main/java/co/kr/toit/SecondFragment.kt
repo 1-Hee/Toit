@@ -1,82 +1,39 @@
 package co.kr.toit
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import android.util.Log
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.fragment.app.Fragment
 import co.kr.toit.databinding.FragmentSecondBinding
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.temporal.WeekFields
+import com.prolificinteractive.materialcalendarview.*
 import java.util.*
-import kotlin.collections.ArrayList
+
+class SecondFragment : Fragment() {
+
+    lateinit var mainActivity : MainActivity
+    lateinit var secondBinding: FragmentSecondBinding
+    lateinit var calendar: MaterialCalendarView
+
+    val date_list = ArrayList<String>()
+    val task_count_list = ArrayList<Int>()
 
 
-class SecondFragment :Fragment() {
-
-    private val DayNameArray = arrayOf(
-        "일", "월", "화", "수", "목", "금", "토"
-    )
-
-    private val CountNumberArray = intArrayOf(
-        1,2,3,4,5,6,7
-    )
-
-    private val CountDailyArray = intArrayOf(
-        1,2,3,4,5,6,7,
-        1,2,3,4,5,6,7,
-        1,2,3,4,5,6,7,
-        1,2,3,4,5,6,7,
-        1,2,3,4,5,6,7
-    )
-
-
-    val subject_list = ArrayList<String>()
-    val idx_list = ArrayList<Int>()
-    val date2_list = ArrayList<String>()
-
-    // 현재 주차를 구함
-    val CurrentDate : LocalDate = LocalDate.now()
-    val weekFields: WeekFields = WeekFields.of(Locale.getDefault())
-    val weekNumber: Int = CurrentDate.get(weekFields.weekOfWeekBasedYear())
-
-    // 이번주의 날짜들을 담을 배열
-    val testArray = ArrayList<LocalDate>()
-
-    // 현재 주차를 기준으로 일주일 간의 날짜를 구하고 배열에 저장?
-
-    lateinit var mainActivity: MainActivity
-    lateinit var fragmentSecondBinding: FragmentSecondBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-
-        var answer = CurrentDate.get(weekFields.weekOfWeekBasedYear())
-        var current = CurrentDate
-
-        while(answer==weekNumber){
-            val temp = current.minusDays(1)
-            answer = temp.get(weekFields.weekOfWeekBasedYear())
-            if(weekNumber == answer){
-                current = temp
-            }
-        }
-        answer = current.get(weekFields.weekOfWeekBasedYear())
-
-        while(answer==weekNumber){
-            testArray.add(current)
-            current = current.plusDays(1)
-            answer = current.get(weekFields.weekOfWeekBasedYear())
-        }
-
+        secondBinding = FragmentSecondBinding.inflate(layoutInflater)
         mainActivity = context as MainActivity
-        fragmentSecondBinding = FragmentSecondBinding.inflate(layoutInflater)
-
+        LoadSQLData()
     }
 
     override fun onCreateView(
@@ -86,47 +43,87 @@ class SecondFragment :Fragment() {
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_second, null)
-        val gr = view.findViewById<GridView>(R.id.second_grid)
 
-        val spinner: Spinner = view.findViewById(R.id.second_spinner)
-        ArrayAdapter.createFromResource(
-            mainActivity,
-            R.array.SecondSpinner,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            spinner.adapter = adapter
-        }
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                when(p2){
-                    0 -> {
-                        gr.numColumns = 1
-                        gr.adapter = SecondAdapter(mainActivity, DayNameArray, CountNumberArray)
-                    }
-                    1 -> {
-                        gr.numColumns = 7
-                        gr.adapter = ThirdAdapter(mainActivity, CountDailyArray)
-                    }
-                }
-            }
+        val calendar = view.findViewById<MaterialCalendarView>(R.id.Calendar)
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
+        for(i in date_list.indices){
+
+            // xxxx년 xx월 xx일
+            val date = date_list[i].split('-', ':', ' ')
+
+            // CalendarDay
+            val maxSize = task_count_list[i]
+
+            val SavedDate = CalendarDay.from(
+                Integer.parseInt(date[0]), Integer.parseInt(date[1])-1, Integer.parseInt(date[2]))
+            calendar.addDecorator(EventDecorator(mainActivity, CreateArray(maxSize), SavedDate))
+
         }
 
         return view
     }
 
-
     override fun onResume() {
         super.onResume()
 
+    }
+
+    // 매개변수의 사이즈를 갖는 배열을 생성하는 함수
+    fun CreateArray(size:Int):Array<String>{
+
+        val members = arrayOf("#EFCD78", "#E11942", "#FF6200EE", "#000000", "#FF03DAC5")
+
+        var temp2 = Array(size, {n -> members[n]})
+
+        return  temp2
 
     }
 
 
+    // 캘린더 뷰 선택시 글씨체가 커지고 색상을 바꾸는 데코레이터 클래스
+    class TodayDecorator(input:CalendarDay) : DayViewDecorator {
+        private var date = input
+
+        override fun shouldDecorate(day: CalendarDay?): Boolean {
+            return day?.equals(date)!!
+        }
+
+        override fun decorate(view: DayViewFacade?) {
+            view?.addSpan(StyleSpan(Typeface.BOLD))
+            view?.addSpan(RelativeSizeSpan(1.4f))
+            view?.addSpan(ForegroundColorSpan(Color.parseColor("#1D872A")))
+        }
+    }
+
+    private fun LoadSQLData(){
+
+        //데이터베이스 오픈
+        val helper = DBHelper(mainActivity)
+
+        //쿼리문
+        val sql = """
+            select main_end_date, count(*) as cnt from MainTaskTable group by date(main_end_date);
+        """.trimIndent()
+
+        val c1 = helper.writableDatabase.rawQuery(sql, null)
+
+        while (c1.moveToNext()) {
+            // 컬럼 index를 가져온다
+            val idx1 = c1.getColumnIndex("main_end_date")
+            val idx2 = c1.getColumnIndex("cnt")
+
+            //데이터를 가져온다
+            val end_date = c1.getString(idx1)
+            val count = c1.getInt(idx2)
+
+            // 데이터를 담는다
+            date_list.add(end_date)
+            task_count_list.add(count)
+
+            helper.writableDatabase.close()
+
+        }
+
+    }
 
 }

@@ -15,8 +15,8 @@ class MainActivity : AppCompatActivity() {
 
     val fg1 = MainFragment()
     val fg2 = SecondFragment()
-    val fg4 = FourthFragment()
-    var fragment_list = arrayOf(fg1, fg2, fg4)
+    val fg3 = ThirdFragment()
+    var fragment_list = arrayOf(fg1, fg2, fg3)
     val fragment_title = arrayOf("일일 스케줄", "주간 스케줄", "나의 통계")
 
 

@@ -15,9 +15,7 @@ class DBHelper : SQLiteOpenHelper {
             main_task text not null,
             main_edit_date date not null,
             main_start_date date not null,
-            main_start_time time not null,
             main_end_date date not null,
-            main_end_time time not null,
             sub_task_number integer)
         """.trimIndent()
 

@@ -3,11 +3,15 @@ package co.kr.toit
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import androidx.annotation.IntegerRes
 import androidx.appcompat.app.AppCompatActivity
 import co.kr.toit.databinding.ActivityToitAddBinding
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 class ToitAddActivity : AppCompatActivity() {
@@ -22,6 +26,11 @@ class ToitAddActivity : AppCompatActivity() {
     }
 
     var TimerSwitch = true
+    val currentTime = System.currentTimeMillis()
+    var start_date = currentTime
+    var end_date = currentTime
+    var start_time: Date? = myTimer.time
+    var end_time: Date? = myTimer.time
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +56,7 @@ class ToitAddActivity : AppCompatActivity() {
         b.addInputTime1.setOnClickListener {
             TimerSwitch = true
             ShowDiallog()
+
         }
 
         b.addInputTime2.setOnClickListener {
@@ -55,32 +65,81 @@ class ToitAddActivity : AppCompatActivity() {
         }
 
         b.addSaveBtn.setOnClickListener {
-            val sdf3 = SimpleDateFormat("yyyy년 MM월 dd일 a h:mm ", Locale.getDefault())
 
-            // 쿼리문
-            val sql = """
+            SQL_Add_SaveManager()
+            reload()
+
+        }
+    }
+
+    private fun SQL_Add_SaveManager(){
+
+        val sdf1 = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val sdf2 = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val sdf3 = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+
+        val startRawDate = Date(start_date)
+        val startRawTime = start_time
+        val endRawDate = Date(end_date)
+        val endRawTime = end_time
+
+        val StringStartDate = sdf1.format(startRawDate)
+        val StringStartTime = sdf2.format(startRawTime)
+        val StringEndDate = sdf1.format(endRawDate)
+        val StringEndTime = sdf2.format(endRawTime)
+
+        val StartDateArr = StringStartDate.split('-')
+        val StartTimeArr = StringStartTime.split(':')
+        val EndDateArr = StringEndDate.split('-')
+        val EndTimeArr = StringEndTime.split(':')
+
+
+        val year1 = Integer.parseInt(StartDateArr[0])
+        val month1 = Integer.parseInt(StartDateArr[1])
+        val day1 = Integer.parseInt(StartDateArr[2])
+        val year2 = Integer.parseInt(EndDateArr[0])
+        val month2 = Integer.parseInt(EndDateArr[1])
+        val day2 = Integer.parseInt(EndDateArr[2])
+
+
+        val hour1 = Integer.parseInt(StartTimeArr[0])
+        val min1 = Integer.parseInt(StartTimeArr[1])
+        val hour2 = Integer.parseInt(EndTimeArr[0])
+        val min2 = Integer.parseInt(EndTimeArr[1])
+
+
+        val CombinedStartDate1 = LocalDateTime.of(year1, month1, day1, hour1, min1)
+        val CombinedStartDate2 = LocalDateTime.of(year2, month2, day2, hour2, min2)
+
+
+        val StartDate = Date.from(CombinedStartDate1.atZone(ZoneId.systemDefault()).toInstant())
+        val EndDate = Date.from(CombinedStartDate2.atZone(ZoneId.systemDefault()).toInstant())
+
+        val main_start_date = sdf3.format(StartDate)
+        val main_end_date = sdf3.format(EndDate)
+
+
+        // 쿼리문
+        val sql = """
                     insert into MainTaskTable
                     (main_task, main_edit_date, main_start_date, 
-                    main_start_time, main_end_date, main_end_time) 
-                    values(?, ?, ?, ?, ? ,?)
+                    main_end_date) 
+                    values(?, ?, ?, ?)
                 """.trimIndent()
 
-            // 데이터베이스 오픈
-            val helper = DBHelper(this)
+        // 데이터베이스 오픈
+        val helper = DBHelper(this)
 
-            // ? 에 설정될 값
-            val arg1 = arrayOf(
-                b.addMainTaskInputText.text.toString(), sdf3.format(Date()),
-                b.addInputDate1.text, b.addInputTime1.text, b.addInputDate2.text,
-                b.addInputTime2.text
-            )
+        // ? 에 설정될 값
+        val arg1 = arrayOf(
+            b.addMainTaskInputText.text.toString(), sdf3.format(Date()), main_start_date,
+            main_end_date
+        )
 
-            // 저장
-            helper.writableDatabase.execSQL(sql, arg1)
-            helper.writableDatabase.close()
+        // 저장
+        helper.writableDatabase.execSQL(sql, arg1)
+        helper.writableDatabase.close()
 
-            reload()
-        }
     }
 
     private fun reload() {
@@ -116,10 +175,12 @@ class ToitAddActivity : AppCompatActivity() {
 
     fun updateTime() {
         val myFormat = "a h:mm" // 출력형식  00:00 PM
-        val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
+        val sdf = SimpleDateFormat(myFormat, Locale.KOREA)
         if(TimerSwitch){
+            start_time = myTimer.time
             b.addInputTime1.setText(sdf.format(myTimer.time))
         } else {
+            end_time = myTimer.time
             b.addInputTime2.setText(sdf.format(myTimer.time))
         }
     }
@@ -136,15 +197,18 @@ class ToitAddActivity : AppCompatActivity() {
         dateRangePicker.show(supportFragmentManager, "support")
 
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
-            val start_date = datePicked.first
-            val end_date = datePicked.second
-            val df = "yyyy년 MM월 dd일"
-            val sdf = SimpleDateFormat(df, Locale.KOREA)
+            start_date = datePicked.first
+            end_date = datePicked.second
+            val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
             b.addInputDate1.setText(sdf.format(start_date))
             b.addInputDate2.setText(sdf.format(end_date))
-
         }
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        reload()
     }
 
     // 툴바의 홈버튼 누르면 홈으로 돌아가게 하는 메서드
