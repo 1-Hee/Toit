@@ -1,5 +1,6 @@
 package co.kr.toit
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,13 +38,12 @@ class MainFragment : Fragment() {
     var vis = false
 
     lateinit var mainActivity: MainActivity
-    lateinit var fragmentMainBinding: FragmentMainBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         mainActivity = context as MainActivity
-        fragmentMainBinding = FragmentMainBinding.inflate(layoutInflater)
+
     }
 
     override fun onCreateView(
@@ -131,7 +132,6 @@ class MainFragment : Fragment() {
 
             helper.writableDatabase.close()
         }
-        fragmentMainBinding.mainFragRecycler.adapter?.notifyDataSetChanged()
 
     }
 
@@ -142,7 +142,6 @@ class MainFragment : Fragment() {
         current_time = System.currentTimeMillis()
         TransCurrentTime = Date(current_time).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
         UpdateRecyclerViewManager()
-
     }
 
 
@@ -157,11 +156,9 @@ class MainFragment : Fragment() {
             )
 
             mainRecyclerBinding.root.layoutParams = layoutParams
-
             mainRecyclerBinding.root.setOnClickListener(holder)
 
             return holder
-
         }
 
         override fun onBindViewHolder(holder: ViewHolderClass, position: Int) {
@@ -177,6 +174,39 @@ class MainFragment : Fragment() {
             }else {
                 holder.fragcheckBox.visibility = View.GONE
             }
+
+            holder.fragcheckBox.setOnClickListener {
+                var builder = AlertDialog.Builder(mainActivity)
+                val main_idx = idx_list[position]
+
+                builder.setTitle("<경고> 메모 삭제")
+                builder.setMessage("정말로 메모를 삭제하시겠습니까?")
+
+                builder.setPositiveButton("삭제"){ dialogInterface, i ->
+                    //데이터 베이스 오픈
+                    val helper = DBHelper(mainActivity)
+                    //쿼리문
+                    val sql = """
+                            delete from MainTaskTable where main_idx = ?
+                            """.trimIndent()
+
+                    //쿼리문 실행
+                    val args = arrayOf(main_idx.toString())
+
+                    helper.writableDatabase.execSQL(sql, args)
+                    helper.writableDatabase.close()
+
+                    val main = mainActivity
+
+                    mainActivity.finish()
+                    mainActivity.overridePendingTransition(0, 0);//인텐트 효과 없애기
+                    val newMainActivity = Intent(mainActivity, MainActivity::class.java)
+                    startActivity(newMainActivity)
+                }
+                builder.setNegativeButton("취소",null)
+                builder.show()
+            }
+
 
 
         }

@@ -1,13 +1,15 @@
 package co.kr.toit
 
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import co.kr.toit.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
             override fun createFragment(position: Int): Fragment {
                 return fragment_list[position]
             }
+
         }
 
         b.mainContainer.adapter = viewPagerAdapter
@@ -44,6 +47,15 @@ class MainActivity : AppCompatActivity() {
             tab.text = fragment_title[position]
         }.attach()
 
+        b.mainContainer.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
 
     }
 
