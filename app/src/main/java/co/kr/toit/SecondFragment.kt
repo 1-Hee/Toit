@@ -71,11 +71,16 @@ class SecondFragment : Fragment() {
     // 매개변수의 사이즈를 갖는 배열을 생성하는 함수
     fun CreateArray(size:Int):Array<String>{
 
+        var temp2:Array<String>
         val members = arrayOf("#EFCD78", "#E11942", "#FF6200EE", "#000000", "#FF03DAC5")
 
-        var temp2 = Array(size, {n -> members[n]})
+        if(size>5){
+            return members
+        }else {
+            temp2 = Array(size, {n -> members[n]})
+        }
 
-        return  temp2
+        return temp2
 
     }
 
