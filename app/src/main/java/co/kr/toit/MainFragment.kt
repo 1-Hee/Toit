@@ -1,26 +1,20 @@
 package co.kr.toit
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import co.kr.toit.databinding.FragmentMainBinding
 import co.kr.toit.databinding.MainRecyclerRowBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
@@ -82,6 +76,9 @@ class MainFragment : Fragment() {
         }
 
         UpdateRecyclerViewManager()
+
+        val spin = view.findViewById<Spinner>(R.id.MFspinner)
+        spin.adapter = ArrayAdapter.createFromResource(mainActivity, R.array.SecondSpinner, android.R.layout.simple_spinner_dropdown_item)
 
         return view
     }
@@ -175,40 +172,13 @@ class MainFragment : Fragment() {
                 holder.fragcheckBox.visibility = View.GONE
             }
 
-            holder.fragcheckBox.setOnClickListener {
-                var builder = AlertDialog.Builder(mainActivity)
-                val main_idx = idx_list[position]
-
-                builder.setTitle("<경고> 메모 삭제")
-                builder.setMessage("정말로 메모를 삭제하시겠습니까?")
-
-                builder.setPositiveButton("삭제"){ dialogInterface, i ->
-                    //데이터 베이스 오픈
-                    val helper = DBHelper(mainActivity)
-                    //쿼리문
-                    val sql = """
-                            delete from MainTaskTable where main_idx = ?
-                            """.trimIndent()
-
-                    //쿼리문 실행
-                    val args = arrayOf(main_idx.toString())
-
-                    helper.writableDatabase.execSQL(sql, args)
-                    helper.writableDatabase.close()
-
-                    val main = mainActivity
-
-                    mainActivity.finish()
-                    mainActivity.overridePendingTransition(0, 0);//인텐트 효과 없애기
-                    val newMainActivity = Intent(mainActivity, MainActivity::class.java)
-                    startActivity(newMainActivity)
+            holder.fragcheckBox.setOnCheckedChangeListener { compoundButton, b ->
+                if(b){
+                    mainActivity.deleteIndex.add(idx_list[position])
+                } else {
+                    mainActivity.deleteIndex.remove(idx_list[position])
                 }
-                builder.setNegativeButton("취소",null)
-                builder.show()
             }
-
-
-
         }
 
         override fun getItemCount(): Int {
