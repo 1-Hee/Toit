@@ -41,8 +41,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         b = ActivityMainBinding.inflate(layoutInflater)
         r = FragmentMainBinding.inflate(layoutInflater)
-
         setContentView(b.root)
+
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
 
         setSupportActionBar(b.mainToolbar)
         title = resources.getString(R.string.app_name)

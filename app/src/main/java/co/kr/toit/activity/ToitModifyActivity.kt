@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.Toast
 import co.kr.toit.SQLiteManager.DBHelper
 import co.kr.toit.R
 import co.kr.toit.databinding.ActivityToitModifyBinding
@@ -39,9 +41,15 @@ class ToitModifyActivity : AppCompatActivity() {
         b = ActivityToitModifyBinding.inflate(layoutInflater)
         setContentView(b.root)
 
+
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+
         setSupportActionBar(b.modiToolbar)
         title = "메모 편집 창"
-
 
         // 상태창 색깔 코드로 바꾸기
         if (Build.VERSION.SDK_INT >= 21) {
@@ -51,15 +59,8 @@ class ToitModifyActivity : AppCompatActivity() {
             window.statusBarColor = this.resources.getColor(R.color.SecondaryColor)
         }
 
-        supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         initModiUI()
-
-        b.modiCloseBtn.setOnClickListener {
-            reload()
-            finish()
-        }
 
         b.modiInputDate1.setOnClickListener { showDateRangePicker() }
         b.modiInputDate2.setOnClickListener { showDateRangePicker() }
@@ -74,15 +75,35 @@ class ToitModifyActivity : AppCompatActivity() {
             ShowDialog()
         }
 
-        b.modiSaveBtn.setOnClickListener {
 
-            SQL_Modify_SaveManager()
-            reload()
-            finish()
-        }
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.modi_menu, menu)
+        return true
+    }
+
+    // 툴바의 홈버튼 누르면 홈으로 돌아가게 하는 메서드
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> { reload() }
+            R.id.modi_save -> {
+                SQL_Modify_SaveManager()
+                reload()
+                finish()
+            }
+            R.id.modi_create_sub -> {
+                Toast.makeText(this, "메인 프로젝트의 세부 과제를 생성합니다.", Toast.LENGTH_SHORT).show()
+            }
+            R.id.modi_delete_sub -> {
+                Toast.makeText(this, "메인 프로젝트의 세부 과제를 삭제합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+    
     private fun SQL_Modify_SaveManager(){
         val sdf1 = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val sdf2 = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -207,14 +228,13 @@ class ToitModifyActivity : AppCompatActivity() {
 
 
         b.modiMainTaskInputText.setText(MainTask)
-        b.modiEditdate.text = EditDate
+        b.modiEditdate.text = "최종 수정일 : $EditDate"
         b.modiInputDate1.setText(main_start_date)
         b.modiInputTime1.setText(main_start_time)
         b.modiInputDate2.setText(main_end_date)
         b.modiInputTime2.setText(main_end_time)
 
     }
-
 
     private fun reload() {
         val mainActivity = Intent(this, MainActivity::class.java)
@@ -262,21 +282,12 @@ class ToitModifyActivity : AppCompatActivity() {
             false
         ).show()
     }
+    
 
-
-    // 툴바의 홈버튼 누르면 홈으로 돌아가게 하는 메서드
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            android.R.id.home -> {
-                reload()
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
+    // 백버튼
     override fun onBackPressed() {
         super.onBackPressed()
+        finish()
         reload()
     }
 }
