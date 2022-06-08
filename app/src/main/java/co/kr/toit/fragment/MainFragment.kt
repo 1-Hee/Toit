@@ -272,9 +272,9 @@ class MainFragment : Fragment() {
             override fun onClick(p0: View?) {
 
                 val main_idx = idx_list[adapterPosition]
-
                 val toitModifyActivity = Intent(mainActivity.baseContext, ToitModifyActivity::class.java)
                 toitModifyActivity.putExtra("main_idx", main_idx)
+                mainActivity.finish()
                 startActivity(toitModifyActivity)
             }
         }
