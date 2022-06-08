@@ -105,7 +105,7 @@ class MainFragment : Fragment() {
             }
         }
 
-        MFspn.adapter = ArrayAdapter.createFromResource(mainActivity, R.array.SecondSpinner1, android.R.layout.simple_spinner_dropdown_item)
+        MFspn.adapter = ArrayAdapter.createFromResource(mainActivity, R.array.SecondSpinner, android.R.layout.simple_spinner_dropdown_item)
 
         MFspn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

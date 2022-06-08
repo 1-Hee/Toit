@@ -26,6 +26,8 @@ import kotlin.collections.ArrayList
 class MainActivity : AppCompatActivity() {
 
     lateinit var b : ActivityMainBinding
+    lateinit var r : FragmentMainBinding
+
 
     val fg1 = MainFragment()
     val fg2 = SecondFragment()
@@ -38,6 +40,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b = ActivityMainBinding.inflate(layoutInflater)
+        r = FragmentMainBinding.inflate(layoutInflater)
+
         setContentView(b.root)
 
         setSupportActionBar(b.mainToolbar)
@@ -105,13 +109,17 @@ class MainActivity : AppCompatActivity() {
 
                     helper.writableDatabase.execSQL(sql, arg1)
                     helper.writableDatabase.close()
+
+                    // r.mainFragRecycler.adapter?.notifyDataSetChanged()
+                }
+
                     overridePendingTransition(0, 0)//인텐트 효과 없애기
                     finish()
                     val newMainActivity = Intent(this, MainActivity::class.java)
                     overridePendingTransition(0, 0)//인텐트 효과 없애기
                     startActivity(newMainActivity)
 
-                }
+
             }else Toast.makeText(this, "완료할 항목이 없습니다", Toast.LENGTH_SHORT).show()
         }
         builder.setNegativeButton("취소",null)
@@ -140,11 +148,8 @@ class MainActivity : AppCompatActivity() {
                     val args = arrayOf(index.toString())
                     helper.writableDatabase.execSQL(sql, args)
                     helper.writableDatabase.close()
-                    overridePendingTransition(0, 0)//인텐트 효과 없애기
-                    finish()
-                    val newMainActivity = Intent(this, MainActivity::class.java)
-                    overridePendingTransition(0, 0)//인텐트 효과 없애기
-                    startActivity(newMainActivity)
+
+//                    r.mainFragRecycler.adapter?.notifyDataSetChanged()
 
                 }
 
