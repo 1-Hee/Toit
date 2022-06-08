@@ -1,4 +1,4 @@
-package co.kr.toit
+package co.kr.toit.fragment
 
 import android.content.Context
 import android.graphics.Color
@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
-import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import co.kr.toit.SQLiteManager.DBHelper
+import co.kr.toit.fragment.Decorator.EventDecorator
+import co.kr.toit.R
+import co.kr.toit.activity.MainActivity
 import co.kr.toit.databinding.FragmentSecondBinding
 import com.prolificinteractive.materialcalendarview.*
 import java.util.*

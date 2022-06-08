@@ -1,4 +1,4 @@
-package co.kr.toit
+package co.kr.toit.SQLiteManager
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

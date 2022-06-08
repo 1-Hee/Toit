@@ -1,12 +1,12 @@
-package co.kr.toit
+package co.kr.toit.activity
 
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
-import androidx.annotation.IntegerRes
 import androidx.appcompat.app.AppCompatActivity
+import co.kr.toit.SQLiteManager.DBHelper
+import co.kr.toit.R
 import co.kr.toit.databinding.ActivityToitAddBinding
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat

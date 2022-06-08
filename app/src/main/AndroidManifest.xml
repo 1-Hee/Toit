@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ToIt">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,11 +19,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ToitAddActivity"
+            android:name=".activity.ToitAddActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"></activity>
         <activity
-            android:name=".ToitModifyActivity"
+            android:name=".activity.ToitModifyActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"></activity>
     </application>

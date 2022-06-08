@@ -1,19 +1,17 @@
-package co.kr.toit
+package co.kr.toit.activity
 
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.WindowManager
-import androidx.core.util.Pair
+import co.kr.toit.SQLiteManager.DBHelper
+import co.kr.toit.R
 import co.kr.toit.databinding.ActivityToitModifyBinding
-import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -50,7 +48,7 @@ class ToitModifyActivity : AppCompatActivity() {
             val window = this.window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            window.statusBarColor = this.resources.getColor(R.color.SecondaryColor) 
+            window.statusBarColor = this.resources.getColor(R.color.SecondaryColor)
         }
 
         supportActionBar?.setHomeButtonEnabled(true)
@@ -153,7 +151,7 @@ class ToitModifyActivity : AppCompatActivity() {
 
     private fun initModiUI(){
 
-        val helper =DBHelper(this)
+        val helper = DBHelper(this)
         val sql = """
             select main_task, main_edit_date, main_start_date, main_end_date             
             from MainTaskTable
@@ -270,7 +268,7 @@ class ToitModifyActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
-                finish()
+                reload()
             }
         }
 

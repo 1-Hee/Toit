@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#EEF3F9"
-    tools:context=".ToitModifyActivity">
+    tools:context=".activity.ToitModifyActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/modi_toolbar"
