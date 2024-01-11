@@ -13,10 +13,10 @@ import timber.log.Timber
 
 abstract class DataBindingActivity<D:ViewDataBinding>:AppCompatActivity() {
     protected lateinit var  mBinding:D
-    // Activity 초기화
-    abstract fun init(savedInstanceState: Bundle?)
     // Activity 에서 binding해서 사용하고자 하는 Config값 정의
     protected abstract fun getDataBindingConfig():DataBindingConfig
+    // Activity 초기화
+    abstract fun init(savedInstanceState: Bundle?)
     // ViewModel 초기화
     protected open fun initViewModel(){
         Timber.i("initViewModel....")
