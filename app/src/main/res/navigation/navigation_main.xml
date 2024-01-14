@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/introFragment"
-        android:name="com.one.toit.ui.fragment.IntroFragment"
+        android:name="com.one.toit.ui.fragment.main.IntroFragment"
         android:label="introFragment"
         />
 </navigation>

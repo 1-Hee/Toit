@@ -71,6 +71,15 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.compose.material:material:1.2.0")
+    implementation("com.google.android.material:material:1.6.0-alpha01")
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+
+
+    // compose navigation
+    val comp_nav_version = "2.4.1"
+    implementation("androidx.navigation:navigation-compose:$comp_nav_version")
 
     // tools
     // multi dex
