@@ -75,8 +75,6 @@ dependencies {
     implementation("com.google.android.material:material:1.6.0-alpha01")
     implementation("io.coil-kt:coil-compose:2.2.2")
 
-
-
     // compose navigation
     val comp_nav_version = "2.4.1"
     implementation("androidx.navigation:navigation-compose:$comp_nav_version")
@@ -147,6 +145,9 @@ dependencies {
     //flex box
     val flexVersion = "3.0.0"
     implementation("com.google.android.flexbox:flexbox:$flexVersion")
+
+//    // admobs
+//    implementation("com.google.android.gms:play-services-ads:22.3.0")
 
 
 }
