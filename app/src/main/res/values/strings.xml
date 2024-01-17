@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Toit</string>
-    <string name="p_todo">TODO</string>
-    <string name="p_statistics">STATISTICS</string>
-    <string name="p_profile">PROFILE</string>
+    <string name="p_todo"><b>Toit!</b></string>
+    <string name="p_statistics">일일 통계(Daily Statistics)</string>
+    <string name="p_profile">마이 페이지</string>
     <string name="p_app_setting">앱 권한 설정</string>
 </resources>
