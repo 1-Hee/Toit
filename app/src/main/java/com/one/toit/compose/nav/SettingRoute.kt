@@ -1,6 +1,5 @@
 package com.one.toit.compose.nav
 
-import androidx.compose.ui.res.stringResource
 import com.one.toit.R
 
 sealed class SettingRoute(

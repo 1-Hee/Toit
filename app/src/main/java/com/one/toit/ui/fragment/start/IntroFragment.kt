@@ -1,4 +1,4 @@
-package com.one.toit.ui.fragment.main
+package com.one.toit.ui.fragment.start
 
 import android.app.Activity
 import android.content.Intent
@@ -12,7 +12,7 @@ import com.one.toit.base.bind.DataBindingConfig
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseFragment
 import com.one.toit.databinding.FragmentIntroBinding
-import com.one.toit.ui.activity.BoardActivity
+import com.one.toit.ui.activity.MainActivity
 import timber.log.Timber
 
 class IntroFragment : BaseFragment<FragmentIntroBinding>() {
@@ -43,7 +43,7 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
         override fun onClickView(view: View) {
             when(view.id){
                 R.id.btn_start -> {
-                    val intent = Intent(requireActivity(), BoardActivity::class.java)
+                    val intent = Intent(requireActivity(), MainActivity::class.java)
                     // TODO intent nickname value?
                     requireActivity().onBackPressedDispatcher.onBackPressed()
                     launcher.launch(intent)

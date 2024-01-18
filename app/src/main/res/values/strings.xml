@@ -4,4 +4,5 @@
     <string name="p_statistics">일일 통계(Daily Statistics)</string>
     <string name="p_profile">마이 페이지</string>
     <string name="p_app_setting">앱 권한 설정</string>
+    <string name="p_board_write">목표 작성 하기, Write It!</string>
 </resources>
