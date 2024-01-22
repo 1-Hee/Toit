@@ -82,4 +82,5 @@
     <color name="mono900">#ff4c4c4c</color>
     <color name="white">#fffdfdfd</color>
     <color name="black">#ff0a090a</color>
+    <color name="none">#00FFFFFF</color>
 </resources>

@@ -1,4 +1,4 @@
-package com.one.toit.compose.ui.page
+package com.one.toit.ui.compose.ui.page
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,14 +42,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
-import com.one.toit.compose.style.black
-import com.one.toit.compose.style.mono100
-import com.one.toit.compose.style.mono300
-import com.one.toit.compose.style.mono800
-import com.one.toit.compose.style.mono900
-import com.one.toit.compose.style.purple200
-import com.one.toit.compose.style.purple300
-import com.one.toit.compose.style.white
+import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.mono100
+import com.one.toit.ui.compose.style.mono300
+import com.one.toit.ui.compose.style.mono800
+import com.one.toit.ui.compose.style.mono900
+import com.one.toit.ui.compose.style.purple200
+import com.one.toit.ui.compose.style.purple300
+import com.one.toit.ui.compose.style.white
 
 @Preview(showBackground = true)
 @Composable

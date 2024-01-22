@@ -1,4 +1,4 @@
-package com.one.toit.compose.nav
+package com.one.toit.ui.compose.nav
 
 import com.one.toit.R
 

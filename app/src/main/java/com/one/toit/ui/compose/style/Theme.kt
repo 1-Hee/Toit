@@ -1,4 +1,4 @@
-package com.one.toit.compose.style
+package com.one.toit.ui.compose.style
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors

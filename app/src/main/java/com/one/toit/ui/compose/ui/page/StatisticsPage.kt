@@ -1,4 +1,4 @@
-package com.one.toit.compose.ui.page
+package com.one.toit.ui.compose.ui.page
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.one.toit.R
-import com.one.toit.compose.style.white
+import com.one.toit.ui.compose.style.white
 
 @Preview(showBackground = true)
 @Composable

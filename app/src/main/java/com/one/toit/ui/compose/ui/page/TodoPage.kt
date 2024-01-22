@@ -1,4 +1,4 @@
-package com.one.toit.compose.ui.page
+package com.one.toit.ui.compose.ui.page
 
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -38,16 +38,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
-import com.one.toit.compose.style.black
-import com.one.toit.compose.style.mono200
-import com.one.toit.compose.style.mono300
-import com.one.toit.compose.style.mono600
-import com.one.toit.compose.style.purple100
-import com.one.toit.compose.style.purple200
-import com.one.toit.compose.style.white
-import com.one.toit.compose.ui.unit.ItemNoContent
-import com.one.toit.compose.ui.unit.ItemTodo
 import com.one.toit.ui.activity.BoardActivity
+import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.mono200
+import com.one.toit.ui.compose.style.mono300
+import com.one.toit.ui.compose.style.mono600
+import com.one.toit.ui.compose.style.purple100
+import com.one.toit.ui.compose.style.purple200
+import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.compose.ui.unit.ItemNoContent
+import com.one.toit.ui.compose.ui.unit.ItemTodo
 
 
 @Preview(showBackground = true)
@@ -64,7 +64,7 @@ fun TodoPage(){
         val intent = Intent(context, BoardActivity::class.java)
         var checked by remember { mutableStateOf(false) }
         val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
-        var hasContent by remember { mutableStateOf(false) }
+        var hasContent by remember { mutableStateOf(true) }
         val scrollState = rememberScrollState()
 
         // content list
@@ -138,10 +138,11 @@ fun TodoPage(){
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
             shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
-            backgroundColor = purple100,
+            backgroundColor = purple200,
             contentColor = contentColorFor(white),
             elevation = FloatingActionButtonDefaults.elevation(4.dp),
             onClick = {
+                intent.putExtra("pageIndex", 0)
                 context.startActivity(intent)
             }
         ){

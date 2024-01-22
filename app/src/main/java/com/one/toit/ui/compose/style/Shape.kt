@@ -1,4 +1,4 @@
-package com.one.toit.compose.style
+package com.one.toit.ui.compose.style
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

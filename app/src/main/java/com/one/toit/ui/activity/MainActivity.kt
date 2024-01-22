@@ -17,6 +17,8 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,15 +40,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.one.toit.R
 import com.one.toit.base.ui.BaseComposeActivity
-import com.one.toit.compose.nav.MainRoute
-import com.one.toit.compose.style.MyApplicationTheme
-import com.one.toit.compose.style.mono300
-import com.one.toit.compose.style.mono600
-import com.one.toit.compose.style.purple200
-import com.one.toit.compose.style.white
-import com.one.toit.compose.ui.page.ProfilePage
-import com.one.toit.compose.ui.page.StatisticsPage
-import com.one.toit.compose.ui.page.TodoPage
+import com.one.toit.ui.compose.nav.MainRoute
+import com.one.toit.ui.compose.style.MyApplicationTheme
+import com.one.toit.ui.compose.style.mono300
+import com.one.toit.ui.compose.style.mono500
+import com.one.toit.ui.compose.style.mono600
+import com.one.toit.ui.compose.style.purple200
+import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.compose.ui.page.ProfilePage
+import com.one.toit.ui.compose.ui.page.StatisticsPage
+import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.MainMenuViewModel
 import timber.log.Timber
 
@@ -119,7 +122,7 @@ fun MainTopBarComponent(
         )
 
         Icon(
-            painter = painterResource(id = R.drawable.ic_setting),
+            imageVector = Icons.Rounded.Settings,
             contentDescription = "환경 설정",
             modifier = Modifier
                 .width(24.dp)
@@ -127,7 +130,8 @@ fun MainTopBarComponent(
                 .align(Alignment.CenterEnd)
                 .clickable {
                     context.startActivity(intent)
-                }
+                },
+            tint = mono500
         )
     }
 }

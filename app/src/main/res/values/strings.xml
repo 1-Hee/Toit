@@ -4,5 +4,17 @@
     <string name="p_statistics">일일 통계(Daily Statistics)</string>
     <string name="p_profile">마이 페이지</string>
     <string name="p_app_setting">앱 권한 설정</string>
-    <string name="p_board_write">목표 작성 하기, Write It!</string>
+
+    <string-array name="arr_board_title">
+        <item>목표 작성 하기, Write It!</item>
+        <item>목표 수정 하기, Modify It!</item>
+        <item>목표 달성 하기, To It!</item>
+    </string-array>
+
+    <string-array name="arr_limit_guide">
+        <item>목표를 달성할 시간을 설정합니다.</item>
+        <item>기한을 설정하지 않은 목표는 달성 시간 통계에 반영 되지 않아요!</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

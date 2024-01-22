@@ -1,4 +1,4 @@
-package com.one.toit.compose.nav
+package com.one.toit.ui.compose.nav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite

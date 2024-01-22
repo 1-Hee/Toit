@@ -1,4 +1,4 @@
-package com.one.toit.compose.ui.unit
+package com.one.toit.ui.compose.ui.unit
 
 import android.app.Activity
 import androidx.compose.foundation.background
@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.one.toit.compose.style.white
+import com.one.toit.ui.compose.style.white
 
 @Composable
 fun SimpleTopBar(activity:Activity, title:String){
