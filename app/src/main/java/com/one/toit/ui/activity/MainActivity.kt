@@ -47,6 +47,7 @@ import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.compose.ui.page.GraphPage
 import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
@@ -146,10 +147,13 @@ fun MainNavGraph(navController: NavHostController) {
             TodoPage()
         }
         composable(MainRoute.Statistics.route) {
-            StatisticsPage()
+            StatisticsPage(navController)
         }
         composable(MainRoute.Profile.route) {
             ProfilePage()
+        }
+        composable(MainRoute.Graph.route){
+            GraphPage(navController)
         }
     }
 }

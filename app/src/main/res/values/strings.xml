@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Toit</string>
     <string name="p_todo"><b>Toit!</b></string>
-    <string name="p_statistics">일일 통계(Daily Statistics)</string>
+    <string name="p_statistics">일일 통계</string>
     <string name="p_profile">마이 페이지</string>
+    <string name="p_graph">ToIt Statistics</string>
+    <string name="sample_guide">성공은 작은 노력의 쌓임입니다.\n오늘 하루도 조금 더 나아가세요.</string>
+
     <string name="p_app_setting">앱 권한 설정</string>
 
     <string-array name="arr_board_title">
