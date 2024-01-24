@@ -9,7 +9,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-data class PackedPieChartEntry(val color: Color, val percentage: Float)
+data class PackedPieChartEntry(
+    val color: Color, val percentage: Float
+)
 
 private fun calculateStartAngles(entries: List<PackedPieChartEntry>): List<Float> {
     var totalPercentage = 0f

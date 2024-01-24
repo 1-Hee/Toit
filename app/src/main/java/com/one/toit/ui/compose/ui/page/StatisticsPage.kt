@@ -26,20 +26,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.one.toit.R
+import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.nav.MainRoute
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
-import com.one.toit.ui.compose.style.mono200
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.PerforatedPieChart
-import com.one.toit.ui.compose.ui.unit.PerformChartEntry
 
-@Preview(showBackground = true)
+// @Preview(showBackground = true)
 @Composable
 fun StatisticsPage(
     navController : NavHostController
@@ -58,15 +56,15 @@ fun StatisticsPage(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Preview with sample data
-            val data = mapOf<String, PerformChartEntry>(
+            val data = mapOf<String, ChartEntry>(
                 Pair(
-                    "완성", PerformChartEntry(
+                    "완성", ChartEntry(
                         volume = 7,
                         color = colorResource(id = R.color.purple200)
                     )
                 ),
                 Pair(
-                    "미완성", PerformChartEntry(
+                    "미완성", ChartEntry(
                         volume = 3,
                         color = colorResource(id = R.color.mono200)
                     )

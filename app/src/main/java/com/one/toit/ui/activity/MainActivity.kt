@@ -147,13 +147,14 @@ fun MainNavGraph(navController: NavHostController) {
             TodoPage()
         }
         composable(MainRoute.Statistics.route) {
-            StatisticsPage(navController)
+            GraphPage(navController)
+            // StatisticsPage(navController)
         }
         composable(MainRoute.Profile.route) {
             ProfilePage()
         }
         composable(MainRoute.Graph.route){
-            GraphPage(navController)
+            // GraphPage(navController)
         }
     }
 }

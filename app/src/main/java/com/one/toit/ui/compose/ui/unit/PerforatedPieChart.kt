@@ -33,17 +33,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono600
 
-data class PerformChartEntry(
-    val volume:Int, // 통계 값, 수치
-    val color:Color // 그래프에 표시될 색상
-)
-
 @Composable
 fun PerforatedPieChart(
-    data: Map<String, PerformChartEntry>,
+    data: Map<String, ChartEntry>,
     radiusOuter: Dp = 140.dp,
     chartBarWidth: Dp = 35.dp,
     animDuration: Int = 1000,
@@ -134,11 +130,10 @@ fun PerforatedPieChart(
         )
 
     }
-
 }
 @Composable
 fun DetailsPieChart(
-    data: Map<String, PerformChartEntry>,
+    data: Map<String, ChartEntry>,
     colors: List<Color>
 ) {
     Column(
@@ -158,7 +153,7 @@ fun DetailsPieChart(
 }
 @Composable
 fun DetailsPieChartItem(
-    data: Pair<String, PerformChartEntry>,
+    data: Pair<String, ChartEntry>,
     height: Dp = 32.dp,
     color: Color
 ) {
