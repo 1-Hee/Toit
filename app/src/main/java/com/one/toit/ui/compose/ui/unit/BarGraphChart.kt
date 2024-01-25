@@ -84,7 +84,7 @@ fun BarGraphChart(
             .height(maxValue.dp)
             .horizontalScroll(scrollState),
         verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = if(data.size > 9) Arrangement.spacedBy(16.dp) else Arrangement.SpaceEvenly
     ) {
         data.forEach { (key, entry) ->
             Column(

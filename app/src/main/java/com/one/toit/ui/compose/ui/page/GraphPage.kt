@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.MaterialTheme
@@ -51,14 +52,15 @@ fun GraphPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             var graphMode by remember { mutableStateOf("막대 그래프") }
             var isCheck by remember { mutableStateOf(false) }
             // dummy
             val test = listOf(
                 "9/1","9/2","9/3","9/4","9/5",
-                "9/6","9/7","9/8","9/9","9/10",
-                "9/10","9/11","9/12","9/13","9/14",
+//                "9/6","9/7","9/8","9/9","9/10",
+//                "9/10","9/11","9/12","9/13","9/14",
             )
             val colorList = listOf(
                 black, red300, orange300, navy400, purple300
