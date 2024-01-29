@@ -149,5 +149,22 @@ dependencies {
 //    // admobs
 //    implementation("com.google.android.gms:play-services-ads:22.3.0")
 
+    // vico
+    // For Jetpack Compose.
+    val vico_version = "1.13.1"
+    implementation("com.patrykandpatrick.vico:compose:$vico_version")
+
+    // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
+    implementation("com.patrykandpatrick.vico:compose-m2:$vico_version")
+
+    // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
+    implementation("com.patrykandpatrick.vico:compose-m3:$vico_version")
+
+    // Houses the core logic for charts and other elements. Included in all other modules.
+    implementation("com.patrykandpatrick.vico:core:$vico_version")
+
+    // For the view system.
+    implementation("com.patrykandpatrick.vico:views:$vico_version")
+
 
 }
