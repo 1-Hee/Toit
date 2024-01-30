@@ -1,7 +1,9 @@
 package com.one.toit.ui.activity
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +40,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.coroutine.TedPermission
 import com.one.toit.R
 import com.one.toit.base.ui.BaseComposeActivity
 import com.one.toit.ui.compose.nav.MainRoute
@@ -52,16 +56,36 @@ import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.MainMenuViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainActivity : BaseComposeActivity() {
-
     private lateinit var mainMenuViewModel: MainMenuViewModel
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission granted, proceed to load image or perform other actions
+                // Call your function to load the image or perform actions requiring the permission
+            } else {
+                // Permission denied, handle accordingly
+                // You might want to show a message to the user or request permission again
+            }
+        }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Timber.plant(Timber.DebugTree())
             MainScreenView(mainMenuViewModel)
+            val list = arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_MEDIA_IMAGES
+            )
+            list.forEach { permission ->
+                requestPermissionLauncher.launch(permission)
+            }
         }
     }
 
@@ -83,7 +107,6 @@ class MainActivity : BaseComposeActivity() {
         }
     }
 }
-
 @Composable
 fun MainScreenView(
     viewModel: MainMenuViewModel

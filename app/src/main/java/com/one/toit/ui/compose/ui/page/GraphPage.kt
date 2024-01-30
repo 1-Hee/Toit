@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material3.Text
@@ -38,10 +37,10 @@ import com.one.toit.ui.compose.style.orange300
 import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.red300
 import com.one.toit.ui.compose.style.white
-import com.one.toit.ui.compose.ui.unit.BarGraphChart
-import com.one.toit.ui.compose.ui.unit.ItemTodo
-import com.one.toit.ui.compose.ui.unit.LineGraphChart
-import com.one.toit.ui.compose.ui.unit.TodayAchieveUnit
+import com.one.toit.ui.compose.ui.unit.graph.BarGraphChart
+import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
+import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
+import com.one.toit.ui.compose.ui.unit.graph.TodayAchieveUnit
 import kotlin.random.Random
 
 // @Preview(showBackground = true)

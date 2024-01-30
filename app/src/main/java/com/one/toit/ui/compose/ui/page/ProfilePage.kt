@@ -1,5 +1,14 @@
 package com.one.toit.ui.compose.ui.page
 
+import android.app.Activity
+import android.content.ContentResolver
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,8 +45,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,11 +65,53 @@ import com.one.toit.ui.compose.style.mono900
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
+import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
+import com.one.toit.util.AppUtil
+import com.one.toit.util.PreferenceUtil
+import timber.log.Timber
+import java.io.File
 
 @Preview(showBackground = true)
 @Composable
 fun ProfilePage() {
-    var userNickname by remember { mutableStateOf("닉네임을 입력하세요") }
+    Timber.plant(Timber.DebugTree())
+    val context = LocalContext.current
+    val prefs = PreferenceUtil.getInstance(context)
+    val profileImgKey = stringResource(id = R.string.key_profile_img)
+    val pickSuccess = stringResource(id = R.string.ts_picked_img)
+    val pickError = stringResource(id = R.string.ts_error_pick_img)
+    // 사진 불러오기 기능
+    // 이미지 불러오기
+    val photoIntent =
+        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+            type = "image/*"
+            action = Intent.ACTION_PICK
+            putExtra(
+                Intent.EXTRA_MIME_TYPES,
+                arrayOf("image/jpeg", "image/png", "image/bmp", "image/webp")
+            )
+        }
+    val photoLauncher = // 갤러리에서 사진 가져오기
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+//                    Timber.i("picked uri %s", uri)
+//                    Timber.i("uri path %s", uri.path)
+//                    Timber.i("encoded path %s", uri.encodedPath)
+                    AppUtil.toast(context, pickSuccess)
+                    prefs.setValue(profileImgKey, uri.toString())
+                } ?: run { AppUtil.toast(context, pickError) }
+            } else if (result.resultCode != Activity.RESULT_CANCELED) {
+                // ??
+            }
+        }
+    /**
+     * 프로필 정보 관련
+     */
+    val nickNameKey = stringResource(id = R.string.key_nickname)
+    var userNickname by remember { mutableStateOf(prefs.getValue(nickNameKey)) }
+    var userProfile by remember { mutableStateOf(prefs.getValue(profileImgKey)) }
     var todoState by remember { mutableStateOf(5) }
     var todoGoal by remember { mutableStateOf(10) }
     var toitPoint by remember { mutableStateOf(2024) }
@@ -64,7 +121,29 @@ fun ProfilePage() {
     var maxRecord by remember { mutableStateOf(26580) } // second
     var avgRecord by remember { mutableStateOf(11460) } // second
     var axiomString by remember { mutableStateOf("성공은 작은 노력의 쌓임입니다.\n오늘 하루도 조금 더 나아가세요.") }
-
+    // 다이얼로그 창
+    var showMenuProfile by remember { mutableStateOf(false) }
+    var showEditNickName by remember { mutableStateOf(false) }
+    if(showMenuProfile){
+        ProfileMenuDialog(
+            onDismiss = { showMenuProfile = false },
+            onNickNameEdit = {
+                showMenuProfile = false
+                showEditNickName = true
+             },
+            onEditProfile = {
+                showMenuProfile = false
+                photoLauncher.launch(photoIntent)
+            },
+            onInitProfile = {}
+        )
+    }
+    if(showEditNickName){
+        EditNickNameDialog {
+            showEditNickName = false
+            userNickname = prefs.getValue(nickNameKey)
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -92,8 +171,35 @@ fun ProfilePage() {
                         .fillMaxSize()
                         .background(color = mono100)
                     ){
+                        val painter = if(userProfile.isBlank()){
+                            painterResource(id = R.drawable.ic_profile)
+                        }else {
+                            painterResource(id = R.drawable.ic_profile)
+                        }
+//                        Timber.i("uri : %s", userProfile)
+                        val uri = Uri.parse(userProfile)
+//                        Timber.i("profile uri : %s", uri)
+//                        val file = File(uri.toString())
+//                        Timber.i("file path %s", file.path)
+//                        Timber.i("abs path %s", file.absolutePath)
+//                        Timber.i("name %s", file.name)
+//                        Timber.i("parent %s", file.parent)
+                        try {
+                            val bitmap = AppUtil.Image.getBitmap(uri, context.contentResolver)
+                            Timber.i("bitmap %s", bitmap)
+                            bitmap.asImageBitmap()
+                        }catch (e:Exception){
+                            Timber.e("error!!!!")
+
+                        }
+
+//                        val profileBitmap = AppUtil.Image
+//                            .getBitmap(uri, context.contentResolver)
+//                            BitmapPainter(profileBitmap as ImageBitmap)
+//                        Timber.i("bitmap : %s", profileBitmap)
+
                         Image(
-                            painter = painterResource(id = R.drawable.ic_profile),
+                            painter = painter,
                             contentDescription = "profileImage",
                             modifier = Modifier
                                 .size(24.dp)
@@ -109,12 +215,11 @@ fun ProfilePage() {
                         .copy(
                             fontSize = 16.sp,
                             color = mono800
-
                         )
                 )
                 // 편집 버튼
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { showMenuProfile = true },
                     modifier = Modifier
                         .width(56.dp)
                         .height(24.dp),
@@ -127,20 +232,21 @@ fun ProfilePage() {
                             .compositeOver(purple300),
                         disabledContentColor = mono300.copy(alpha = ContentAlpha.disabled)
                     ),
+                    shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(0.dp),
                 ) {
                     Row(
                         modifier = Modifier
-                            .wrapContentWidth()
-                            .wrapContentHeight(),
+                            .fillMaxSize(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_create_todo),
                             contentDescription = "",
                             modifier = Modifier.size(16.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "편집",
                             fontSize = 10.sp,
@@ -149,10 +255,8 @@ fun ProfilePage() {
                             )
                         )
                     }
-
                 }
             }
-
             // 일일 달성 목표
             Column(
                 modifier = Modifier

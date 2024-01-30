@@ -19,12 +19,14 @@ import com.one.toit.base.ui.BaseFragment
 import com.one.toit.databinding.FragmentIntroBinding
 import com.one.toit.ui.activity.MainActivity
 import com.one.toit.util.AppUtil
+import com.one.toit.util.PreferenceUtil
 import timber.log.Timber
 
 class IntroFragment : BaseFragment<FragmentIntroBinding>() {
 
     // 백버튼 콜백
     private lateinit var callBack: OnBackPressedCallback
+    private lateinit var prefs:PreferenceUtil
     override fun getDataBindingConfig(): DataBindingConfig {
         // 키보드 엔터 이벤트 핸들링을 위한 리스너
         val onKeyListener: View.OnKeyListener = View.OnKeyListener { view, keyCode, keyEvent ->
@@ -32,9 +34,10 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
                 && keyEvent.action == KeyEvent.ACTION_DOWN){
                 // hide keypad
                 AppUtil.UIManager.hideKeyPad(requireActivity())
-                // action...
-                Timber.d("enter...")
-                moveToMain()
+                val txtView = view as TextView
+                Timber.i("value : %s", txtView.text)
+                saveNickName(txtView.text.toString())
+                // moveToMain()
                 true
             }else {
                 false
@@ -48,8 +51,9 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
             if(keyCode == 5 || keyCode == 6){
                 // hide keypad
                 AppUtil.UIManager.hideKeyPad(requireActivity())
-                Timber.d("enter...?")
-                moveToMain()
+                Timber.i("value : %s", textView.text)
+                saveNickName(textView.text.toString())
+                // moveToMain()
                 true
             }else {
                 false
@@ -72,6 +76,12 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
     override fun initViewModel() {
     }
 
+    override fun onResume() {
+        super.onResume()
+        prefs = PreferenceUtil.getInstance(requireContext())
+        val nickNameKey = requireContext().getString(R.string.key_nickname)
+        if(prefs.getValue(nickNameKey).isNotBlank()){ moveToMain() }
+    }
     override fun initView() {
         // 콜백함수에 intent 추가!
         callBack = object : OnBackPressedCallback(true){
@@ -98,18 +108,36 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
         mBinding.notifyChange()
     }
 
-    val viewClickListener = object : ViewClickListener {
+    private val viewClickListener = object : ViewClickListener {
         override fun onViewClick(view: View) {
             when(view.id){
                 R.id.l_btn_start -> {
-                    // TODO intent nickname value?
-                    moveToMain()
+                    val text = mBinding.etInputNickname.text.toString()
+                    saveNickName(text)
+                    Timber.i("value %s", mBinding.etInputNickname.text.toString())
+                    // moveToMain()
                 }
             }
         }
     }
 
+    private fun saveNickName(text:String){
+        if(text.isBlank()){
+            val errText = requireContext().getString(R.string.ts_invalid_nickname)
+            AppUtil.toast(requireContext(), errText)
+            return
+        }
+        val nickNameKey = requireContext().getString(R.string.key_nickname)
+        val successText = requireContext().getString(R.string.ts_save_nickname)
+        AppUtil.toast(requireContext(), successText)
+        Timber.i("nickName.. %s", text)
+        prefs.setValue(nickNameKey, text)
+        moveToMain()
+    }
+
     private fun moveToMain(){
+        val startText = requireContext().getString(R.string.ts_greet)
+        AppUtil.toast(requireContext(), startText)
         val intent = Intent(requireActivity(), MainActivity::class.java)
         requireActivity().onBackPressedDispatcher.onBackPressed()
         launcher.launch(intent)
@@ -120,9 +148,7 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
     ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
             result -> Timber.d("onActivityResult.......")
         if (result.resultCode == Activity.RESULT_OK) { // 저장 성공
-            Timber.d("result Ok...")
         }else if(result.resultCode == Activity.RESULT_CANCELED){ // 저장 실패
-            Timber.e("result Cancel...")
         }
     }
 }

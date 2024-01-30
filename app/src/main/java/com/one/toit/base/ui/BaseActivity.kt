@@ -20,6 +20,7 @@ abstract class BaseActivity<D:ViewDataBinding> : DataBindingActivity<D>() {
     private var mApplicationProvider:ViewModelProvider? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.plant(Timber.DebugTree())
     }
 
     /**

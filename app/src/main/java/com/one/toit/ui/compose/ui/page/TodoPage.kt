@@ -43,11 +43,10 @@ import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono200
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono600
-import com.one.toit.ui.compose.style.purple100
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
-import com.one.toit.ui.compose.ui.unit.ItemNoContent
-import com.one.toit.ui.compose.ui.unit.ItemTodo
+import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
+import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 
 
 @Preview(showBackground = true)

@@ -71,6 +71,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/gl_horizontal1"
             app:layout_constraintBottom_toTopOf="@id/tv_guide"
+            android:onClick="@{(v)->click.onViewClick(v)}"
             />
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_guide"
@@ -124,22 +125,6 @@
             android:layout_marginHorizontal="8dp"
             android:layout_marginVertical="8dp"
             />
-<!--        <androidx.appcompat.widget.AppCompatButton-->
-<!--            android:id="@+id/btn_start"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:background="@color/purple200"-->
-<!--            android:text="시작하기"-->
-<!--            android:textSize="16sp"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:ems="10"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/tv_input_nickname"-->
-<!--            app:layout_constraintBottom_toBottomOf="@id/gl_horizontal2"-->
-<!--            android:onClick="@{(v)->click.onViewClick(v)}"-->
-<!--            />-->
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

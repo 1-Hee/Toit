@@ -20,4 +20,34 @@
     </string-array>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- keys-->
+    <string name="key_nickname">NickName</string>
+    <string name="key_profile_img">ImgProfile</string>
+    <!-- 프로필 편집 메뉴 창 -->
+    <string-array name="menu_profile_edit">
+        <item>프로필 편집</item>
+        <item>닉네임 변경하기</item>
+        <item>프로필 사진 변경</item>
+        <item>프로필 사진 초기화</item>
+        <item>취소</item>
+    </string-array>
+
+    <!-- 닉네임 변경 다이얼로그 값 -->
+    <string name="txt_h_edit_nickname">닉네임 변경</string>
+    <string name="txt_guide_nickname">사용자의 닉네임을 변경합니다.</string>
+    <string name="txt_holder_nickname">닉네임을 입력해주세요(16자 이내)</string>
+    <string name="txt_edit">변경</string>
+    <string name="txt_cancel">취소</string>
+
+    <!-- 토스트 문구 -->
+    <string name="ts_invalid_nickname">유효한 닉네임을 입력해주세요.</string>
+    <string name="ts_save_nickname">닉네임이 등록되었습니다.</string>
+    <string name="ts_greet">Let\'s Toit!</string>
+    <string name="ts_edit_nickname">닉네임이 변경되었습니다.</string>
+
+    <string name="ts_picked_img">프로필 사진이 저장되었습니다.</string>
+    <string name="ts_error_pick_img">프로필 사진을 불러오던 중 오류가 발생했습니다.</string>
+
+
 </resources>

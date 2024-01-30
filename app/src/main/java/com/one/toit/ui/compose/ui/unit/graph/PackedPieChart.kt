@@ -1,4 +1,4 @@
-package com.one.toit.ui.compose.ui.unit
+package com.one.toit.ui.compose.ui.unit.graph
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size

@@ -1,5 +1,6 @@
 package com.one.toit.ui.activity
 
+import android.content.res.Configuration
 import android.os.Bundle
 import com.one.toit.R
 import com.one.toit.base.bind.DataBindingConfig
@@ -11,5 +12,12 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         return DataBindingConfig(R.layout.activity_start)
     }
     override fun init(savedInstanceState: Bundle?) {
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if(hasFocus){
+            hideSystemUI()
+        }
     }
 }

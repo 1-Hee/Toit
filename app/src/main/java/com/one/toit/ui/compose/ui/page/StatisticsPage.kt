@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -35,7 +34,7 @@ import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.white
-import com.one.toit.ui.compose.ui.unit.PerforatedPieChart
+import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
 
 // @Preview(showBackground = true)
 @Composable
