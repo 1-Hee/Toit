@@ -81,7 +81,8 @@ class MainActivity : BaseComposeActivity() {
             val list = arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_MEDIA_IMAGES
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.MANAGE_EXTERNAL_STORAGE
             )
             list.forEach { permission ->
                 requestPermissionLauncher.launch(permission)

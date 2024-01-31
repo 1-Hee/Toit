@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -15,6 +16,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.room.Ignore
+import timber.log.Timber
 
 class AppUtil {
     // 토스트 메세지
@@ -38,32 +40,8 @@ class AppUtil {
         }
     }
     object Image {
-        fun loadBitmapFromUri(uri: Uri, contentResolver: ContentResolver): Bitmap? {
-            return try {
-                ImageDecoder.decodeBitmap(
-                    ImageDecoder.createSource(contentResolver, uri)
-                )
-            } catch (e: Exception) {
-                // Handle any exceptions that may occur during bitmap loading
-                e.printStackTrace()
-                null
-            }
-        }
-
-        fun loadDrawableFromUri(uri: Uri, contentResolver: ContentResolver): Drawable? {
-            return try {
-                contentResolver.openInputStream(uri)?.use { inputStream ->
-                    Drawable.createFromStream(inputStream, uri.toString())
-                }
-            } catch (e: Exception) {
-                // Handle any exceptions that may occur during drawable loading
-                e.printStackTrace()
-                null
-            }
-        }
-
         @Suppress("DEPRECATION")
-        fun getBitmap(uri:Uri, contentResolver: ContentResolver):Bitmap{
+        fun getBitmap(uri:Uri, contentResolver: ContentResolver):Bitmap?{
             val bitmap = if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
                 MediaStore.Images.Media.getBitmap(contentResolver, uri)
             }else {

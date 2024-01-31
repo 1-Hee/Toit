@@ -37,6 +37,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +50,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -84,6 +87,7 @@ fun ProfilePage() {
     // 사진 불러오기 기능
     // 이미지 불러오기
     val photoIntent =
+        // ACTION_GET_CONTENT
         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
             type = "image/*"
             action = Intent.ACTION_PICK
@@ -91,14 +95,18 @@ fun ProfilePage() {
                 Intent.EXTRA_MIME_TYPES,
                 arrayOf("image/jpeg", "image/png", "image/bmp", "image/webp")
             )
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
         }
+
     val photoLauncher = // 갤러리에서 사진 가져오기
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-//                    Timber.i("picked uri %s", uri)
-//                    Timber.i("uri path %s", uri.path)
-//                    Timber.i("encoded path %s", uri.encodedPath)
+                    Timber.i("picked uri %s", uri)
+                    Timber.i("uri path %s", uri.path)
+                    Timber.i("encoded path %s", uri.encodedPath)
+                    val file = File(uri.path)
+                    Timber.i("real path? : %s", file.absolutePath)
                     AppUtil.toast(context, pickSuccess)
                     prefs.setValue(profileImgKey, uri.toString())
                 } ?: run { AppUtil.toast(context, pickError) }
@@ -112,6 +120,7 @@ fun ProfilePage() {
     val nickNameKey = stringResource(id = R.string.key_nickname)
     var userNickname by remember { mutableStateOf(prefs.getValue(nickNameKey)) }
     var userProfile by remember { mutableStateOf(prefs.getValue(profileImgKey)) }
+
     var todoState by remember { mutableStateOf(5) }
     var todoGoal by remember { mutableStateOf(10) }
     var toitPoint by remember { mutableStateOf(2024) }
@@ -171,43 +180,39 @@ fun ProfilePage() {
                         .fillMaxSize()
                         .background(color = mono100)
                     ){
-                        val painter = if(userProfile.isBlank()){
+                        val bitmap =  if(userProfile.isBlank()){
+                            Timber.e("no data for user profile!!!!!!!!!!!!")
+                            null
+                        }else {
+                            try {
+                                val uri = Uri.parse(userProfile)
+                                val parseBitmap = AppUtil.Image.getBitmap(uri, context.contentResolver)
+                                Timber.i("success parse Bitmap.. %s %s %s",
+                                    parseBitmap?.width, parseBitmap?.height, parseBitmap?.density)
+                                parseBitmap?.asImageBitmap()
+                            }catch (e:Exception){
+                                Timber.e("profile path : %s", userProfile)
+                                Timber.e("parsing error!!!!!!!!!!!....")
+                                Timber.e("cause :%s", e.cause)
+                                Timber.e("msg : %s", e.message)
+                                null
+                            }
+                        }
+                        val painter = if(bitmap == null) {
                             painterResource(id = R.drawable.ic_profile)
                         }else {
-                            painterResource(id = R.drawable.ic_profile)
+                            BitmapPainter(bitmap)
                         }
-//                        Timber.i("uri : %s", userProfile)
-                        val uri = Uri.parse(userProfile)
-//                        Timber.i("profile uri : %s", uri)
-//                        val file = File(uri.toString())
-//                        Timber.i("file path %s", file.path)
-//                        Timber.i("abs path %s", file.absolutePath)
-//                        Timber.i("name %s", file.name)
-//                        Timber.i("parent %s", file.parent)
-                        try {
-                            val bitmap = AppUtil.Image.getBitmap(uri, context.contentResolver)
-                            Timber.i("bitmap %s", bitmap)
-                            bitmap.asImageBitmap()
-                        }catch (e:Exception){
-                            Timber.e("error!!!!")
-
-                        }
-
-//                        val profileBitmap = AppUtil.Image
-//                            .getBitmap(uri, context.contentResolver)
-//                            BitmapPainter(profileBitmap as ImageBitmap)
-//                        Timber.i("bitmap : %s", profileBitmap)
-
                         Image(
                             painter = painter,
                             contentDescription = "profileImage",
                             modifier = Modifier
-                                .size(24.dp)
-                                .align(Alignment.Center)
+                                .fillMaxSize()
+                                .align(Alignment.Center),
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }
-
                 // 프로필 명
                 Text(
                     text = "$userNickname 님",
@@ -300,9 +305,7 @@ fun ProfilePage() {
                             )
                     )
                 }
-
             }
-
             // 레코드 보드
             Column(
                 modifier = Modifier
@@ -343,9 +346,7 @@ fun ProfilePage() {
                         .height(24.dp)
                         .background(mono300))
                     RecordBox("평균 목표", "$avgTodo" )
-
                 }
-
                 // 최단기록, 최장기록, 평균 기록
                 Row(
                     modifier = Modifier

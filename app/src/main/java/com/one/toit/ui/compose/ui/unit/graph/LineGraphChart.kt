@@ -55,28 +55,30 @@ fun LineGraphChart(
         )
     }
     // val spacing = 48f
-    val scrollstate = rememberScrollState()
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ){
-
         val textMeasurer = rememberTextMeasurer()
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(maxValue.dp)
         ) {
-
-            var prevX = 0f
-            var prevY = 0f
-            // Timber.i("start : $prevX | $prevY")
-            data.values.forEachIndexed { index, chartEntry ->
-                val startingPoint = Offset(size.width - prevX, prevY)
-                val nextX = prevX + (size.width/data.values.size.toFloat())
-                val endingPoint = Offset(size.width - nextX, chartEntry.volume.toFloat())
-                // Timber.i("idx $index : (${startingPoint.x} , ${startingPoint.y}) | (${endingPoint.x}, ${endingPoint.y})")
+            val unit = (size.width / data.values.size)
+            val valueList = data.values.toList()
+            val center = (size.height/2)
+            for (idx in valueList.indices){
+                if(idx == valueList.size -1 ) return@Canvas
+                val index = idx + 1
+                val chartEntry = valueList[index]
+                val startX = unit*(idx)
+                val startY = center - valueList[index-1].volume.toFloat()
+                val endX = unit*(idx+1)
+                val endY = center - valueList[index].volume.toFloat()
+                val startingPoint = Offset(startX, startY)
+                val endingPoint = Offset(endX, endY)
                 drawLine(
                     graphColor,
                     strokeWidth = 4.dp.toPx(),
@@ -84,7 +86,6 @@ fun LineGraphChart(
                     end = endingPoint * animatedProgress.value,
                     cap = StrokeCap.Round
                 )
-
                 // 점
                 drawCircle(
                     dotColor,
@@ -97,73 +98,50 @@ fun LineGraphChart(
                     center = Offset(endingPoint.x, endingPoint.y) * animatedProgress.value
                 )
                 // 값
+                if(idx == 0){
+                    val startValue = valueList[index-1].volume.toFloat()
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = startValue.toString(),
+                        topLeft = startingPoint * animatedProgress.value,
+                        style = TextStyle.Default.copy(
+                            color = textColor,
+                            fontSize = 8.sp
+                        )
+                    )
+                    // 날짜
+                    val mStartPoint = Offset(startingPoint.x, size.height - 64f)
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = keyList[index-1],
+                        topLeft = mStartPoint,
+                        style = TextStyle.Default.copy(
+                            color = textColor,
+                            fontSize = 8.sp
+                        )
+                    )
+                }
                 drawText(
                     textMeasurer = textMeasurer,
                     text = chartEntry.volume.toString(),
-                    topLeft = startingPoint * animatedProgress.value,
+                    topLeft = endingPoint * animatedProgress.value,
                     style = TextStyle.Default.copy(
                         color = textColor,
                         fontSize = 8.sp
                     )
                 )
-                val mStartPoint = Offset(startingPoint.x, size.height - 64f)
+                // 날짜
+                val mEndPoint = Offset(endingPoint.x, size.height - 64f)
                 drawText(
                     textMeasurer = textMeasurer,
                     text = keyList[index],
-                    topLeft = mStartPoint * animatedProgress.value,
+                    topLeft = mEndPoint,
                     style = TextStyle.Default.copy(
                         color = textColor,
                         fontSize = 8.sp
                     )
                 )
-                prevX = nextX
-                prevY = endingPoint.y
-
             }
-
-//            val spacePerHour = (size.width - spacing) / data.values.size
-//            val normX = mutableListOf<Float>()
-//            val normY = mutableListOf<Float>()
-//            val strokePath = Path().apply {
-//                for (i in data.values.indices) {
-//                    val currentX = spacing + i * spacePerHour
-//                    if (i == 0) {
-//                        moveTo(currentX, yPoints[i])
-//                    } else {
-//                        val previousX = spacing + (i - 1) * spacePerHour
-//                        val conX1 = (previousX + currentX) / 2f
-//                        val conX2 = (previousX + currentX) / 2f
-//                        val conY1 = yPoints[i - 1]
-//                        val conY2 = yPoints[i]
-//                        cubicTo(
-//                            x1 = conX1,
-//                            y1 = conY1,
-//                            x2 = conX2,
-//                            y2 = conY2,
-//                            x3 = currentX,
-//                            y3 = yPoints[i]
-//                        )
-//                    }
-//                    // Circle dot points
-//                    normX.add(currentX)
-//                    normY.add(yPoints[i])
-//                }
-//            }
-//            drawPath(
-//                path = strokePath,
-//                color = graphColor,
-//                style = Stroke(
-//                    width = 4.dp.toPx(),
-//                    cap = StrokeCap.Round
-//                )
-//            )
-//            (normX.indices).forEach {
-//                drawCircle(
-//                    mono100,
-//                    radius = 4.dp.toPx(),
-//                    center = Offset(normX[it], normY[it])
-//                )
-//            }
         }
     }
 }

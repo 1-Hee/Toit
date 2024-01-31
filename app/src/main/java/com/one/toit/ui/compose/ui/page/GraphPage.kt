@@ -50,7 +50,6 @@ fun GraphPage(
 ){
     val outerScrollState = rememberScrollState()
     val innerScrollState = rememberScrollState()
-
     // dummy
     val test = listOf(
         "9/1","9/2","9/3","9/4","9/5",
@@ -119,25 +118,15 @@ fun GraphPage(
                     maxValue = 172,
                 )
             }else {
-                // TODO 꺾은선 그래프!
-
-//                val testMap = mutableMapOf<String, ChartEntry>(
-//                    "1" to ChartEntry(volume = 100, red300),
-//                    "2" to ChartEntry(volume = 200, red300),
-//                    "3" to ChartEntry(volume = 300, red300),
-//                    "4" to ChartEntry(volume = 400, red300),
-//                    "5" to ChartEntry(volume = 500, red300),
-//                )
-
                 LineGraphChart(
                     data = testData,
                     durationMillis = 700,
                     maxValue = 172
                 )
             }
-
-            //
-            TodayAchieveUnit(10, 10)
+            Spacer(modifier = Modifier.height(24.dp))
+            TodayAchieveUnit(5, 10)
+            // TODO 투두리스트 Header 달기!
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -151,7 +140,6 @@ fun GraphPage(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
         }
     }
 }
