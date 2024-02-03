@@ -110,7 +110,11 @@ fun AppSettingPage(){
                     ),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            SettingUnit(
+            /**
+             * 체크할 권한
+             * 1) 푸시 알림, 2) 카메라, 3) 미디어, 4) 위치
+             */
+              SettingUnit(
                 imgVector = Icons.Rounded.Notifications,
                 settingName = "앱 푸시 알림",
                 description = "앱 사용에 필요한 정보와 알림을 수신합니다.\n앱 OS 설정에서 권한을 수정할 수 있습니다."

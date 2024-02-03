@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
@@ -16,6 +17,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.room.Ignore
+import com.one.toit.data.dto.MediaDTO
 import timber.log.Timber
 
 class AppUtil {
@@ -52,6 +54,53 @@ class AppUtil {
                 }
             }
             return bitmap
+        }
+
+        /**
+         * 이미지 로드
+         */
+        fun loadImage(
+            resolver: ContentResolver,
+            selection: String? = null,
+            selectionArgs: Array<String>? = null,
+            sortOrder: String? = null
+        ):MutableList<MediaDTO>{
+            val mediaDTOList = mutableListOf<MediaDTO>()
+            val projection = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.MIME_TYPE,
+                MediaStore.Images.Media.DATE_MODIFIED,
+                MediaStore.MediaColumns.SIZE
+            )
+
+            val cursor: Cursor = resolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, sortOrder)
+                ?: return mutableListOf();
+            val idColum:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val dpNameColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val mimeColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)
+            // option : DATE_MODIFIED, DATE_ADDED, DATE_EXPIRES, DATE_TAKEN
+            val dateColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
+            val sizeColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+
+
+            while(cursor.moveToNext()){
+                val id:Long = cursor.getLong(idColum)
+                val dpName:String = cursor.getString(dpNameColumn)
+                val mimeType:String = cursor.getString(mimeColumn)
+                val contentUri:Uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
+                val date:Long = cursor.getLong(dateColumn)
+                val fileSize:Long = cursor.getLong(sizeColumn)
+                val mediaDTO = MediaDTO(
+                    fileName = dpName,
+                    mimeType =  mimeType,
+                    savedAddress = contentUri.toString(),
+                    lastUpdate = date,
+                    fileSize = fileSize
+                )
+                mediaDTOList.add(mediaDTO)
+            }
+            return mediaDTOList
         }
     }
 }
