@@ -1,5 +1,6 @@
 package com.one.toit.ui.activity
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -53,6 +54,32 @@ class SettingActivity : BaseComposeActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SettingScreenView(this)
+        }
+    }
+
+    // 권한 요청 결과 처리
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            1001 -> {
+                // 각 권한에 대한 결과를 확인하고 필요한 처리 수행
+                for (i in permissions.indices) {
+                    when (permissions[i]) {
+                        Manifest.permission.READ_MEDIA_VIDEO -> {
+                            // READ_MEDIA_VIDEO에 대한 처리
+                        }
+                        Manifest.permission.READ_MEDIA_IMAGES -> {
+                            // READ_MEDIA_IMAGES에 대한 처리
+                        }
+                        // ... 다른 권한들에 대한 처리 추가 ...
+                    }
+                }
+            }
+            // 다른 요청 코드에 대한 처리 추가
         }
     }
 }

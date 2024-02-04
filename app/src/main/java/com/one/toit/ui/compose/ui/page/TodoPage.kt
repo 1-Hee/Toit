@@ -1,6 +1,11 @@
 package com.one.toit.ui.compose.ui.page
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +31,7 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +43,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.gun0912.tedpermission.coroutine.TedPermission
 import com.one.toit.R
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
@@ -47,6 +56,7 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
+import timber.log.Timber
 
 
 @Preview(showBackground = true)
@@ -58,7 +68,10 @@ fun TodoPage(){
             .background(white)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
-
+        /**
+         * 권한 체크
+         */
+        requestPermission(LocalContext.current)
         val context = LocalContext.current
         val intent = Intent(context, BoardActivity::class.java)
         var checked by remember { mutableStateOf(false) }
@@ -157,3 +170,88 @@ fun TodoPage(){
     }
 }
 
+private fun requestPermission(context:Context){
+    // API Version < 33
+    val ALL_PERMISSION:Array<String> = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.CAMERA
+    )
+    // API Version >= 33
+    val ALL_PERMISSION_33:Array<String> = arrayOf(
+        Manifest.permission.READ_MEDIA_VIDEO,
+        Manifest.permission.READ_MEDIA_IMAGES,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.CAMERA
+    )
+    val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+        ALL_PERMISSION_33
+    }else {
+        ALL_PERMISSION
+    }
+
+    // 권한 요청 함수
+    val permissionsToRequest = mutableListOf<String>()
+
+    // 필요한 권한 중에서 아직 허용되지 않은 권한을 확인
+    for (permission in permissionList) {
+        if (ContextCompat.checkSelfPermission(context, permission)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsToRequest.add(permission)
+        }
+    }
+
+    // 권한 요청이 필요한 경우 요청
+    if (permissionsToRequest.isNotEmpty()) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            permissionsToRequest.toTypedArray(),
+            1001
+        )
+    }
+
+//    // API Version < 33
+//    val ALL_PERMISSION:Array<String> = arrayOf(
+//        Manifest.permission.READ_EXTERNAL_STORAGE,
+//        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//        Manifest.permission.POST_NOTIFICATIONS,
+//        Manifest.permission.ACCESS_FINE_LOCATION,
+//        Manifest.permission.CAMERA
+//    )
+//    // API Version >= 33
+//    val ALL_PERMISSION_33:Array<String> = arrayOf(
+//        Manifest.permission.READ_MEDIA_VIDEO,
+//        Manifest.permission.READ_MEDIA_IMAGES,
+//        Manifest.permission.READ_EXTERNAL_STORAGE,
+//        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//        Manifest.permission.POST_NOTIFICATIONS,
+//        Manifest.permission.ACCESS_FINE_LOCATION,
+//        Manifest.permission.CAMERA
+//    )
+//    val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+//        ALL_PERMISSION_33
+//    }else {
+//        ALL_PERMISSION
+//    }
+//    LaunchedEffect(Unit) {
+//        // CoroutineScope
+//        val deniedMsg = "앱 사용이 필요한 권한을 허용해주세요. \n[설정] > [앱 및 알림] > [고급] > [앱 권한]"
+//        val permissionResult =
+//            TedPermission.create()
+//                .setDeniedMessage(deniedMsg)
+//                .setPermissions(*permissionList)
+//                .check()
+//        /*
+//        requestPermission
+//         */
+//        permissionResult.deniedPermissions.forEach { it ->
+//            Timber.i("action : %s", it)
+//        }
+//    }
+}

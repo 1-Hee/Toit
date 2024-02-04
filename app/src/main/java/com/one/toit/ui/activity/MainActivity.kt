@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,7 +64,6 @@ import timber.log.Timber
 
 class MainActivity : BaseComposeActivity() {
     private lateinit var mainMenuViewModel: MainMenuViewModel
-
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -78,34 +78,13 @@ class MainActivity : BaseComposeActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainScreenView(mainMenuViewModel)
-            val list = arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.MANAGE_EXTERNAL_STORAGE
-            )
-            list.forEach { permission ->
-                requestPermissionLauncher.launch(permission)
-            }
         }
     }
-
     override fun initViewModel() {
         super.initViewModel()
         mainMenuViewModel = getApplicationScopeViewModel(MainMenuViewModel::class.java)
         mainMenuViewModel.init()
         mainMenuViewModel.setPageName(baseContext.getString(R.string.p_todo))
-    }
-
-    private val launcher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
-            result -> Timber.d("onActivityResult.......")
-        if (result.resultCode == Activity.RESULT_OK) { // 저장 성공
-            Timber.d("result Ok...")
-        }else if(result.resultCode == Activity.RESULT_CANCELED){ // 저장 실패
-            Timber.e("result Cancel...")
-        }
     }
 }
 @Composable
@@ -160,7 +139,6 @@ fun MainTopBarComponent(
         )
     }
 }
-
 @Composable
 fun MainNavGraph(navController: NavHostController) {
     NavHost(
@@ -190,7 +168,6 @@ fun MainBottomNavigation(navController: NavHostController, viewModel:MainMenuVie
         MainRoute.Statistics,
         MainRoute.Profile
     )
-
     BottomNavigation(
         backgroundColor = Color.White,
         contentColor = Color(0xff0a090a)

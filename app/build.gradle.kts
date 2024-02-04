@@ -70,7 +70,7 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    // debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.material:material:1.2.0")
     implementation("com.google.android.material:material:1.6.0-alpha01")
     implementation("io.coil-kt:coil-compose:2.2.2")
@@ -78,6 +78,9 @@ dependencies {
     // compose navigation
     val comp_nav_version = "2.4.1"
     implementation("androidx.navigation:navigation-compose:$comp_nav_version")
+
+    // glide compose
+    implementation("com.github.skydoves:landscapist-glide:1.4.7")
 
     // tools
     // multi dex

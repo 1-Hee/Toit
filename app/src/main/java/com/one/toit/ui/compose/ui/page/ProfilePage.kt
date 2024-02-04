@@ -1,6 +1,9 @@
 package com.one.toit.ui.compose.ui.page
 
+import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
@@ -53,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.loader.content.CursorLoader
 import com.one.toit.R
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -66,7 +70,10 @@ import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
+import com.skydoves.landscapist.CircularReveal
+import com.skydoves.landscapist.glide.GlideImage
 import timber.log.Timber
+import java.io.InputStream
 
 @Preview(showBackground = true)
 @Composable
@@ -75,46 +82,15 @@ fun ProfilePage() {
     val context = LocalContext.current
     val prefs = PreferenceUtil.getInstance(context)
     val profileImgKey = stringResource(id = R.string.key_profile_img)
-    val pickSuccess = stringResource(id = R.string.ts_picked_img)
-    val pickError = stringResource(id = R.string.ts_error_pick_img)
-    // 사진 불러오기 기능
-    // 이미지 불러오기
-//    val photoIntent =
-//        // ACTION_GET_CONTENT
-//        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-//            type = "image/*"
-//            action = Intent.ACTION_PICK
-//            putExtra(
-//                Intent.EXTRA_MIME_TYPES,
-//                arrayOf("image/jpeg", "image/png", "image/bmp", "image/webp")
-//            )
-//            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-//        }
-//
-//    val photoLauncher = // 갤러리에서 사진 가져오기
-//        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                result.data?.data?.let { uri ->
-//                    Timber.i("picked uri %s", uri)
-//                    Timber.i("uri path %s", uri.path)
-//                    Timber.i("encoded path %s", uri.encodedPath)
-//                    val file = File(uri.path)
-//                    Timber.i("real path? : %s", file.absolutePath)
-//                    AppUtil.toast(context, pickSuccess)
-//                    prefs.setValue(profileImgKey, uri.toString())
-//                } ?: run { AppUtil.toast(context, pickError) }
-//            } else if (result.resultCode != Activity.RESULT_CANCELED) {
-//                // ??
-//            }
-//        }
-
     /**
      * 프로필 정보 관련
      */
     val nickNameKey = stringResource(id = R.string.key_nickname)
-    var userNickname by remember { mutableStateOf(prefs.getValue(nickNameKey)) }
-    var userProfile by remember { mutableStateOf(prefs.getValue(profileImgKey)) }
-
+    var userNickname by remember { mutableStateOf(prefs.getValue(nickNameKey)) } // 사용자 닉네임
+    var userProfile by remember { mutableStateOf(prefs.getValue(profileImgKey)) } // 사용자 프로필 이미지 주소
+    /**
+     * 사용자 프로필 통계 정보
+     */
     var todoState by remember { mutableStateOf(5) }
     var todoGoal by remember { mutableStateOf(10) }
     var toitPoint by remember { mutableStateOf(2024) }
@@ -124,22 +100,35 @@ fun ProfilePage() {
     var maxRecord by remember { mutableStateOf(26580) } // second
     var avgRecord by remember { mutableStateOf(11460) } // second
     var axiomString by remember { mutableStateOf("성공은 작은 노력의 쌓임입니다.\n오늘 하루도 조금 더 나아가세요.") }
-    // 다이얼로그 창
+    // 다이얼로그 창 상태관리 변수
     var showMenuProfile by remember { mutableStateOf(false) }
     var showEditNickName by remember { mutableStateOf(false) }
-
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            Timber.i("image : %s", uri.toString())
-            // 실제 파일 경로를 얻기 위해 ContentResolver 사용
-            val realPath = getRealPathFromURI(context.contentResolver, it)
-            realPath.let { filePath ->
-                Timber.i("realPath : %s ", filePath)
-                prefs.setValue(profileImgKey, filePath)
-                Timber.i("userProfile : %s", userProfile)
+    val pickSuccess = stringResource(id = R.string.ts_picked_img)
+    val pickError = stringResource(id = R.string.ts_error_pick_img)
+    // 사진 불러오기 기능
+    val photoIntent =
+        // ACTION_GET_CONTENT
+        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+            type = "image/*"
+            action = Intent.ACTION_PICK
+            putExtra(
+                Intent.EXTRA_MIME_TYPES,
+                arrayOf("image/jpeg", "image/png", "image/bmp", "image/webp")
+            )
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
+        }
+    val photoLauncher = // 갤러리에서 사진 가져오기
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    AppUtil.toast(context, pickSuccess)
+                    prefs.setValue(profileImgKey, uri.toString())
+                    userProfile = uri.toString()
+                } ?: run { AppUtil.toast(context, pickError) }
+            } else if (result.resultCode != Activity.RESULT_CANCELED) {
+                // ??
             }
         }
-    }
 
     if(showMenuProfile){
         ProfileMenuDialog(
@@ -150,10 +139,13 @@ fun ProfilePage() {
              },
             onEditProfile = {
                 showMenuProfile = false
-                // photoLauncher.launch(photoIntent)
-                launcher.launch("image/*")
+                photoLauncher.launch(photoIntent)
             },
-            onInitProfile = {}
+            onInitProfile = {
+                prefs.setValue(profileImgKey, "")
+                userProfile = ""
+                showMenuProfile = false
+            }
         )
     }
     if(showEditNickName){
@@ -189,78 +181,18 @@ fun ProfilePage() {
                         .fillMaxSize()
                         .background(color = mono100)
                     ){
-                        /**
-                         * 현재 intent를 통해서 uri를 콜백함수로 처리하면
-                         * 콘텐츠 프로바이더를 통해 가져오는 것과 다른 주소를 리턴하고
-                         * 결과적으로 파싱 함수를 통해 변환하는 것이 불가능해짐
-                         */
-
-                        val defPainter = painterResource(id = R.drawable.ic_profile)
-                        val painter = if(userProfile.isBlank()){
-                            Timber.i("userProfile is empty!!")
-                            defPainter
-                        }else {
-                            try {
-                                Timber.i("user profile : %s", userProfile)
-                                val uri = Uri.parse(userProfile)
-                                val bitmap = AppUtil.Image.getBitmap(uri, context.contentResolver)
-                                if(bitmap == null) defPainter
-                                else {
-                                    BitmapPainter(bitmap.asImageBitmap())
-                                }
-                            }catch (e : Exception){
-                                Timber.e("[msg] : %s", e.message)
-                                Timber.e("parsing error!!!!")
-                                defPainter
-                            }
-                        }
-
-//                        val list = AppUtil.Image.loadImage(context.contentResolver)
-//                        Timber.i("[list] : %s", list)
-//                        prefs.setValue(profileImgKey, list[0].savedAddress);
-//                        try {
-//                            Timber.i("adddress : %s", userProfile)
-//                            val uri = Uri.parse(userProfile);
-//                            Timber.i("profile uri : %s", uri)
-//                            val bitmap = AppUtil.Image.getBitmap(uri, context.contentResolver)
-//                            Timber.i("user bitmap : %s", bitmap)
-//                            if(bitmap != null){
-//                                painter = BitmapPainter(bitmap.asImageBitmap())
-//                            }
-//
-//                        }catch (e:Exception){
-//
-//                        }
-//                        val bitmap =  if(userProfile.isBlank()){
-//                            Timber.e("no data for user profile!!!!!!!!!!!!")
-//                            null
-//                        }else {
-//                            try {
-//                                val uri = Uri.parse(userProfile)
-//                                val parseBitmap = AppUtil.Image.getBitmap(uri, context.contentResolver)
-//                                Timber.i("success parse Bitmap.. %s %s %s",
-//                                    parseBitmap?.width, parseBitmap?.height, parseBitmap?.density)
-//                                parseBitmap?.asImageBitmap()
-//                            }catch (e:Exception){
-//                                Timber.e("profile path : %s", userProfile)
-//                                Timber.e("parsing error!!!!!!!!!!!....")
-//                                Timber.e("cause :%s", e.cause)
-//                                Timber.e("msg : %s", e.message)
-//                                null
-//                            }
-//                        }
-//                        val painter = if(bitmap == null) {
-//                            painterResource(id = R.drawable.ic_profile)
-//                        }else {
-//                            BitmapPainter(bitmap)
-//                        }
-                        Image(
-                            painter = painter,
-                            contentDescription = "profileImage",
+                        GlideImage(
+                            imageModel = userProfile,
+                            // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
+                            contentScale = ContentScale.Crop,
+                            circularReveal = CircularReveal(duration = 0),
+                            // 이미지 로딩 전 표시할 place holder 이미지
+                            placeHolder = painterResource(id = R.drawable.ic_profile),
+                            // 에러 발생 시 표시할 이미지
+                            error = painterResource(id = R.drawable.ic_profile),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .align(Alignment.Center),
-                            contentScale = ContentScale.Crop
                         )
                     }
                 }
@@ -447,8 +379,7 @@ fun RecordBox(title:String, content:String, hasHelp:Boolean = false){
         Row(
             modifier = Modifier
                 .wrapContentSize()
-                .align(Alignment.TopCenter)
-            ,
+                .align(Alignment.TopCenter),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -467,7 +398,6 @@ fun RecordBox(title:String, content:String, hasHelp:Boolean = false){
                     tint = mono900,
                     modifier = Modifier.size(16.dp)
                 )
-
             }
         }
         Text(
@@ -487,21 +417,4 @@ fun calcTimeString(time:Long):String{
     val hour  = ( time / 60 ) / 60;
     val min = (time / 60) % 60;
     return "$hour:$min"
-}
-
-
-// ContentResolver를 사용하여 URI에서 실제 파일 경로 얻기
-private fun getRealPathFromURI(contentResolver: ContentResolver, uri: Uri): String {
-    var realPath = ""
-    val projection = arrayOf(MediaStore.Images.Media._ID)
-    val cursor: Cursor = contentResolver.query(uri, projection, null, null, null) ?: return ""
-    val idColum:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-    cursor.use {
-        if (it.moveToFirst()) {
-            val id:Long = cursor.getLong(idColum)
-            val contentUri:Uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
-            realPath = contentUri.toString();
-        }
-    }
-    return realPath
 }
