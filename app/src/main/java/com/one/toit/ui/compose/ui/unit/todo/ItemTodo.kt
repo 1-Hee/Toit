@@ -38,6 +38,7 @@ import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.ui.unit.WarningDialog
 import timber.log.Timber
+import kotlin.random.Random
 
 @Preview(showBackground = true)
 @Composable
@@ -47,14 +48,10 @@ fun ItemTodo(
     logTimeString:String = "12:34에 기록됨.",
     isSuccess:Boolean = false
 ){
-
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
-
     var showPreViewDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-
-
     // 다이얼로그 팝업
     if (showPreViewDialog) {
         TodoPreviewDialog(
@@ -72,7 +69,6 @@ fun ItemTodo(
             }
         )
     }
-
     // 삭제 다이얼로그
     if(showDeleteDialog){
         WarningDialog(
@@ -84,7 +80,6 @@ fun ItemTodo(
             textAction = "삭제"
         )
     }
-
     Card(
         elevation = 1.dp,
         shape = RoundedCornerShape(12.dp),
@@ -93,9 +88,13 @@ fun ItemTodo(
             .height(92.dp)
             .background(mono50)
             .clickable {
-                showPreViewDialog = true
-//                intent.putExtra("pageIndex", 2)
-//                context.startActivity(intent)
+                // dommy...
+                if(Random.nextBoolean()){
+                    showPreViewDialog = true
+                }else{
+                    intent.putExtra("pageIndex", 2)
+                    context.startActivity(intent)
+                }
             }
     ){
         Box(

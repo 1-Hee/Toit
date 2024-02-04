@@ -78,7 +78,6 @@ fun TodoPage(){
         val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
         var hasContent by remember { mutableStateOf(true) }
         val scrollState = rememberScrollState()
-
         // content list
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -121,7 +120,6 @@ fun TodoPage(){
                             uncheckedTrackColor= mono200,
                         ),
                     )
-
                 }
             }
             // content
@@ -215,43 +213,4 @@ private fun requestPermission(context:Context){
             1001
         )
     }
-
-//    // API Version < 33
-//    val ALL_PERMISSION:Array<String> = arrayOf(
-//        Manifest.permission.READ_EXTERNAL_STORAGE,
-//        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//        Manifest.permission.POST_NOTIFICATIONS,
-//        Manifest.permission.ACCESS_FINE_LOCATION,
-//        Manifest.permission.CAMERA
-//    )
-//    // API Version >= 33
-//    val ALL_PERMISSION_33:Array<String> = arrayOf(
-//        Manifest.permission.READ_MEDIA_VIDEO,
-//        Manifest.permission.READ_MEDIA_IMAGES,
-//        Manifest.permission.READ_EXTERNAL_STORAGE,
-//        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//        Manifest.permission.POST_NOTIFICATIONS,
-//        Manifest.permission.ACCESS_FINE_LOCATION,
-//        Manifest.permission.CAMERA
-//    )
-//    val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-//        ALL_PERMISSION_33
-//    }else {
-//        ALL_PERMISSION
-//    }
-//    LaunchedEffect(Unit) {
-//        // CoroutineScope
-//        val deniedMsg = "앱 사용이 필요한 권한을 허용해주세요. \n[설정] > [앱 및 알림] > [고급] > [앱 권한]"
-//        val permissionResult =
-//            TedPermission.create()
-//                .setDeniedMessage(deniedMsg)
-//                .setPermissions(*permissionList)
-//                .check()
-//        /*
-//        requestPermission
-//         */
-//        permissionResult.deniedPermissions.forEach { it ->
-//            Timber.i("action : %s", it)
-//        }
-//    }
 }

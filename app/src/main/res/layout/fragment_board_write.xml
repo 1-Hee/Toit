@@ -54,6 +54,7 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
         android:onClick="@{(v)->click.onViewClick(v)}"
+        android:background="@color/white"
         >
 
         <androidx.constraintlayout.widget.Guideline
