@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -25,12 +26,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.navy400
 import com.one.toit.ui.compose.style.orange300
@@ -41,6 +45,7 @@ import com.one.toit.ui.compose.ui.unit.graph.BarGraphChart
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.TodayAchieveUnit
+import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
 import kotlin.random.Random
 
 // @Preview(showBackground = true)
@@ -71,7 +76,6 @@ fun GraphPage(
         testData[date] = ChartEntry(volume, colorList[randIdx])
     }
     // dummy!
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -124,9 +128,34 @@ fun GraphPage(
                     maxValue = 172
                 )
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(id = R.string.txt_guide_graph),
+                style = MaterialTheme.typography.caption
+                    .copy(
+                        fontSize = 8.sp,
+                        color = mono400,
+                        textAlign = TextAlign.End
+                    ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            )
             Spacer(modifier = Modifier.height(24.dp))
             TodayAchieveUnit(5, 10)
-            // TODO 투두리스트 Header 달기!
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(id = R.string.header_todo_list),
+                style = MaterialTheme.typography.subtitle1
+                    .copy(
+                        fontSize = 16.sp,
+                        color = black
+                    ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            )
+            Spacer(modifier = Modifier.height(24.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

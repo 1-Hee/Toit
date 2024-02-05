@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,6 +69,7 @@ import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
+import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
 import com.skydoves.landscapist.CircularReveal
@@ -154,6 +156,15 @@ fun ProfilePage() {
             userNickname = prefs.getValue(nickNameKey)
         }
     }
+
+    // 프로필 프리뷰
+    var isShowProfilePreview by remember { mutableStateOf(false) }
+    if(isShowProfilePreview){
+        ProfilePreviewDialog(userProfile){
+            isShowProfilePreview = false
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -192,7 +203,8 @@ fun ProfilePage() {
                             error = painterResource(id = R.drawable.ic_profile),
                             modifier = Modifier
                                 .fillMaxSize()
-                                .align(Alignment.Center),
+                                .align(Alignment.Center)
+                                .clickable { isShowProfilePreview = true },
                         )
                     }
                 }

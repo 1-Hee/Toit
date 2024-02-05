@@ -76,6 +76,8 @@ fun StatisticsPage(
                 radiusOuter = 64.dp,
                 chartBarWidth = 16.dp,
                 animDuration = 700,
+                total = 10,
+                success = 7
             )
             // 격언
             val sentence = stringResource(id = R.string.sample_guide)

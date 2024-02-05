@@ -48,6 +48,9 @@
 
     <string name="ts_picked_img">프로필 사진이 저장되었습니다.</string>
     <string name="ts_error_pick_img">프로필 사진을 불러오던 중 오류가 발생했습니다.</string>
+    <string name="header_todo_list">TODO! List</string>
+    <string name="txt_guide_graph">최근 2주간의 목표 달성 통계 그래프로 확인하실 수 있습니다.</string>
+    <string name="txt_daily_circle_graph">목표 달성</string>
 
 
 </resources>

@@ -29,13 +29,17 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono600
+import com.one.toit.ui.compose.style.mono700
+import com.one.toit.ui.compose.style.mono900
 
 @Composable
 fun PerforatedPieChart(
@@ -43,6 +47,8 @@ fun PerforatedPieChart(
     radiusOuter: Dp = 140.dp,
     chartBarWidth: Dp = 35.dp,
     animDuration: Int = 1000,
+    total:Int,
+    success:Int
 ) {
     val colors = mutableListOf<Color>()
 
@@ -119,6 +125,33 @@ fun PerforatedPieChart(
                     )
                     lastValue += value
                 }
+            }
+            Column(modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.Center),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "$success / $total",
+                    style = MaterialTheme.typography.caption.copy(
+                        fontSize = 14.sp,
+                        color = mono900,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier
+                        .wrapContentSize()
+                )
+                Text(
+                    text = stringResource(R.string.txt_daily_circle_graph),
+                    style = MaterialTheme.typography.caption.copy(
+                        fontSize = 12.sp,
+                        color = mono600,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier
+                        .wrapContentSize()
+                )
             }
         }
 
