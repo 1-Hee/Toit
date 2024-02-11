@@ -1,6 +1,10 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.android.gms.oss-licenses-plugin")
     kotlin("kapt")// 사용하는 코틀린 버전에 맞게 해주어야함!
 }
 
@@ -13,9 +17,10 @@ android {
         applicationId = "com.one.toit"
         minSdk = 24
         targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
-
+        versionCode = 2
+        versionName = "1.0.1"
+        versionName = "1.1.5"
+        multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,16 +33,47 @@ android {
             )
         }
     }
+    signingConfigs {
+        create("debugSignedKey") {
+            /*
+             */
+        }
+
+        create("releaseSignedKey") {
+            /*
+             */
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    applicationVariants.all {
+        val variant = this
+        val currentDate = Date();
+        val formattedDate = SimpleDateFormat("yyyy_MM_dd").format(currentDate)
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                if(output.outputFile != null){
+                    if(output.outputFile.name.endsWith(".apk")){
+                        val appPrefix = "to_it"
+                        val versionName = variant.versionName
+                        val buildType = variant.buildType.name
+                        val outputName = "${appPrefix}_${buildType}_${formattedDate}_${versionName}.apk"
+                        output.outputFileName = outputName
+                    }
+                }
+            }
+    }
+
     buildFeatures {
         compose = true
         dataBinding = true
         viewBinding = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -169,5 +205,8 @@ dependencies {
     // For the view system.
     implementation("com.patrykandpatrick.vico:views:$vico_version")
 
+    // https://developers.google.com/android/guides/opensource?hl=ko#kotlin-dsl
+    val oss_version = "17.0.1"
+    implementation("com.google.android.gms:play-services-oss-licenses:$oss_version")
 
 }

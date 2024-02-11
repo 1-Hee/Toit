@@ -1,11 +1,7 @@
 package com.one.toit.ui.compose.ui.page
 
 import android.app.Activity
-import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
-import android.database.Cursor
-import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,7 +23,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
@@ -46,9 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,7 +53,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.loader.content.CursorLoader
 import com.one.toit.R
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -75,12 +70,12 @@ import com.one.toit.util.PreferenceUtil
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import timber.log.Timber
-import java.io.InputStream
 
 @Preview(showBackground = true)
 @Composable
 fun ProfilePage() {
     Timber.plant(Timber.DebugTree())
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
     val prefs = PreferenceUtil.getInstance(context)
     val profileImgKey = stringResource(id = R.string.key_profile_img)
@@ -173,6 +168,7 @@ fun ProfilePage() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             // 사용자 프로필 부분

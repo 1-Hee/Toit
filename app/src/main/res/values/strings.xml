@@ -51,6 +51,10 @@
     <string name="header_todo_list">TODO! List</string>
     <string name="txt_guide_graph">최근 2주간의 목표 달성 통계 그래프로 확인하실 수 있습니다.</string>
     <string name="txt_daily_circle_graph">목표 달성</string>
+    <string name="txt_h_app_version">앱 버전</string>
+    <string name="txt_oss">오픈 소스 라이선스</string>
+    <string name="txt_remove_ads">광고 제거 하기</string>
+    <string name="txt_app_restore">앱 설정 백업/복원</string>
 
 
 </resources>
