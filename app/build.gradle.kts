@@ -1,5 +1,11 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Properties
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+}
 
 plugins {
     id("com.android.application")
@@ -17,11 +23,18 @@ android {
         applicationId = "com.one.toit"
         minSdk = 24
         targetSdk = 33
-        versionCode = 2
+        versionCode = 3
         versionName = "1.0.1"
         versionName = "1.1.5"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        println("key1 : "+manifestPlaceholders["GOOGLE_ADS_KEY"])
+        buildConfigField("String", "GOOGLE_ADS_KEY", getApiKey("GOOGLE_ADS_KEY"))
+        manifestPlaceholders["GOOGLE_ADS_KEY"] = getApiKey("GOOGLE_ADS_KEY")
+        println("key2 : "+getApiKey("GOOGLE_ADS_KEY"))
+        println("key3 : "+manifestPlaceholders["GOOGLE_ADS_KEY"])
+
     }
 
     buildTypes {
@@ -85,7 +98,6 @@ android {
 }
 
 dependencies {
-
     // default config
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -106,6 +118,7 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
+
     // debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.material:material:1.2.0")
     implementation("com.google.android.material:material:1.6.0-alpha01")
@@ -143,7 +156,6 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version") // Room의 Kotlin 확장 (선택 사항)
     kapt("androidx.room:room-compiler:$room_version") // Room 애노테이션 프로세서 (kapt 구성)
 
-
     // rxjava, rxkotlin implements
     val rx_java_version = "3.1.8"
     val rx_kotlin_version = "3.0.1"
@@ -180,28 +192,20 @@ dependencies {
      * TODO.. ViewPager2 사용시 해제
      *  implementation 'androidx.viewpager2:viewpager2:1.0.0-beta03'
      */
-
     //flex box
     val flexVersion = "3.0.0"
     implementation("com.google.android.flexbox:flexbox:$flexVersion")
-
-//    // admobs
-//    implementation("com.google.android.gms:play-services-ads:22.3.0")
 
     // vico
     // For Jetpack Compose.
     val vico_version = "1.13.1"
     implementation("com.patrykandpatrick.vico:compose:$vico_version")
-
     // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
     implementation("com.patrykandpatrick.vico:compose-m2:$vico_version")
-
     // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
     implementation("com.patrykandpatrick.vico:compose-m3:$vico_version")
-
     // Houses the core logic for charts and other elements. Included in all other modules.
     implementation("com.patrykandpatrick.vico:core:$vico_version")
-
     // For the view system.
     implementation("com.patrykandpatrick.vico:views:$vico_version")
 
@@ -209,4 +213,7 @@ dependencies {
     val oss_version = "17.0.1"
     implementation("com.google.android.gms:play-services-oss-licenses:$oss_version")
 
+    // admobs
+    val admob_version = "22.6.0"
+    implementation("com.google.android.gms:play-services-ads:$admob_version")
 }

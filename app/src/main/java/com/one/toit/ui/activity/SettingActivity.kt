@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.AddCircle
@@ -61,8 +62,11 @@ import com.one.toit.ui.compose.nav.SettingRoute
 import com.one.toit.ui.compose.style.MyApplicationTheme
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono200
+import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.mono800
+import com.one.toit.ui.compose.style.purple200
+import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.red400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.SimpleTopBar
@@ -402,7 +406,13 @@ fun SettingUnit(
                 checked = status,
                 onCheckedChange = {
                     openSetting()
-                }
+                },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = purple400,
+                    checkedTrackColor = purple200,
+                    uncheckedThumbColor = mono400,
+                    uncheckedTrackColor = mono200
+                )
             )
         }
         Text(

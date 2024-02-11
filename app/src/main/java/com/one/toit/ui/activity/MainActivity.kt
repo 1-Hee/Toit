@@ -41,6 +41,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.MobileAds
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.coroutine.TedPermission
 import com.one.toit.R
@@ -78,6 +79,7 @@ class MainActivity : BaseComposeActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainScreenView(mainMenuViewModel)
+           //  MobileAds.initialize(this) {}
         }
     }
     override fun initViewModel() {
