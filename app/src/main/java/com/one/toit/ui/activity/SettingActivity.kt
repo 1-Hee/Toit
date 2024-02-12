@@ -2,11 +2,13 @@ package com.one.toit.ui.activity
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -57,6 +61,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.one.toit.BuildConfig
 import com.one.toit.R
+import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.ui.BaseComposeActivity
 import com.one.toit.ui.compose.nav.SettingRoute
 import com.one.toit.ui.compose.style.MyApplicationTheme
@@ -70,9 +75,19 @@ import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.red400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.SimpleTopBar
+import com.one.toit.ui.compose.ui.unit.WarningDialog
+import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
+import com.one.toit.util.PreferenceUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SettingActivity : BaseComposeActivity() {
+    // vm
+    private lateinit var taskRegisterViewModel:TaskRegisterViewModel
+    // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
+    private lateinit var launcher: ActivityResultLauncher<Intent>
+
     private val permissionFlag:Array<Boolean> = Array(4){false}
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +95,28 @@ class SettingActivity : BaseComposeActivity() {
             checkPermission()
             SettingScreenView(this, permissionFlag,
                 openSetting = { openAppPermissions() },
-                openLicenses = {  openOSSActivity() },
+                openLicenses = { openOSSActivity() },
                 showBackupDialogs = {},
+                clearAllAppData = { clearAppAppData(this) },
                 removeAdsAction = {}
             )
         }
+        // launcer init
+        launcher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
+            if (it.resultCode == Activity.RESULT_OK) {
+                // 데이터 찍어볼경우!
+                /*
+                val intent = result.data
+                val resultState = intent?.getStringExtra("newAlbumName")
+                Timber.i("resultState : %s", resultState)
+                 */
+            }
+        }
+        // vm init
+        val factory = ApplicationFactory(this.application)
+        taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
     }
     private fun checkPermission(){
         // 알림 권한
@@ -122,19 +154,6 @@ class SettingActivity : BaseComposeActivity() {
         permissionFlag[3] = locationFlag
     }
 
-    // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
-    private val launcher: ActivityResultLauncher<Intent> = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
-        if (it.resultCode == Activity.RESULT_OK) {
-            // 데이터 찍어볼경우!
-            /*
-            val intent = result.data
-            val resultState = intent?.getStringExtra("newAlbumName")
-            Timber.i("resultState : %s", resultState)
-             */
-        }
-    }
     // 앱 설정 이동시키는 메서드
     private fun openAppPermissions(){
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -149,6 +168,26 @@ class SettingActivity : BaseComposeActivity() {
         launcher.launch(intent)
     }
 
+    // 앱 설정 초기화
+    // 데이터베이스 & prefs 초기화
+    private fun clearAppAppData(context:Context){
+        // prefs 초기화
+        val prefs = PreferenceUtil.getInstance(context)
+        prefs.clearAll()
+        // db 초기화
+        lifecycleScope.launch(Dispatchers.IO){
+            taskRegisterViewModel.clearAll()
+            val intent = Intent(context, StartActivity::class.java)
+            launcher.launch(intent)
+            setResult(RESULT_CANCELED)
+            finish()
+        }
+        // 토스트 메세지
+        val clearText = getString(R.string.msg_app_data_clear)
+        Toast.makeText(context, clearText, Toast.LENGTH_SHORT).show()
+
+    }
+
 }
 
 @Composable
@@ -158,6 +197,7 @@ fun SettingScreenView(
     openSetting: () -> Unit,
     openLicenses: () -> Unit,
     showBackupDialogs: () -> Unit,
+    clearAllAppData: () -> Unit,
     removeAdsAction:() -> Unit
 ){
     val navController = rememberNavController()
@@ -172,6 +212,7 @@ fun SettingScreenView(
                 openSetting = openSetting,
                 openLicenses = openLicenses,
                 showBackupDialogs = showBackupDialogs,
+                clearAllAppData = clearAllAppData,
                 removeAdsAction = removeAdsAction
             )
         }
@@ -191,6 +232,7 @@ fun SettingNavGraph(
     openSetting: () -> Unit,
     openLicenses: () -> Unit,
     showBackupDialogs: () -> Unit,
+    clearAllAppData: () -> Unit,
     removeAdsAction:() -> Unit
 ){
     NavHost(navController = navController, startDestination = SettingRoute.AppSetting.route){
@@ -200,6 +242,7 @@ fun SettingNavGraph(
                 openSetting = openSetting,
                 openLicenses = openLicenses,
                 showBackupDialogs = showBackupDialogs,
+                clearAllAppData = clearAllAppData,
                 removeAdsAction = removeAdsAction
             )
         }
@@ -212,7 +255,8 @@ fun AppSettingPage(
     openSetting: () -> Unit,
     openLicenses: () -> Unit,
     showBackupDialogs: () -> Unit,
-    removeAdsAction:() -> Unit
+    clearAllAppData: () -> Unit,
+    removeAdsAction:() -> Unit,
 ){
     val context = LocalContext.current
     // 앱 버전
@@ -220,12 +264,30 @@ fun AppSettingPage(
     val appVersion by remember { mutableStateOf(BuildConfig.VERSION_NAME) }
     // 오픈 소스 라이선스
     val ossText by remember { mutableStateOf(context.getString(R.string.txt_oss)) }
+    // 앱 데이터 초기화
+    val appDataClearText by remember { mutableStateOf(context.getString(R.string.txt_app_data_clear)) }
     // 광고 제거하기
     val removeAdsText by remember { mutableStateOf(context.getString(R.string.txt_remove_ads)) }
     // 설정 복원
     val restoreText by remember { mutableStateOf(context.getString(R.string.txt_app_restore)) }
     // 스크롤
     val scrollState = rememberScrollState()
+    // 다이얼로그 창
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    // 삭제 다이얼로그
+    if(showDeleteDialog){
+        WarningDialog(
+            onDismiss = { showDeleteDialog = false },
+            onCancel = { showDeleteDialog = false },
+            onAction = {
+                showDeleteDialog = false
+                clearAllAppData()
+            },
+            title = stringResource(id = R.string.txt_app_data_clear),
+            content = stringResource(R.string.txt_guide_app_data_clear),
+            textAction = "초기화"
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -344,12 +406,28 @@ fun AppSettingPage(
                     .clickable { showBackupDialogs() }
             )
             Spacer(modifier = Modifier.height(16.dp))
+            // 앱 데이터 초기화
+            Text(
+                text = appDataClearText,
+                style = MaterialTheme.typography.caption
+                    .copy(
+                        color = red400,
+                        fontSize = 16.sp
+                    ),
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(vertical = 8.dp)
+                    .clickable {
+                        showDeleteDialog = true
+                    }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             // 광고 제거 하기
             Text(
                 text = removeAdsText,
                 style = MaterialTheme.typography.caption
                     .copy(
-                        color = red400,
+                        color = black,
                         fontSize = 16.sp
                     ),
                 modifier = Modifier
@@ -430,7 +508,7 @@ fun SettingUnit(
 @Composable
 fun DefaultPreView(){
     MyApplicationTheme {
-        SettingScreenView(SettingActivity(), Array(4) { false },{},{},{},{})
+        SettingScreenView(SettingActivity(), Array(4) { false },{},{},{},{},{})
     }
 }
 

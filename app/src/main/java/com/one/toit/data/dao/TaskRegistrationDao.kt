@@ -14,29 +14,22 @@ interface TaskRegistrationDao {
     // create
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addTaskRegister(taskRegister: TaskRegister)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAllTaskRegister(vararg taskRegisters: TaskRegister)
-
     // read
     @Query("SELECT * FROM table_task_registration")
     fun readTaskRegisterList(): LiveData<List<TaskRegister>>
-
     // update
     @Update
     fun modifyTaskRegister(taskRegister: TaskRegister)
-
     // delete
     @Delete
     fun removeTaskRegister(taskRegister: TaskRegister)
-
     @Delete
     fun removeTaskRegisterList(vararg taskRegisters: TaskRegister)
-
     // delete all
     @Query("DELETE FROM sqlite_sequence where name='table_task_registration'")
     fun clearAll()
-
     @Query("DELETE FROM table_task_registration")
     fun deleteAll()
 }

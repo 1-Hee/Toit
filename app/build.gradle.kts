@@ -28,7 +28,7 @@ android {
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["ADMOB_APP_KEY"] = getApiKey("ADMOB_APP_KEY")
-        buildConfigField("String", "ADMOB_SDK_KEY", "${getApiKey("ADMOB_SDK_KEY")}")
+        buildConfigField("String", "ADMOB_SDK_KEY", getApiKey("ADMOB_SDK_KEY"))
     }
 
     buildTypes {

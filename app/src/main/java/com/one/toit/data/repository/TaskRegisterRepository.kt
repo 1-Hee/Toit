@@ -14,7 +14,7 @@ class TaskRegisterRepository(
     suspend fun addTaskRegister(taskRegister: TaskRegister)
         = withContext(Dispatchers.IO) {
         Timber.d("addTaskRegister.. %s", taskRegister)
-        taskRegistrationDao.addTaskRegister(taskRegister = taskRegister)
+        taskRegistrationDao.addTaskRegister(taskRegister)
     }
     suspend fun addAllTaskRegister(vararg taskRegisters: TaskRegister)
         = withContext(Dispatchers.IO){
@@ -31,13 +31,13 @@ class TaskRegisterRepository(
     suspend fun modifyTaskRegister(taskRegister: TaskRegister)
         = withContext(Dispatchers.IO){
         Timber.d("modifyTaskRegister... %s", taskRegister)
-        taskRegistrationDao.modifyTaskRegister(taskRegister = taskRegister)
+        taskRegistrationDao.modifyTaskRegister(taskRegister)
     }
     // delete
     suspend fun removeTaskRegister(taskRegister: TaskRegister)
         = withContext(Dispatchers.IO){
         Timber.d("removeTaskRegister... %s", taskRegister)
-        taskRegistrationDao.removeTaskRegister(taskRegister = taskRegister)
+        taskRegistrationDao.removeTaskRegister(taskRegister)
     }
 
     suspend fun removeTaskRegisterList(vararg taskRegisters: TaskRegister)

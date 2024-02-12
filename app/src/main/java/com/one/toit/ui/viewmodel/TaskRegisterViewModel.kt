@@ -15,37 +15,44 @@ class TaskRegisterViewModel(
     private val repository:TaskRegisterRepository
     init {
         val taskRegistrationDao = TaskRegistrationBase
-            .getInstance(application.applicationContext)
-            .TaskRegistrationDao()
+                                    .getInstance(application.applicationContext)
+                                    .TaskRegistrationDao()
         repository = TaskRegisterRepository(taskRegistrationDao)
     }
     // create
     suspend fun addTaskRegister(taskRegister: TaskRegister){
-        Timber.d("")
+        Timber.d("vm.. addTaskRegister : %s", taskRegister)
         repository.addTaskRegister(taskRegister)
     }
     suspend fun addAllTaskRegister(vararg taskRegisters : TaskRegister){
+        Timber.d("vm.. addAllTaskRegister : %s", taskRegisters)
         repository.addAllTaskRegister(*taskRegisters)
     }
     // read
     suspend fun readTaskRegisterList():LiveData<List<TaskRegister>>{
+        Timber.d("vm.. readTaskRegisterList ...")
         return repository.readTaskRegisterList()
     }
     // update
     suspend fun modifyTaskRegister(taskRegister: TaskRegister){
+        Timber.d("vm.. modifyTaskRegister : %s", taskRegister)
         repository.modifyTaskRegister(taskRegister)
     }
     // delete
     suspend fun removeTaskRegister(taskRegister: TaskRegister){
+        Timber.d("vm.. removeTaskRegister : %s", taskRegister)
         repository.removeTaskRegister(taskRegister)
     }
     suspend fun removeTaskRegisterList(vararg taskRegisters:TaskRegister){
+        Timber.d("vm.. removeTaskRegisterList : %s", taskRegisters)
         repository.removeTaskRegisterList(*taskRegisters)
     }
     suspend fun clearAll(){
+        Timber.d("vm.. clearAll")
         repository.clearAll()
     }
     suspend fun deleteAll(){
+        Timber.d("vm.. deleteAll")
         repository.deleteAll()
     }
 }

@@ -55,4 +55,7 @@
     <string name="txt_oss">오픈 소스 라이선스</string>
     <string name="txt_remove_ads">광고 제거 하기</string>
     <string name="txt_app_restore">앱 설정 백업/복원</string>
+    <string name="txt_app_data_clear">앱 데이터 초기화</string>
+    <string name="msg_app_data_clear">앱 데이터가 모두 초기화되었습니다.</string>
+    <string name="txt_guide_app_data_clear">정말로 모든 앱 데이터를 초기화 하시겠어요?\n초기화 이후에는 데이터를 복구할 수 없습니다.\n*단, 앱 권한 설정은 초기화되지 않습니다.</string>
 </resources>
