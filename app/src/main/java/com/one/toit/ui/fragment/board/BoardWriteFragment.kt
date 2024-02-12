@@ -7,18 +7,27 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
 import com.one.toit.R
 import com.one.toit.base.bind.DataBindingConfig
+import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseFragment
+import com.one.toit.data.model.TaskRegister
 import com.one.toit.databinding.FragmentBoardWriteBinding
 import com.one.toit.ui.dialog.CustomTimeDialog
+import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
 class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
+
+    // viewModel
+    private lateinit var taskRegisterViewModel: TaskRegisterViewModel
 
     private lateinit var guideArray:Array<String>
     override fun getDataBindingConfig(): DataBindingConfig {
@@ -54,7 +63,6 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(editable: Editable) {}
         }
-
         return DataBindingConfig(R.layout.fragment_board_write)
             .addBindingParam(BR.limitDescription, "")
             .addBindingParam(BR.isLimit, false)
@@ -64,6 +72,8 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
             .addBindingParam(BR.textWatcher, textWatcher)
     }
     override fun initViewModel() {
+        val factory = ApplicationFactory(requireActivity().application)
+        taskRegisterViewModel = getFragmentScopeViewModel(TaskRegisterViewModel::class.java, factory)
     }
     override fun initView() {
         guideArray = requireContext().resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
@@ -112,8 +122,20 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                 }
                 // 버튼
                 R.id.l_btn_write_todo -> {
-                    requireActivity().setResult(Activity.RESULT_OK)
-                    requireActivity().finish()
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val taskRegister = TaskRegister()
+                        taskRegisterViewModel.addTaskRegister(taskRegister)
+                    }
+
+                    lifecycleScope.launch {
+                        taskRegisterViewModel.readTaskRegisterList().observe(viewLifecycleOwner){
+                            Timber.i("list : %s", it)
+                        }
+                    }
+
+
+//                    requireActivity().setResult(Activity.RESULT_OK)
+//                    requireActivity().finish()
                 }
             }
         }

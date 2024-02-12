@@ -79,7 +79,7 @@ class MainActivity : BaseComposeActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainScreenView(mainMenuViewModel)
-           //  MobileAds.initialize(this) {}
+            MobileAds.initialize(this) {}
         }
     }
     override fun initViewModel() {

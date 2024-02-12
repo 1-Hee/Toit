@@ -1,7 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Properties
 
 fun getApiKey(propertyKey: String): String {
     return gradleLocalProperties(rootDir).getProperty(propertyKey)
@@ -28,16 +27,13 @@ android {
         versionName = "1.1.5"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        println("key1 : "+manifestPlaceholders["GOOGLE_ADS_KEY"])
-        buildConfigField("String", "GOOGLE_ADS_KEY", getApiKey("GOOGLE_ADS_KEY"))
-        manifestPlaceholders["GOOGLE_ADS_KEY"] = getApiKey("GOOGLE_ADS_KEY")
-        println("key2 : "+getApiKey("GOOGLE_ADS_KEY"))
-        println("key3 : "+manifestPlaceholders["GOOGLE_ADS_KEY"])
-
+        manifestPlaceholders["ADMOB_APP_KEY"] = getApiKey("ADMOB_APP_KEY")
+        buildConfigField("String", "ADMOB_SDK_KEY", "${getApiKey("ADMOB_SDK_KEY")}")
     }
 
     buildTypes {
+        debug {
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -196,7 +192,7 @@ dependencies {
     val flexVersion = "3.0.0"
     implementation("com.google.android.flexbox:flexbox:$flexVersion")
 
-    // vico
+//    // vico
     // For Jetpack Compose.
     val vico_version = "1.13.1"
     implementation("com.patrykandpatrick.vico:compose:$vico_version")

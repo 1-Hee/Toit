@@ -62,6 +62,7 @@ import com.one.toit.ui.compose.style.mono900
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.compose.ui.unit.AdmobBanner
 import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
@@ -360,7 +361,6 @@ fun ProfilePage() {
                     RecordBox("평균 기록", calcTimeString(avgRecord.toLong()))
                 }
             }
-
             // 격언
             Text(
                 text = axiomString,
@@ -375,9 +375,12 @@ fun ProfilePage() {
                     .wrapContentHeight()
                     .padding(vertical = 48.dp)
             )
+            // admobs
+            AdmobBanner(modifier = Modifier.fillMaxWidth())
         }
     }
 }
+
 
 @Composable
 fun RecordBox(title:String, content:String, hasHelp:Boolean = false){

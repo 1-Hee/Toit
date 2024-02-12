@@ -33,7 +33,7 @@
         >
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${GOOGLE_ADS_KEY}"/>
+            android:value="${ADMOB_APP_KEY}"/>
         <activity
             android:name=".ui.activity.BoardActivity"
             android:exported="false" />
