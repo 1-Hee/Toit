@@ -7,10 +7,13 @@ import com.one.toit.base.bind.DataBindingConfig
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseDialog
 import com.one.toit.databinding.DialogCustomTimeBinding
+import com.one.toit.util.AppUtil
+import kotlin.math.max
+import kotlin.math.min
 
 class CustomTimeDialog(
     private val hour: Int = 0,
-    private val min:Int = 1,
+    private val min:Int = 0,
     private val listener:OnDialogClickListener
 ) : BaseDialog<DialogCustomTimeBinding>(){
     override fun getDataBindingConfig(): DataBindingConfig {
@@ -21,13 +24,29 @@ class CustomTimeDialog(
     override fun initView() {
         // 시간 설정
         mBinding.npHour.minValue = 0
-        mBinding.npHour.maxValue = 23
-        mBinding.npHour.value = this.hour
+        val maxHour = min(hour, 23)
+        mBinding.npHour.maxValue = maxHour
+        mBinding.npHour.value = 0
 
         // 분 설정
         mBinding.npMinute.minValue = 0
-        mBinding.npMinute.maxValue = 59
-        mBinding.npMinute.value = this.min
+        val maxMin = max(min, 59)
+        mBinding.npMinute.maxValue = maxMin
+        mBinding.npMinute.value = 0
+
+        // 값 감지 및 유효성 체크용 리스너
+        mBinding.npHour.setOnValueChangedListener { picker, oldVal, newVal ->
+            // 값이 변경될 때 호출되는 콜백
+            // newVal에는 새로운 값이 들어 있음
+        }
+
+        mBinding.npMinute.setOnValueChangedListener { picker, oldVal, newVal ->
+            if(mBinding.npHour.value >= hour && newVal >= min) {
+                mBinding.npMinute.value = 0
+                val context = requireContext();
+                AppUtil.toast(context, context.getString(R.string.msg_invalid_time))
+            }
+        }
     }
 
     private val viewClickListener = object : ViewClickListener {

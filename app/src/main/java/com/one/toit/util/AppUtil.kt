@@ -19,7 +19,12 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.room.Ignore
 import com.one.toit.data.dto.MediaDTO
 import timber.log.Timber
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.util.Calendar
 
+@Suppress("UNREACHABLE_CODE")
 class AppUtil {
     // 토스트 메세지
     companion object {
@@ -41,6 +46,47 @@ class AppUtil {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
+
+    object Time {
+        fun getTimeArray(): Array<Int> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val now = LocalDateTime.now()
+                val midnight = LocalDateTime.of(now.toLocalDate(), LocalTime.MAX)
+                val duration = Duration.between(now, midnight)
+                val hours = duration.toHours().toInt()
+                val minutes = (duration.toMinutes() % 60).toInt()
+                val seconds = (duration.seconds % 60).toInt()
+                return arrayOf(hours, minutes, seconds)
+            } else {
+                val now = Calendar.getInstance()
+                val midnight = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }
+                val remainingTime = midnight.timeInMillis - now.timeInMillis
+                val hours = (remainingTime / (1000 * 60 * 60)).toInt()
+                val minutes = ((remainingTime % (1000 * 60 * 60)) / (1000 * 60)).toInt()
+                val seconds = ((remainingTime % (1000 * 60)) / 1000).toInt()
+                return arrayOf(hours, minutes, seconds)
+            }
+        }
+        fun parseToLimitString(hour:Int, min:Int):String{
+            val hourString = if(hour > 9){
+                hour.toString()
+            }else {
+                "0$hour"
+            }
+            val minString = if(min > 9){
+                min.toString()
+            }else {
+                "0$min"
+            }
+            return "$hourString:$minString"
+        }
+    }
+
     object Image {
         @Suppress("DEPRECATION")
         fun getBitmap(uri:Uri, contentResolver: ContentResolver):Bitmap?{

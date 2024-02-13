@@ -80,6 +80,7 @@ import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class SettingActivity : BaseComposeActivity() {
@@ -175,17 +176,19 @@ class SettingActivity : BaseComposeActivity() {
         val prefs = PreferenceUtil.getInstance(context)
         prefs.clearAll()
         // db 초기화
-        lifecycleScope.launch(Dispatchers.IO){
-            taskRegisterViewModel.clearAll()
+        val deleteResult = lifecycleScope.async(Dispatchers.IO){
+            taskRegisterViewModel.deleteAll()
+        }
+        lifecycleScope.launch {
+            deleteResult.await()
+            // 토스트 메세지
+            val clearText = getString(R.string.msg_app_data_clear)
+            Toast.makeText(context, clearText, Toast.LENGTH_SHORT).show()
             val intent = Intent(context, StartActivity::class.java)
             launcher.launch(intent)
             setResult(RESULT_CANCELED)
             finish()
         }
-        // 토스트 메세지
-        val clearText = getString(R.string.msg_app_data_clear)
-        Toast.makeText(context, clearText, Toast.LENGTH_SHORT).show()
-
     }
 
 }

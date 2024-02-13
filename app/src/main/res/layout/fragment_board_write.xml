@@ -45,6 +45,10 @@
         <variable
             name="rippleColor"
             type="Integer" />
+        <!-- 마감 기한 -->
+        <variable
+            name="limitText"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -197,6 +201,7 @@
             android:id="@+id/et_limit_input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{limitText}"
             android:textSize="14sp"
             android:textColor="@color/black"
             android:textColorHint="@color/mono100"

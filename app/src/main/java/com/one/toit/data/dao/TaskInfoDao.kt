@@ -12,7 +12,7 @@ import com.one.toit.data.model.TaskInfo
 interface TaskInfoDao {
     // create
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addTaskInfo(taskInfo: TaskInfo)
+    fun addTaskInfo(taskInfo: TaskInfo):Long
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAllTaskInfo(vararg taskInfo: TaskInfo)
     // read
@@ -27,8 +27,8 @@ interface TaskInfoDao {
     @Delete
     fun removeTaskInfoList(vararg taskInfo: TaskInfo)
     // delete all
-    @Query("DELETE FROM sqlite_sequence where name='table_task_information'")
-    fun clearAll()
+//    @Query("DELETE FROM sqlite_sequence where name='table_task_information'")
+//    fun clearAll()
     @Query("DELETE FROM table_task_information")
     fun deleteAll()
 }

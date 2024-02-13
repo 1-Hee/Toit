@@ -5,27 +5,27 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.one.toit.data.dao.TaskInfoDao
+import com.one.toit.data.dao.TaskRegistrationDao
 import com.one.toit.data.model.TaskInfo
 import com.one.toit.data.model.TaskRegister
 
-/**
- *  Task 상세 정보 저장 데이터 베이스,
- */
 @Database(entities = [TaskRegister::class, TaskInfo::class], version = 1, exportSchema = false)
-abstract class TaskInformationBase : RoomDatabase(){
+abstract class TaskDataBase : RoomDatabase(){
     // dao
-    abstract fun TaskInfoDao():TaskInfoDao
+    abstract fun TaskInfoDao(): TaskInfoDao
+    abstract fun TaskRegistrationDao(): TaskRegistrationDao
     companion object {
         @Volatile
-        private var INSTANCE:TaskInformationBase? = null
-        fun getInstance(context:Context):TaskInformationBase{
+        private var INSTANCE:TaskDataBase? = null
+        fun getInstance(context: Context):TaskDataBase{
+            // context.deleteDatabase("task_data_base")
             if(INSTANCE==null){
                 synchronized(this){
                     val instance = Room
                         .databaseBuilder(
                             context.applicationContext,
-                            TaskInformationBase::class.java,
-                            "table_task_information"
+                            TaskDataBase::class.java,
+                            "task_data_base"
                         ).build()
                     INSTANCE = instance
                     return instance

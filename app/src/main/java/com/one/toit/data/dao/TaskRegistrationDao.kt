@@ -13,7 +13,7 @@ import com.one.toit.data.model.TaskRegister
 interface TaskRegistrationDao {
     // create
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addTaskRegister(taskRegister: TaskRegister)
+    fun addTaskRegister(taskRegister: TaskRegister):Long
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAllTaskRegister(vararg taskRegisters: TaskRegister)
     // read
@@ -28,8 +28,8 @@ interface TaskRegistrationDao {
     @Delete
     fun removeTaskRegisterList(vararg taskRegisters: TaskRegister)
     // delete all
-    @Query("DELETE FROM sqlite_sequence where name='table_task_registration'")
-    fun clearAll()
+//    @Query("DELETE FROM sqlite_sequence where name='table_task_registration'")
+//    fun clearAll()
     @Query("DELETE FROM table_task_registration")
     fun deleteAll()
 }

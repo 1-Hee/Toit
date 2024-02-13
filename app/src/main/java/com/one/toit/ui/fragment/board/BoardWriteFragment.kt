@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
@@ -14,20 +15,28 @@ import com.one.toit.base.bind.DataBindingConfig
 import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseFragment
+import com.one.toit.data.model.TaskInfo
 import com.one.toit.data.model.TaskRegister
 import com.one.toit.databinding.FragmentBoardWriteBinding
 import com.one.toit.ui.dialog.CustomTimeDialog
+import com.one.toit.ui.viewmodel.TaskInfoViewModel
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Arrays
+import java.util.Date
 
 
 class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
 
     // viewModel
+    // 부모 엔티티
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
+    // 자식 엔티티
+    private lateinit var taskInfoViewModel: TaskInfoViewModel
 
     private lateinit var guideArray:Array<String>
     override fun getDataBindingConfig(): DataBindingConfig {
@@ -70,10 +79,12 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
             .addBindingParam(BR.onKeyListener, onKeyListener)
             .addBindingParam(BR.textListener, textListener)
             .addBindingParam(BR.textWatcher, textWatcher)
+            .addBindingParam(BR.limitText, "00:00")
     }
     override fun initViewModel() {
         val factory = ApplicationFactory(requireActivity().application)
         taskRegisterViewModel = getFragmentScopeViewModel(TaskRegisterViewModel::class.java, factory)
+        taskInfoViewModel = getFragmentScopeViewModel(TaskInfoViewModel::class.java, factory)
     }
     override fun initView() {
         guideArray = requireContext().resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
@@ -92,6 +103,15 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
         mBinding.setVariable(BR.textColor, textColor)
         mBinding.setVariable(BR.rippleColor, rippleColor)
         mBinding.notifyChange()
+
+        lifecycleScope.launch {
+            taskRegisterViewModel.readTaskRegisterList().observe(viewLifecycleOwner){
+                Timber.i("register list : %s", it)
+            }
+            taskInfoViewModel.readTaskInfoList().observe(viewLifecycleOwner){
+                Timber.i("info list : %s", it)
+            }
+        }
 
     }
     private fun setGuideDesc(flag:Boolean){
@@ -117,33 +137,56 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                 }
                 // 기한 설정
                 R.id.et_limit_input -> {
-                    val dialog = CustomTimeDialog(listener = dialogListener)
+                    val timeArr:Array<Int> = AppUtil.Time.getTimeArray()
+                    Timber.i("array : %s", timeArr.contentToString())
+                    val dialog = CustomTimeDialog(
+                        hour = timeArr[0],
+                        min = timeArr[1],
+                        listener = dialogListener,
+                    )
                     dialog.show(requireActivity().supportFragmentManager, null)
                 }
-                // 버튼
+                // 등록 버튼!
                 R.id.l_btn_write_todo -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val taskRegister = TaskRegister()
-                        taskRegisterViewModel.addTaskRegister(taskRegister)
-                    }
-
-                    lifecycleScope.launch {
-                        taskRegisterViewModel.readTaskRegisterList().observe(viewLifecycleOwner){
-                            Timber.i("list : %s", it)
+                    val titleString = mBinding.etTitleTodo.text.toString()
+                    val context = requireContext()
+                    val msg:String = if(titleString.isNotBlank()){
+                        lifecycleScope.launch(Dispatchers.IO){
+                            val taskRegister = TaskRegister()
+                            val taskId = taskRegisterViewModel.addTaskRegister(taskRegister)
+                            Timber.i("taskId : %s", taskId)
+                            val taskInfo = getTaskInfo(taskId, titleString)
+                            val infoId = taskInfoViewModel.addTaskInfo(taskInfo)
+                            Timber.i("info : %s", infoId)
+                            requireActivity().setResult(Activity.RESULT_OK)
+                            requireActivity().finish()
                         }
+                        context.getString(R.string.msg_success_todo)
+                    }else {
+                        context.getString(R.string.msg_input_title)
                     }
-
-
-//                    requireActivity().setResult(Activity.RESULT_OK)
-//                    requireActivity().finish()
+                    AppUtil.toast(context, msg)
                 }
             }
         }
     }
 
+    private fun getTaskInfo(taskId:Long, titleString:String):TaskInfo{
+        val memo = mBinding.etMemoTodo.text.toString()
+        return TaskInfo(
+            taskTitle = titleString,
+            taskMemo = memo,
+            fkTaskId = taskId
+        )
+    }
+
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
+            val mLimitString = AppUtil.Time.parseToLimitString(hour, min)
+            mBinding.limitText = mLimitString
+            mBinding.notifyChange()
+            // TODO 여기서 받은 시간을, 현재 시간 +해서 DateString으로 TaskInfo에 추가해야함!
         }
 
         override fun onCancel() {

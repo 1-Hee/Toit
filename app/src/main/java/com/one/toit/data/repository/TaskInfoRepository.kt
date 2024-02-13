@@ -11,10 +11,10 @@ class TaskInfoRepository(
     private val taskInfoDao: TaskInfoDao
 ) {
     // create
-    suspend fun addTaskInfo(taskInfo: TaskInfo)
+    suspend fun addTaskInfo(taskInfo: TaskInfo):Long
             = withContext(Dispatchers.IO) {
         Timber.d("addTaskInfo.. %s", taskInfo)
-        taskInfoDao.addTaskInfo(taskInfo)
+        return@withContext taskInfoDao.addTaskInfo(taskInfo)
     }
     suspend fun addAllTaskInfo(vararg taskInfo: TaskInfo)
             = withContext(Dispatchers.IO){
@@ -46,11 +46,11 @@ class TaskInfoRepository(
         taskInfoDao.removeTaskInfoList(*taskInfo)
     }
 
-    suspend fun clearAll()
-            = withContext(Dispatchers.IO){
-        Timber.d("clearAll...")
-        taskInfoDao.clearAll()
-    }
+//    suspend fun clearAll()
+//            = withContext(Dispatchers.IO){
+//        Timber.d("clearAll...")
+//        taskInfoDao.clearAll()
+//    }
 
     suspend fun deleteAll()
             = withContext(Dispatchers.IO){

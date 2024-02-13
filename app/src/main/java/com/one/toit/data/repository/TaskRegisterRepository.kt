@@ -11,10 +11,10 @@ class TaskRegisterRepository(
     private val taskRegistrationDao: TaskRegistrationDao
 ) {
     // create
-    suspend fun addTaskRegister(taskRegister: TaskRegister)
+    suspend fun addTaskRegister(taskRegister: TaskRegister):Long
         = withContext(Dispatchers.IO) {
         Timber.d("addTaskRegister.. %s", taskRegister)
-        taskRegistrationDao.addTaskRegister(taskRegister)
+        return@withContext taskRegistrationDao.addTaskRegister(taskRegister)
     }
     suspend fun addAllTaskRegister(vararg taskRegisters: TaskRegister)
         = withContext(Dispatchers.IO){
@@ -46,11 +46,11 @@ class TaskRegisterRepository(
         taskRegistrationDao.removeTaskRegisterList(*taskRegisters)
     }
 
-    suspend fun clearAll()
-        = withContext(Dispatchers.IO){
-        Timber.d("clearAll...")
-        taskRegistrationDao.clearAll()
-    }
+//    suspend fun clearAll()
+//        = withContext(Dispatchers.IO){
+//        Timber.d("clearAll...")
+//        taskRegistrationDao.clearAll()
+//    }
 
     suspend fun deleteAll()
         = withContext(Dispatchers.IO){
