@@ -2,7 +2,10 @@ package com.one.toit.ui.activity
 
 import android.Manifest
 import android.app.Activity
+import android.app.TaskInfo
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -36,6 +39,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,7 +53,9 @@ import com.google.android.gms.ads.MobileAds
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.coroutine.TedPermission
 import com.one.toit.R
+import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.ui.BaseComposeActivity
+import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.compose.nav.MainRoute
 import com.one.toit.ui.compose.style.MyApplicationTheme
 import com.one.toit.ui.compose.style.mono300
@@ -58,28 +68,27 @@ import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.MainMenuViewModel
+import com.one.toit.ui.viewmodel.TaskInfoViewModel
+import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MainActivity : BaseComposeActivity() {
+class MainActivity : BaseComposeActivity(), LifecycleObserver {
+    // viewModel
     private lateinit var mainMenuViewModel: MainMenuViewModel
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            if (isGranted) {
-                // Permission granted, proceed to load image or perform other actions
-                // Call your function to load the image or perform actions requiring the permission
-            } else {
-                // Permission denied, handle accordingly
-                // You might want to show a message to the user or request permission again
-            }
-        }
+    // 부모 엔티티
+    private lateinit var taskRegisterViewModel: TaskRegisterViewModel
+    // 자식 엔티티
+    private lateinit var taskInfoViewModel: TaskInfoViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this) {} // 광고 init
+        requestPermission(this) // 권한 체크
         setContent {
-            MainScreenView(mainMenuViewModel)
-            MobileAds.initialize(this) {}
+            MainScreenView(mainMenuViewModel, taskRegisterViewModel, taskInfoViewModel)
         }
     }
     override fun initViewModel() {
@@ -87,19 +96,69 @@ class MainActivity : BaseComposeActivity() {
         mainMenuViewModel = getApplicationScopeViewModel(MainMenuViewModel::class.java)
         mainMenuViewModel.init()
         mainMenuViewModel.setPageName(baseContext.getString(R.string.p_todo))
+        val factory = ApplicationFactory(this.application)
+        taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
+        taskInfoViewModel = getApplicationScopeViewModel(TaskInfoViewModel::class.java, factory)
+    }
+
+    //  권한 요청 함수
+    private fun requestPermission(context: Context){
+        // API Version < 33
+        val ALL_PERMISSION:Array<String> = arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.CAMERA
+        )
+        // API Version >= 33
+        val ALL_PERMISSION_33:Array<String> = arrayOf(
+            Manifest.permission.READ_MEDIA_VIDEO,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.CAMERA
+        )
+        val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            ALL_PERMISSION_33
+        }else {
+            ALL_PERMISSION
+        }
+        // 권한 요청 함수
+        val permissionsToRequest = mutableListOf<String>()
+        // 필요한 권한 중에서 아직 허용되지 않은 권한을 확인
+        for (permission in permissionList) {
+            if (ContextCompat.checkSelfPermission(context, permission)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsToRequest.add(permission)
+            }
+        }
+        // 권한 요청이 필요한 경우 요청
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                permissionsToRequest.toTypedArray(),
+                1001
+            )
+        }
     }
 }
 @Composable
 fun MainScreenView(
-    viewModel: MainMenuViewModel
+    viewModel: MainMenuViewModel,
+    taskRegisterViewModel: TaskRegisterViewModel,
+    taskInfoViewModel: TaskInfoViewModel
 ) {
     val navController = rememberNavController()
     Scaffold(
         topBar = { MainTopBarComponent(viewModel) },
-        bottomBar = { MainBottomNavigation(navController = navController, viewModel = viewModel) }
+        bottomBar = { MainBottomNavigation(navController = navController, menuViewModel = viewModel) }
     ) {
         Box(Modifier.padding(it)){
-            MainNavGraph(navController = navController)
+            MainNavGraph(navController, taskRegisterViewModel, taskInfoViewModel)
         }
     }
 }
@@ -142,13 +201,17 @@ fun MainTopBarComponent(
     }
 }
 @Composable
-fun MainNavGraph(navController: NavHostController) {
+fun MainNavGraph(
+    navController: NavHostController,
+    taskRegisterViewModel: TaskRegisterViewModel,
+    taskInfoViewModel: TaskInfoViewModel
+) {
     NavHost(
         navController,
         startDestination = MainRoute.Todo.route
     )  {
         composable(route = MainRoute.Todo.route) {
-            TodoPage()
+            TodoPage(navController, taskRegisterViewModel, taskInfoViewModel)
         }
         composable(MainRoute.Statistics.route) {
             // GraphPage(navController)
@@ -164,7 +227,11 @@ fun MainNavGraph(navController: NavHostController) {
 }
 
 @Composable
-fun MainBottomNavigation(navController: NavHostController, viewModel:MainMenuViewModel) {
+fun MainBottomNavigation(
+    navController: NavHostController,
+    menuViewModel:MainMenuViewModel,
+
+) {
     val items = listOf<MainRoute>(
         MainRoute.Todo,
         MainRoute.Statistics,
@@ -225,19 +292,11 @@ fun MainBottomNavigation(navController: NavHostController, viewModel:MainMenuVie
                         }
                         launchSingleTop = true
                         restoreState = true
-                        viewModel.setPageName(itemTitle)
-                        Timber.i("bottom : %s : ", viewModel.pageName)
+                        menuViewModel.setPageName(itemTitle)
+                        Timber.i("bottom : %s : ", menuViewModel.pageName)
                     }
                 }
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    MyApplicationTheme {
-        MainScreenView(MainMenuViewModel())
     }
 }

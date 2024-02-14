@@ -104,15 +104,6 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
         mBinding.setVariable(BR.rippleColor, rippleColor)
         mBinding.notifyChange()
 
-        lifecycleScope.launch {
-            taskRegisterViewModel.readTaskRegisterList().observe(viewLifecycleOwner){
-                Timber.i("register list : %s", it)
-            }
-            taskInfoViewModel.readTaskInfoList().observe(viewLifecycleOwner){
-                Timber.i("info list : %s", it)
-            }
-        }
-
     }
     private fun setGuideDesc(flag:Boolean){
         val guideText = if(flag) guideArray[0] else guideArray[1]

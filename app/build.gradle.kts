@@ -114,6 +114,8 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
+    // 컴포저블을 위한 라이브 데이터 의존성 추가! (= 컴포저블의 옵저버 패턴을 위하여)
+    implementation("androidx.compose.runtime:runtime-livedata:1.3.1")
 
     // debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.material:material:1.2.0")

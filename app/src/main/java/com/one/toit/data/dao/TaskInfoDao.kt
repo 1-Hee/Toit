@@ -18,6 +18,8 @@ interface TaskInfoDao {
     // read
     @Query("SELECT * FROM table_task_information")
     fun readTaskInfoList(): LiveData<List<TaskInfo>>
+    @Query("SELECT * FROM table_task_information where fk_task_id = :fkTaskId limit 1")
+    fun readTaskInfoListWithTaskId(fkTaskId:Long): LiveData<TaskInfo>
     // update
     @Update
     fun modifyTaskInfo(taskInfo: TaskInfo)

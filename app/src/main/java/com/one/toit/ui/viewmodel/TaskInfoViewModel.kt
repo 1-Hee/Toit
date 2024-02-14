@@ -33,6 +33,10 @@ class TaskInfoViewModel (
         Timber.d("vm.. readTaskInfoList...")
         return repository.readTaskInfoList()
     }
+    suspend fun readTaskInfoListWithTaskId(fkTaskId:Long): LiveData<TaskInfo>{
+        Timber.d("vm.. readTaskInfoListWithTaskId... %s", fkTaskId)
+        return repository.readTaskInfoListWithTaskId(fkTaskId)
+    }
     // update
     suspend fun modifyTaskInfo(taskInfo: TaskInfo){
         Timber.d("vm.. modifyTaskInfo : %s", taskInfo)

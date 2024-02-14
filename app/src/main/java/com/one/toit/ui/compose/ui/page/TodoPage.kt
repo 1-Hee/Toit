@@ -1,11 +1,6 @@
 package com.one.toit.ui.compose.ui.page
 
-import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,17 +31,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.gun0912.tedpermission.coroutine.TedPermission
+import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavHostController
 import com.one.toit.R
+import com.one.toit.data.dto.TaskDTO
+import com.one.toit.data.model.TaskRegister
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono200
@@ -56,28 +53,89 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
+import com.one.toit.ui.viewmodel.TaskInfoViewModel
+import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
-@Preview(showBackground = true)
 @Composable
-fun TodoPage(){
+fun TodoPage(
+    navController: NavHostController,
+    taskRegisterViewModel: TaskRegisterViewModel,
+    taskInfoViewModel: TaskInfoViewModel
+){
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val intent = Intent(context, BoardActivity::class.java)
+    var checked by remember { mutableStateOf(false) }
+    val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
+    var hasContent by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+    // MutableState로 선언된 리스트
+    var mTaskMap by remember { mutableStateOf<Map<Long, TaskDTO>>(mutableMapOf()) }
+    var mTaskDTOList by remember { mutableStateOf<List<TaskDTO>>(mutableListOf()) }
+    // LaunchedEffect를 통해 비동기 작업을 수행하고 결과를 MutableState에 반영
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.Main) {
+            taskRegisterViewModel.readTaskRegisterList().observe(lifecycleOwner){ list ->
+                val newTaskMap = mTaskMap.toMutableMap()
+                list.forEach { register ->
+                    val dto = TaskDTO(
+                        taskId = register.taskId,
+                        createAt = register.createAt
+                    )
+                    newTaskMap[dto.taskId] = dto
+                    mTaskMap = newTaskMap
+                }
+            }
+        }
+    }
+
+    Timber.i("mTaskMap..!!!! %s", mTaskMap)
+
+
+    if(mTaskMap.keys.isNotEmpty()){
+        LaunchedEffect(Unit){
+            withContext(Dispatchers.Main){
+                Timber.i("keyList.. %s", mTaskMap.keys)
+                val updatedTaskDTOMap = mTaskMap.toMutableMap()
+                val updateList = mutableListOf<TaskDTO>()
+                mTaskMap.keys.forEach { key ->
+                    taskInfoViewModel.readTaskInfoListWithTaskId(key).observe(lifecycleOwner){
+                        val mTaskDTO = updatedTaskDTOMap[it.fkTaskId]
+                        Timber.i("맵 확인!!! %s", mTaskDTO)
+                        Timber.i("인포 확인..! %s", it)
+                        mTaskDTO?.taskTitle = it.taskTitle
+                        mTaskDTO?.taskMemo = it.taskMemo
+                        mTaskDTO?.taskLimit = it.taskLimit
+                        mTaskDTO?.taskComplete = it.taskComplete
+                        mTaskDTO?.taskCertification = it.taskCertification
+                        if (mTaskDTO != null) {
+                            updatedTaskDTOMap[mTaskDTO.taskId] = mTaskDTO
+                            updateList.add(mTaskDTO)
+                            Timber.i("updated taskDTO..!!!!! %s", mTaskDTO)
+                        }
+                    }
+                    mTaskMap = updatedTaskDTOMap
+                    mTaskDTOList = updateList
+                    Timber.i("taskMap..!!!!! %s", mTaskMap)
+                }
+            }
+        }
+        Timber.i("if mTaskDTOList!!!! %s", mTaskDTOList)
+    }
+
+    Timber.i("mTaskDTOList!!!! %s", mTaskDTOList)
+
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(white)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
-        /**
-         * 권한 체크
-         */
-        requestPermission(LocalContext.current)
-        val context = LocalContext.current
-        val intent = Intent(context, BoardActivity::class.java)
-        var checked by remember { mutableStateOf(false) }
-        val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
-        var hasContent by remember { mutableStateOf(true) }
-        val scrollState = rememberScrollState()
         // content list
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -165,52 +223,5 @@ fun TodoPage(){
                 tint = white
             )
         }
-    }
-}
-
-private fun requestPermission(context:Context){
-    // API Version < 33
-    val ALL_PERMISSION:Array<String> = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.POST_NOTIFICATIONS,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.CAMERA
-    )
-    // API Version >= 33
-    val ALL_PERMISSION_33:Array<String> = arrayOf(
-        Manifest.permission.READ_MEDIA_VIDEO,
-        Manifest.permission.READ_MEDIA_IMAGES,
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.POST_NOTIFICATIONS,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.CAMERA
-    )
-    val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-        ALL_PERMISSION_33
-    }else {
-        ALL_PERMISSION
-    }
-
-    // 권한 요청 함수
-    val permissionsToRequest = mutableListOf<String>()
-
-    // 필요한 권한 중에서 아직 허용되지 않은 권한을 확인
-    for (permission in permissionList) {
-        if (ContextCompat.checkSelfPermission(context, permission)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionsToRequest.add(permission)
-        }
-    }
-
-    // 권한 요청이 필요한 경우 요청
-    if (permissionsToRequest.isNotEmpty()) {
-        ActivityCompat.requestPermissions(
-            context as Activity,
-            permissionsToRequest.toTypedArray(),
-            1001
-        )
     }
 }
