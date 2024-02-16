@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.one.toit.R
+import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -52,14 +53,11 @@ import com.one.toit.ui.compose.style.white
 
 @Composable
 fun TodoPreviewDialog(
+    taskDTO: TaskDTO,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
     onEdit: (id:Int) -> Unit
 ) {
-    val context = LocalContext.current
-    val todoText by remember { mutableStateOf<String>("친구에게 생일 축하 메세지 보내기") }
-    val memoText by remember { mutableStateOf<String>("오늘은 친구의 생일! 특별한 메시지와 함께 축하 인사를 전하고, 얼른 만날 계획을 세워야겠다.") }
-    val dateText by remember { mutableStateOf<String>("2023. 01. 01.에 등록됨") }
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -141,7 +139,7 @@ fun TodoPreviewDialog(
                     )
 
                     Text(
-                        text = todoText,
+                        text = taskDTO.taskTitle,
                         style = MaterialTheme.typography.subtitle1.copy(
                             fontSize = 14.sp,
                             color = black
@@ -179,7 +177,7 @@ fun TodoPreviewDialog(
                 }
                 // 메모 내용
                 Text(
-                    text = memoText,
+                    text = taskDTO.taskMemo,
                     style = MaterialTheme.typography.subtitle1.copy(
                         fontSize = 14.sp,
                         color = mono700,
@@ -190,17 +188,21 @@ fun TodoPreviewDialog(
                         .wrapContentHeight()
                 )
                 // 이미지
-                Image(
-                    painter = painterResource(id = R.drawable.img_sample),
-                    contentDescription = "photo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(216.dp)
-                )
+                if(taskDTO.taskCertification?.isNotBlank() == true){
+                    // TODO Uri 파싱 함수로 이미지 바인딩
+                    Image(
+                        painter = painterResource(id = R.drawable.img_sample),
+                        contentDescription = "photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(216.dp)
+                    )
+                }
                 // 날짜
                 Text(
-                    text = dateText,
+                    // 파싱 함수 추가
+                    text = taskDTO.createAt,
                     style = MaterialTheme.typography.subtitle1.copy(
                         fontSize = 12.sp,
                         color = mono400,

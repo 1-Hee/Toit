@@ -164,9 +164,9 @@ fun GraphPage(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
-                repeat(12){
-                    ItemTodo()
-                }
+//                repeat(12){
+//                    ItemTodo()
+//                }
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }

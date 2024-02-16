@@ -43,6 +43,14 @@
         <variable
             name="modifyRippleColor"
             type="Integer" />
+        <!-- 데이터 -->
+        <variable
+            name="taskDTO"
+            type="com.one.toit.data.dto.TaskDTO" />
+        <!-- 마감기한 문자열 -->
+        <variable
+            name="deadLineString"
+            type="String" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_read_board"
@@ -100,6 +108,7 @@
                         android:id="@+id/tv_todo_content"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@{taskDTO.taskTitle}"
                         android:textSize="12sp"
                         android:textColor="@color/mono600"
                         android:textColorHint="@color/mono400"
@@ -138,6 +147,7 @@
                     android:id="@+id/tv_memo_todo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@{taskDTO.taskMemo}"
                     android:textSize="14sp"
                     android:textColor="@color/mono600"
                     android:textAlignment="textStart"
@@ -200,6 +210,7 @@
                         android:id="@+id/tv_limit_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@{deadLineString}"
                         android:textSize="14sp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/mono100"

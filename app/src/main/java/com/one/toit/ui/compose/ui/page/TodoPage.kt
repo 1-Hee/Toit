@@ -26,6 +26,7 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,7 @@ import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import com.one.toit.ui.viewmodel.TaskInfoViewModel
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import com.one.toit.ui.viewmodel.TaskViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -62,73 +64,37 @@ import timber.log.Timber
 @Composable
 fun TodoPage(
     navController: NavHostController,
-    taskRegisterViewModel: TaskRegisterViewModel,
-    taskInfoViewModel: TaskInfoViewModel
+    taskViewModel: TaskViewModel
 ){
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val intent = Intent(context, BoardActivity::class.java)
     var checked by remember { mutableStateOf(false) }
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
-    var hasContent by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    // MutableState로 선언된 리스트
-    var mTaskMap by remember { mutableStateOf<Map<Long, TaskDTO>>(mutableMapOf()) }
-    var mTaskDTOList by remember { mutableStateOf<List<TaskDTO>>(mutableListOf()) }
+
+    // MutableState를 사용하여 taskDTOList를 감싸기
+    val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
     // LaunchedEffect를 통해 비동기 작업을 수행하고 결과를 MutableState에 반영
     LaunchedEffect(Unit) {
         withContext(Dispatchers.Main) {
-            taskRegisterViewModel.readTaskRegisterList().observe(lifecycleOwner){ list ->
-                val newTaskMap = mTaskMap.toMutableMap()
-                list.forEach { register ->
-                    val dto = TaskDTO(
-                        taskId = register.taskId,
-                        createAt = register.createAt
-                    )
-                    newTaskMap[dto.taskId] = dto
-                    mTaskMap = newTaskMap
-                }
+            val taskList = taskViewModel.readTaskList()
+            Timber.i("[할일 목록] : %s", taskList)
+            // 데이터 변화를 감지하기 위해 MutableState를 업데이트
+            taskDTOListState.value = taskList.map { task ->
+                TaskDTO(
+                    task.register.taskId,
+                    task.register.createAt,
+                    task.info.taskTitle,
+                    task.info.taskMemo,
+                    task.info.taskLimit,
+                    task.info.taskComplete,
+                    task.info.taskCertification
+                )
             }
         }
     }
-
-    Timber.i("mTaskMap..!!!! %s", mTaskMap)
-
-
-    if(mTaskMap.keys.isNotEmpty()){
-        LaunchedEffect(Unit){
-            withContext(Dispatchers.Main){
-                Timber.i("keyList.. %s", mTaskMap.keys)
-                val updatedTaskDTOMap = mTaskMap.toMutableMap()
-                val updateList = mutableListOf<TaskDTO>()
-                mTaskMap.keys.forEach { key ->
-                    taskInfoViewModel.readTaskInfoListWithTaskId(key).observe(lifecycleOwner){
-                        val mTaskDTO = updatedTaskDTOMap[it.fkTaskId]
-                        Timber.i("맵 확인!!! %s", mTaskDTO)
-                        Timber.i("인포 확인..! %s", it)
-                        mTaskDTO?.taskTitle = it.taskTitle
-                        mTaskDTO?.taskMemo = it.taskMemo
-                        mTaskDTO?.taskLimit = it.taskLimit
-                        mTaskDTO?.taskComplete = it.taskComplete
-                        mTaskDTO?.taskCertification = it.taskCertification
-                        if (mTaskDTO != null) {
-                            updatedTaskDTOMap[mTaskDTO.taskId] = mTaskDTO
-                            updateList.add(mTaskDTO)
-                            Timber.i("updated taskDTO..!!!!! %s", mTaskDTO)
-                        }
-                    }
-                    mTaskMap = updatedTaskDTOMap
-                    mTaskDTOList = updateList
-                    Timber.i("taskMap..!!!!! %s", mTaskMap)
-                }
-            }
-        }
-        Timber.i("if mTaskDTOList!!!! %s", mTaskDTOList)
-    }
-
-    Timber.i("mTaskDTOList!!!! %s", mTaskDTOList)
-
-
+    // taskDTOListState를 사용하여 UI 업데이트
+    val taskDTOList = taskDTOListState.value
 
     Box(
         modifier = Modifier
@@ -166,7 +132,6 @@ fun TodoPage(
                         checked = checked,
                         onCheckedChange = {
                             checked = it
-                            hasContent = it
                         },
                         modifier = Modifier
                             .wrapContentWidth()
@@ -182,7 +147,7 @@ fun TodoPage(
             }
             // content
             // 등록한 List가 있을 경우
-            if(hasContent){
+            if(taskDTOList.isNotEmpty()){
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -190,8 +155,8 @@ fun TodoPage(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    repeat(12){
-                        ItemTodo()
+                    repeat(taskDTOList.size){
+                        ItemTodo(taskDTO = taskDTOList[it])
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -199,7 +164,6 @@ fun TodoPage(
                 ItemNoContent()
             }
         }
-
         // 플로팅 버튼
         FloatingActionButton(
             modifier = Modifier

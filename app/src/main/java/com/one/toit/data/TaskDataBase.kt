@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.one.toit.data.dao.TaskDao
 import com.one.toit.data.dao.TaskInfoDao
 import com.one.toit.data.dao.TaskRegistrationDao
 import com.one.toit.data.model.TaskInfo
@@ -14,6 +15,7 @@ abstract class TaskDataBase : RoomDatabase(){
     // dao
     abstract fun TaskInfoDao(): TaskInfoDao
     abstract fun TaskRegistrationDao(): TaskRegistrationDao
+    abstract fun TaskDao():TaskDao
     companion object {
         @Volatile
         private var INSTANCE:TaskDataBase? = null

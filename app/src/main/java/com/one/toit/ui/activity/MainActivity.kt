@@ -70,6 +70,7 @@ import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.MainMenuViewModel
 import com.one.toit.ui.viewmodel.TaskInfoViewModel
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import com.one.toit.ui.viewmodel.TaskViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -83,12 +84,17 @@ class MainActivity : BaseComposeActivity(), LifecycleObserver {
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     // 자식 엔티티
     private lateinit var taskInfoViewModel: TaskInfoViewModel
+    private lateinit var taskViewModel:TaskViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {} // 광고 init
         requestPermission(this) // 권한 체크
         setContent {
-            MainScreenView(mainMenuViewModel, taskRegisterViewModel, taskInfoViewModel)
+            MainScreenView(mainMenuViewModel, taskViewModel)
+        }
+        lifecycleScope.launch {
+            val data = taskViewModel.readTaskList()
+            Timber.i("taskList .. %s", data)
         }
     }
     override fun initViewModel() {
@@ -99,6 +105,7 @@ class MainActivity : BaseComposeActivity(), LifecycleObserver {
         val factory = ApplicationFactory(this.application)
         taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
         taskInfoViewModel = getApplicationScopeViewModel(TaskInfoViewModel::class.java, factory)
+        taskViewModel = getApplicationScopeViewModel(TaskViewModel::class.java, factory)
     }
 
     //  권한 요청 함수
@@ -149,8 +156,7 @@ class MainActivity : BaseComposeActivity(), LifecycleObserver {
 @Composable
 fun MainScreenView(
     viewModel: MainMenuViewModel,
-    taskRegisterViewModel: TaskRegisterViewModel,
-    taskInfoViewModel: TaskInfoViewModel
+    taskViewModel: TaskViewModel
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -158,7 +164,7 @@ fun MainScreenView(
         bottomBar = { MainBottomNavigation(navController = navController, menuViewModel = viewModel) }
     ) {
         Box(Modifier.padding(it)){
-            MainNavGraph(navController, taskRegisterViewModel, taskInfoViewModel)
+            MainNavGraph(navController, taskViewModel)
         }
     }
 }
@@ -203,15 +209,14 @@ fun MainTopBarComponent(
 @Composable
 fun MainNavGraph(
     navController: NavHostController,
-    taskRegisterViewModel: TaskRegisterViewModel,
-    taskInfoViewModel: TaskInfoViewModel
+    taskViewModel: TaskViewModel
 ) {
     NavHost(
         navController,
         startDestination = MainRoute.Todo.route
     )  {
         composable(route = MainRoute.Todo.route) {
-            TodoPage(navController, taskRegisterViewModel, taskInfoViewModel)
+            TodoPage(navController, taskViewModel)
         }
         composable(MainRoute.Statistics.route) {
             // GraphPage(navController)

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.os.Build
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
@@ -15,6 +16,7 @@ import com.one.toit.R
 import com.one.toit.base.bind.DataBindingConfig
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseFragment
+import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.dto.WarningDTO
 import com.one.toit.databinding.FragmentBoardReadBinding
 import com.one.toit.ui.dialog.WarningDialog
@@ -25,6 +27,8 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     override fun getDataBindingConfig(): DataBindingConfig {
         return DataBindingConfig(R.layout.fragment_board_read)
             .addBindingParam(BR.click, viewClickListener)
+            .addBindingParam(BR.taskDTO, TaskDTO())
+            .addBindingParam(BR.deadLineString, "제한 없음")
     }
 
     override fun initViewModel() {
@@ -54,6 +58,26 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
         mBinding.setVariable(BR.modifyStrokeColor, modifyStrokeColor)
         mBinding.setVariable(BR.modifyTextColor, modifyTextColor)
         mBinding.setVariable(BR.modifyRippleColor, modifyRippleColor)
+
+        // 번들 참조
+        arguments?.let { bundle ->
+            Timber.i("[READ FRAGMENT] %s", bundle)
+            @Suppress("DEPRECATION")
+            val mTaskDTO = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                bundle.getParcelable("taskDTO", TaskDTO::class.java)
+            } else {
+                bundle.getParcelable("taskDTO")
+            }
+            Timber.e("[READ FRAGMENT DTO] %s", mTaskDTO)
+            mBinding.setVariable(BR.taskDTO, mTaskDTO)
+            val deadLineString = if(mTaskDTO?.taskLimit?.isNotBlank()==true){
+                mTaskDTO.taskLimit
+            }else {
+                "제한 없음"
+            }
+            mBinding.setVariable(BR.deadLineString, deadLineString)
+        }
+
         mBinding.notifyChange()
 
     }
