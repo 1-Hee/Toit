@@ -1,14 +1,11 @@
 package com.one.toit.util
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -17,15 +14,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.room.Ignore
 import com.one.toit.data.dto.MediaDTO
 import timber.log.Timber
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
@@ -167,7 +162,7 @@ class AppUtil {
                 _dateFormat = value
             }
 
-        private var _timeFormat = "h:mm:ss a" // time format
+        private var _timeFormat = "HH:mm:ss" // time format
         var timeFormat
             get() = _timeFormat
             set(value) {
@@ -178,7 +173,7 @@ class AppUtil {
         private var _dateString:String = ""
         val dateString:String
             get() {
-                _dateString = getCurrentTime(isDate = true)
+                _dateString = getCurrentTimeString(isDate = true)
                 return _dateString
             }
 
@@ -186,14 +181,14 @@ class AppUtil {
         private var _timeString:String = ""
         val timeString:String
             get() {
-                _timeString = getCurrentTime(isDate = false)
+                _timeString = getCurrentTimeString(isDate = false)
                 return _timeString
             }
 
         /**
          * @param isDate : true (일자) : false (시간)
          */
-        fun getCurrentTime(isDate: Boolean):String{
+        private fun getCurrentTimeString(isDate: Boolean):String{
             // 오레오 이상일 경우에는 LocalDateTime을 사용하도록
             return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 val date = LocalDateTime.now()
@@ -205,7 +200,7 @@ class AppUtil {
         }
 
         // simple date parser
-        private fun parseDateString(date: Date, isDate:Boolean):String{
+        fun parseDateString(date: Date, isDate:Boolean):String{
             val format = if(isDate) this.dateFormat else this.timeFormat
             val sdf = SimpleDateFormat(format)
             return sdf.format(date)
@@ -213,47 +208,58 @@ class AppUtil {
 
         // local date parser | 오레오(O) 이상
         @RequiresApi(Build.VERSION_CODES.O)
-        private fun parseDateString(date: LocalDateTime, isDate:Boolean):String{
+        fun parseDateString(date: LocalDateTime, isDate:Boolean):String{
             val format = if(isDate) this.dateFormat else this.timeFormat
             val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(format)
             return date.format(formatter)
         }
 
-        // 연월일에 대해서 8자리 문자열로 처리
-        fun convertToDateString(year: Int, month: Int, dayOfMonth:Int):String{
-            val monthString:String = if(month<10) "0$month" else month.toString()
-            val dayString:String = if(dayOfMonth<10) "0$dayOfMonth" else dayOfMonth.toString()
-            return "$year-$monthString-$dayString"
+        @RequiresApi(Build.VERSION_CODES.O)
+        private fun calculateDeadline(baseTime: LocalDateTime, hoursToAdd: Int, minutesToAdd: Int): LocalDateTime {
+            return baseTime.plusHours(hoursToAdd.toLong()).plusMinutes(minutesToAdd.toLong())
         }
 
-        // 시간에 대해서 4자리 문자열로 처리 (24시간 구분 X)
-        fun convertToTimeString(hour:Int, minute:Int):String {
-            val hourString:String = if(hour < 10) "0$hour" else hour.toString()
-            val minuteString:String = if(minute < 10) "0$minute" else minute.toString()
-            return "$hourString:$minuteString"
+        private fun calculateDeadline(baseTime: Date, hoursToAdd: Int, minutesToAdd: Int): Date {
+            val baseTimeInMillis = baseTime.time
+            val deadlineInMillis = baseTimeInMillis + (hoursToAdd * 60L * 60L * 1000L) + (minutesToAdd * 60L * 1000L)
+            return Date(deadlineInMillis)
         }
 
-        fun parseTimeStamp(timestamp: Long, format:String = ""): String {
+        fun getDeadLineString(hours:Int, minutes:Int, isDate: Boolean):String{
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                parseTimeStampLdt(timestamp, format)
+                val currentDateTime = LocalDateTime.now()
+                val deadline = calculateDeadline(currentDateTime, hours, minutes)
+                parseDateString(deadline, isDate)
             } else {
-                parseTimeStampSdf(timestamp, format)
+                val currentDate = Date()
+                val deadline = calculateDeadline(currentDate, hours, minutes)
+                parseDateString(deadline, isDate)
             }
+        }
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun getDeadLineLocalDate(hours: Int, minutes: Int):LocalDateTime{
+            val currentDateTime = LocalDateTime.now()
+            return calculateDeadline(currentDateTime, hours, minutes)
+        }
+        fun getDeadLineDate(hours: Int, minutes: Int):Date{
+            val currentDate = Date()
+            return calculateDeadline(currentDate, hours, minutes)
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
-        private fun parseTimeStampLdt(timestamp: Long, format: String = ""): String {
-            val instant = Instant.ofEpochMilli(timestamp)
-            val date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-            val formatter = DateTimeFormatter.ofPattern(format.ifBlank { dateFormat })
-            return date.format(formatter)
+        fun parseToLocalDateTime(dateString: String): LocalDateTime {
+            val formatter = DateTimeFormatter.ofPattern(dateFormat)
+            return LocalDateTime.parse(dateString, formatter)
         }
 
-        private fun parseTimeStampSdf(timestamp: Long, format: String = ""): String {
-            val sdf = SimpleDateFormat(format.ifBlank { dateFormat }, Locale.getDefault())
-            val date = Date(timestamp)
-            return sdf.format(date)
+        fun parseToDate(dateString: String?): Date? {
+            val dateFormat = SimpleDateFormat(dateFormat, Locale.getDefault())
+            return try{
+                dateFormat.parse(dateString)
+            }catch (pe:ParseException){
+                Timber.e("[ERROR] : %s", pe.message)
+                null
+            }
         }
-
     }
 }

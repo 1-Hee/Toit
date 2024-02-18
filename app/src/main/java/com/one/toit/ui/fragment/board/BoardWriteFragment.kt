@@ -1,6 +1,7 @@
 package com.one.toit.ui.fragment.board
 
 import android.app.Activity
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -26,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
 import java.util.Arrays
 import java.util.Date
 
@@ -39,6 +41,9 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     private lateinit var taskInfoViewModel: TaskInfoViewModel
 
     private lateinit var guideArray:Array<String>
+    private var mDeadLDT:LocalDateTime? = null
+    private var mDeadDate:Date? = null
+
     override fun getDataBindingConfig(): DataBindingConfig {
         // 키보드 엔터 이벤트 핸들링을 위한 리스너
         val onKeyListener: View.OnKeyListener = View.OnKeyListener { view, keyCode, keyEvent ->
@@ -173,20 +178,48 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
 
     private fun getTaskInfo(taskId:Long, titleString:String):TaskInfo{
         val memo = mBinding.etMemoTodo.text.toString()
+        val limitString = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if(mDeadLDT != null){
+                try {
+                    AppUtil.Time.parseDateString(mDeadLDT!!, true)
+                }catch (e:Exception){
+                    ""
+                }
+            }else {
+                ""
+            }
+        }else {
+            if(mDeadDate != null){
+                try {
+                    AppUtil.Time.parseDateString(mDeadDate!!, true)
+                }catch (e:Exception){
+                    ""
+                }
+            }else {
+                ""
+            }
+        }
         return TaskInfo(
             taskTitle = titleString,
             taskMemo = memo,
-            fkTaskId = taskId
+            fkTaskId = taskId,
+            taskLimit = limitString
         )
     }
 
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
-            val mLimitString = AppUtil.Time.parseToLimitString(hour, min)
-            mBinding.limitText = mLimitString
+            AppUtil.Time.timeFormat = "HH:mm"
+            val mTimeString = AppUtil.Time.getDeadLineString(hour, min, false)
+            Timber.i("deadline .. %s", mTimeString)
+            mBinding.limitText = mTimeString
             mBinding.notifyChange()
-            // TODO 여기서 받은 시간을, 현재 시간 +해서 DateString으로 TaskInfo에 추가해야함!
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mDeadLDT = AppUtil.Time.getDeadLineLocalDate(hour, min)
+            }else {
+                mDeadDate = AppUtil.Time.getDeadLineDate(hour, min)
+            }
         }
 
         override fun onCancel() {

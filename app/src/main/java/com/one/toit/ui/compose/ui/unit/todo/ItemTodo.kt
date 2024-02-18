@@ -2,6 +2,7 @@ package com.one.toit.ui.compose.ui.unit.todo
 
 import android.app.Application
 import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +21,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
-import com.one.toit.base.ui.BaseApplication
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
@@ -43,8 +41,7 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.ui.unit.WarningDialog
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
-import timber.log.Timber
-import kotlin.random.Random
+import java.util.Calendar
 
 @Composable
 fun ItemTodo(
@@ -131,7 +128,6 @@ fun ItemTodo(
                     .wrapContentSize()
                     .align(Alignment.TopStart)
             )
-
             // 달성 여부
             if(isSuccess){
                 Icon(
@@ -163,8 +159,24 @@ fun ItemTodo(
                         tint = purple200
                     )
                     Spacer(modifier = Modifier.width(8.dp))
+                    val mTaskLimit = taskDTO.taskLimit.toString()
+                    val limitString =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val ldt = AppUtil.Time.parseToLocalDateTime(mTaskLimit)
+                        val mHour = if(ldt.hour > 9) ldt.hour.toString() else "0${ldt.hour}"
+                        val mMin = if(ldt.minute > 9) ldt.minute.toString() else "0${ldt.minute}"
+                        "${mHour}:${mMin}"
+                    }else {
+                        val date = AppUtil.Time.parseToDate(mTaskLimit)
+                        val calendar: Calendar = Calendar.getInstance()
+                        calendar.time = date
+                        val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
+                        val minute: Int = calendar.get(Calendar.MINUTE)
+                        val mHour = if(hour > 9) hour.toString() else "0$hour"
+                        val mMin = if(minute > 9) minute.toString() else "0$minute"
+                        "${mHour}:${mMin}"
+                    }
                     Text(
-                        text = taskDTO.taskLimit?:"",
+                        text = limitString,
                         style = MaterialTheme.typography.subtitle1
                             .copy(
                                 fontSize = 14.sp,
@@ -174,9 +186,25 @@ fun ItemTodo(
                 }
             }
             // 로그 시간
+            val mTaskCreateAt = taskDTO.createAt
+            val logString =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val ldt = AppUtil.Time.parseToLocalDateTime(mTaskCreateAt)
+                val mHour = if(ldt.hour > 9) ldt.hour.toString() else "0${ldt.hour}"
+                val mMin = if(ldt.minute > 9) ldt.minute.toString() else "0${ldt.minute}"
+                "${mHour}:${mMin}에 작성됨"
+            }else {
+                val date = AppUtil.Time.parseToDate(mTaskCreateAt)
+                val calendar: Calendar = Calendar.getInstance()
+                calendar.time = date
+                val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
+                val minute: Int = calendar.get(Calendar.MINUTE)
+                val mHour = if(hour > 9) hour.toString() else "0$hour"
+                val mMin = if(minute > 9) minute.toString() else "0$minute"
+                "${mHour}:${mMin}에 작성 됨"
+            }
             Text(
                 // TODO 시간 파싱 함수 작성
-                text = taskDTO.createAt,
+                text = logString,
                 style = MaterialTheme.typography.subtitle1
                     .copy(
                         fontSize = 14.sp,

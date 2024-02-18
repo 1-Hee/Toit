@@ -29,6 +29,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.util.Calendar
+import java.util.Date
 
 
 class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
@@ -39,6 +42,8 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
 
     private lateinit var guideArray:Array<String>
     private var mTaskDTO: TaskDTO? = null
+    private var mDeadLDT: LocalDateTime? = null
+    private var mDeadDate: Date? = null
     override fun getDataBindingConfig(): DataBindingConfig {
         mBundle = Bundle() // bundle init
         // 키보드 엔터 이벤트 핸들링을 위한 리스너
@@ -84,6 +89,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             .addBindingParam(BR.textListener, textListener)
             .addBindingParam(BR.textWatcher, textWatcher)
             .addBindingParam(BR.taskDTO, TaskDTO())
+            .addBindingParam(BR.deadLineString, "제한 없음")
     }
 
     override fun initViewModel() {
@@ -108,11 +114,33 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                 bundle.getParcelable("taskDTO")
             }
             Timber.e("[READ FRAGMENT DTO] %s", mTaskDTO)
-            //
-            val limitFlag = mTaskDTO?.taskLimit?.isNotBlank()==true
-            mBinding.setVariable(BR.isLimit, limitFlag)
             mBinding.setVariable(BR.taskDTO, mTaskDTO)
-            setGuideDesc(limitFlag)
+            val mHasLimit = mTaskDTO?.taskLimit?.isNotBlank()==true
+            val deadLineString:String
+            if(mHasLimit){
+                val limitString = mTaskDTO?.taskLimit.toString()
+                val parsedLimitString = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val ldt = AppUtil.Time.parseToLocalDateTime(limitString)
+                    val mHour = if(ldt.hour > 9) ldt.hour.toString() else "0${ldt.hour}"
+                    val mMin = if(ldt.minute > 9) ldt.minute.toString() else "0${ldt.minute}"
+                    "${mHour}:${mMin}"
+                }else {
+                    val date = AppUtil.Time.parseToDate(limitString)
+                    val calendar: Calendar = Calendar.getInstance()
+                    calendar.time = date
+                    val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
+                    val minute: Int = calendar.get(Calendar.MINUTE)
+                    val mHour = if(hour > 9) hour.toString() else "0$hour"
+                    val mMin = if(minute > 9) minute.toString() else "0$minute"
+                    "${mHour}:${mMin}"
+                }
+                deadLineString = parsedLimitString
+            }else {
+                deadLineString = "제한 없음"
+            }
+            mBinding.setVariable(BR.deadLineString, deadLineString)
+            mBinding.setVariable(BR.isLimit, mHasLimit)
+            setGuideDesc(mHasLimit)
         }
     }
 
@@ -136,7 +164,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                     if(mTaskDTO != null){
                         val todoTitle = mBinding.etTitleTodo.text.toString()
                         val todoMemo = mBinding.etMemoTodo.text.toString()
-                        val todoLimit = "" // TODO 시간 선택자 받아서 세팅해주기...
+                        val todoLimit = if(mBinding.isLimit == true) getLimitString() else ""
                         mTaskDTO?.taskTitle = todoTitle
                         mTaskDTO?.taskMemo = todoMemo
                         mTaskDTO?.taskLimit = todoLimit
@@ -170,9 +198,39 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                 }
                 // 기한 설정
                 R.id.et_limit_input -> {
-                    val dialog = CustomTimeDialog(listener = dialogListener)
+                    val timeArr:Array<Int> = AppUtil.Time.getTimeArray()
+                    Timber.i("array : %s", timeArr.contentToString())
+                    val dialog = CustomTimeDialog(
+                        hour = timeArr[0],
+                        min = timeArr[1],
+                        listener = dialogListener,
+                    )
                     dialog.show(requireActivity().supportFragmentManager, null)
                 }
+            }
+        }
+    }
+
+    private fun getLimitString():String{
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if(mDeadLDT != null){
+                try {
+                    AppUtil.Time.parseDateString(mDeadLDT!!, true)
+                }catch (e:Exception){
+                    ""
+                }
+            }else {
+                ""
+            }
+        }else {
+            if(mDeadDate != null){
+                try {
+                    AppUtil.Time.parseDateString(mDeadDate!!, true)
+                }catch (e:Exception){
+                    ""
+                }
+            }else {
+                ""
             }
         }
     }
@@ -192,6 +250,16 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
+            AppUtil.Time.timeFormat = "HH:mm"
+            val mTimeString = AppUtil.Time.getDeadLineString(hour, min, false)
+            Timber.i("deadline .. %s", mTimeString)
+            mBinding.setVariable(BR.deadLineString, mTimeString)
+            mBinding.notifyChange()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mDeadLDT = AppUtil.Time.getDeadLineLocalDate(hour, min)
+            }else {
+                mDeadDate = AppUtil.Time.getDeadLineDate(hour, min)
+            }
         }
         override fun onCancel() {
         }

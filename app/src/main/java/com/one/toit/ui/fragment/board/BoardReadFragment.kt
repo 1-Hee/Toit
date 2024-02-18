@@ -53,6 +53,7 @@ import java.io.OutputStreamWriter
 import java.lang.Exception
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -190,13 +191,31 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
             }
             Timber.e("[READ FRAGMENT DTO] %s", mTaskDTO)
             mBinding.setVariable(BR.taskDTO, mTaskDTO)
-            val deadLineString = if(mTaskDTO?.taskLimit?.isNotBlank()==true){
-                mTaskDTO?.taskLimit
+            val mHasLimit = mTaskDTO?.taskLimit?.isNotBlank()==true
+            val deadLineString:String
+            if(mHasLimit){
+                val limitString = mTaskDTO?.taskLimit.toString()
+                val parsedLimitString = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val ldt = AppUtil.Time.parseToLocalDateTime(limitString)
+                    val mHour = if(ldt.hour > 9) ldt.hour.toString() else "0${ldt.hour}"
+                    val mMin = if(ldt.minute > 9) ldt.minute.toString() else "0${ldt.minute}"
+                    "${mHour}:${mMin}"
+                }else {
+                    val date = AppUtil.Time.parseToDate(limitString)
+                    val calendar: Calendar = Calendar.getInstance()
+                    calendar.time = date
+                    val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
+                    val minute: Int = calendar.get(Calendar.MINUTE)
+                    val mHour = if(hour > 9) hour.toString() else "0$hour"
+                    val mMin = if(minute > 9) minute.toString() else "0$minute"
+                    "${mHour}:${mMin}"
+                }
+                deadLineString = parsedLimitString
             }else {
-                "제한 없음"
+                deadLineString = "제한 없음"
             }
             mBinding.setVariable(BR.deadLineString, deadLineString)
-            mBinding.setVariable(BR.hasLimit, mTaskDTO?.taskLimit?.isNotBlank() == true)
+            mBinding.setVariable(BR.hasLimit, mHasLimit)
         }
     }
 

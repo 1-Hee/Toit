@@ -27,14 +27,16 @@ android {
         versionName = "1.1.5"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders["ADMOB_APP_KEY"] = getApiKey("ADMOB_APP_KEY")
-        buildConfigField("String", "ADMOB_SDK_KEY", getApiKey("ADMOB_SDK_KEY"))
     }
 
     buildTypes {
         debug {
+            manifestPlaceholders["ADMOB_APP_KEY"] = getApiKey("ADMOB_TEST_APP_KEY")
+            buildConfigField("String", "ADMOB_SDK_KEY", getApiKey("ADMOB_TEST_BANNER_SDK_KEY"))
         }
         release {
+            manifestPlaceholders["ADMOB_APP_KEY"] = getApiKey("ADMOB_APP_KEY")
+            buildConfigField("String", "ADMOB_SDK_KEY", getApiKey("ADMOB_BANNER_SDK_KEY"))
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
