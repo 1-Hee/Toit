@@ -7,6 +7,7 @@ import java.util.Date
 data class TaskDTO(
     val taskId:Long = -1,
     val createAt:String = Date().toString(),
+    val taskInfoId:Long = -1,
     var taskTitle:String = "",
     var taskMemo:String = "",
     var taskLimit:String? = null,
@@ -17,6 +18,7 @@ data class TaskDTO(
     private constructor(parcel: Parcel) : this(
         taskId = parcel.readLong(),
         createAt = parcel.readString()?:"",
+        taskInfoId = parcel.readLong(),
         taskTitle = parcel.readString()?:"",
         taskMemo = parcel.readString()?:"",
         taskLimit = parcel.readString()?:"",
@@ -27,6 +29,7 @@ data class TaskDTO(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(taskId)
         parcel.writeString(createAt)
+        parcel.writeLong(taskInfoId)
         parcel.writeString(taskTitle)
         parcel.writeString(taskMemo)
         parcel.writeString(taskLimit)

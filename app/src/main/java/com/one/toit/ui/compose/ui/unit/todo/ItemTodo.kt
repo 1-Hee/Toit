@@ -1,5 +1,6 @@
 package com.one.toit.ui.compose.ui.unit.todo
 
+import android.app.Application
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
+import com.one.toit.base.ui.BaseApplication
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
@@ -38,16 +41,21 @@ import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.ui.unit.WarningDialog
+import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import com.one.toit.util.AppUtil
 import timber.log.Timber
 import kotlin.random.Random
 
 @Composable
 fun ItemTodo(
     taskDTO: TaskDTO,
-    isSuccess:Boolean = taskDTO.taskCertification?.isNotBlank()?:false,
+    isSuccess:Boolean = taskDTO.taskComplete?.isNotBlank()?:false
 ){
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
+    val application = context.applicationContext as Application
+    val taskRegisterViewModel = TaskRegisterViewModel(application)
+
     var showPreViewDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     // 다이얼로그 팝업
@@ -57,23 +65,32 @@ fun ItemTodo(
             onDismiss = {
                 showPreViewDialog = false
             },
-            onEdit = { id ->
-                Timber.i("id : %s", id)
-                intent.putExtra("pageIndex", 1)
-                context.startActivity(intent)
-            },
+//            onEdit = { id ->
+//                Timber.i("id : %s", id)
+//                intent.putExtra("pageIndex", 1)
+//                context.startActivity(intent)
+//            },
             onDelete = {
                 showPreViewDialog = false
                 showDeleteDialog = true
             }
         )
     }
+    var msg by remember { mutableStateOf("목표 삭제 실패...") }
+
     // 삭제 다이얼로그
     if(showDeleteDialog){
         WarningDialog(
             onDismiss = { showDeleteDialog = false },
             onCancel = { showDeleteDialog = false },
-            onAction = { showDeleteDialog = false },
+            onAction = {
+                showDeleteDialog = false
+                if(taskDTO.taskId > 0){
+                    msg = "목표가 삭제되었습니다."
+                    taskRegisterViewModel.removeTaskRegisterById(taskDTO.taskId)
+                }
+                AppUtil.toast(context, msg)
+            },
             title = "목표 삭제하기",
             content = "정말로  등록하신 목표를 삭제 하시겠어요?\n[삭제]를 누르시면 회원님의 목표가 삭제됩니다.",
             textAction = "삭제"
@@ -88,9 +105,9 @@ fun ItemTodo(
             .background(mono50)
             .clickable {
                 // dommy...
-                if(isSuccess){
+                if (isSuccess) {
                     showPreViewDialog = true
-                }else{
+                } else {
                     intent.putExtra("pageIndex", 2)
                     intent.putExtra("taskDTO", taskDTO)
                     context.startActivity(intent)
@@ -126,7 +143,6 @@ fun ItemTodo(
                         .align(Alignment.TopEnd)
                 )
             }
-
             // 남은 시간
             if(taskDTO.taskLimit?.isNotBlank() == true){
                 Row(

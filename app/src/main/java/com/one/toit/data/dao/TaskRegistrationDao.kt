@@ -27,6 +27,9 @@ interface TaskRegistrationDao {
     fun removeTaskRegister(taskRegister: TaskRegister)
     @Delete
     fun removeTaskRegisterList(vararg taskRegisters: TaskRegister)
+    @Query("DELETE FROM table_task_registration WHERE task_id = :taskId")
+    fun removeTaskRegisterById(taskId:Long)
+
     // delete all
 //    @Query("DELETE FROM sqlite_sequence where name='table_task_registration'")
 //    fun clearAll()

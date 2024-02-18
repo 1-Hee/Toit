@@ -39,11 +39,15 @@ class TaskRegisterRepository(
         Timber.d("removeTaskRegister... %s", taskRegister)
         taskRegistrationDao.removeTaskRegister(taskRegister)
     }
-
     suspend fun removeTaskRegisterList(vararg taskRegisters: TaskRegister)
         = withContext(Dispatchers.IO){
         Timber.d("removeTaskRegisters... %s", taskRegisters)
         taskRegistrationDao.removeTaskRegisterList(*taskRegisters)
+    }
+    suspend fun removeTaskRegisterById(taskId:Long)
+        = withContext(Dispatchers.IO){
+        Timber.d("removeTaskRegisterById... %s", taskId)
+        taskRegistrationDao.removeTaskRegisterById(taskId)
     }
 
 //    suspend fun clearAll()

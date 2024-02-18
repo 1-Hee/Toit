@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -35,12 +38,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.one.toit.R
+import com.one.toit.base.ui.BaseApplication
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
@@ -50,14 +55,22 @@ import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 
 @Composable
 fun TodoPreviewDialog(
     taskDTO: TaskDTO,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
-    onEdit: (id:Int) -> Unit
+//    onEdit: (id:Int) -> Unit
 ) {
+    val context = LocalContext.current
+    val completeSuffix = stringResource(R.string.suffix_complete)
+    val completeDateString by remember { mutableStateOf(
+        (taskDTO.taskComplete ?: "") + completeSuffix)
+    }
+    val scrollState = rememberScrollState()
+
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -82,18 +95,18 @@ fun TodoPreviewDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Edit,
-                    contentDescription = "iconEdit",
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clickable {
-                            onEdit(0)
-                            onDismiss()
-                        },
-                    tint = white
-                )
-                Spacer(modifier = Modifier.width(16.dp))
+//                Icon(
+//                    imageVector = Icons.Rounded.Edit,
+//                    contentDescription = "iconEdit",
+//                    modifier = Modifier
+//                        .size(18.dp)
+//                        .clickable {
+//                            onEdit(0)
+//                            onDismiss()
+//                        },
+//                    tint = white
+//                )
+//                Spacer(modifier = Modifier.width(16.dp))
                 Icon(
                     imageVector = Icons.Rounded.Delete,
                     contentDescription = "iconEdit",
@@ -186,6 +199,8 @@ fun TodoPreviewDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
+                        .heightIn(max = 172.dp)
+                        .verticalScroll(scrollState)
                 )
                 // 이미지
                 if(taskDTO.taskCertification?.isNotBlank() == true){
@@ -202,7 +217,7 @@ fun TodoPreviewDialog(
                 // 날짜
                 Text(
                     // 파싱 함수 추가
-                    text = taskDTO.createAt,
+                    text = completeDateString,
                     style = MaterialTheme.typography.subtitle1.copy(
                         fontSize = 12.sp,
                         color = mono400,

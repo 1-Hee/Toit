@@ -3,9 +3,12 @@ package com.one.toit.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.one.toit.data.TaskDataBase
 import com.one.toit.data.model.TaskRegister
 import com.one.toit.data.repository.TaskRegisterRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TaskRegisterViewModel(
@@ -47,6 +50,13 @@ class TaskRegisterViewModel(
         Timber.d("vm.. removeTaskRegisterList : %s", taskRegisters)
         repository.removeTaskRegisterList(*taskRegisters)
     }
+    fun removeTaskRegisterById(taskId:Long){
+        Timber.d("vm.. removeTaskRegisterById : %s", taskId)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.removeTaskRegisterById(taskId)
+        }
+    }
+
 //    suspend fun clearAll(){
 //        Timber.d("vm.. clearAll")
 //        repository.clearAll()

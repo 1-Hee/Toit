@@ -10,6 +10,12 @@
     <data>
         <import type="android.view.View"/>
         <variable
+            name="title"
+            type="String" />
+        <variable
+            name="actionName"
+            type="String" />
+        <variable
             name="limitDescription"
             type="String" />
         <variable
@@ -55,191 +61,214 @@
         android:id="@+id/cl_write_board"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
-        android:onClick="@{(v)->click.onViewClick(v)}"
         android:background="@color/white"
         >
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/gl_horizontal"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintGuide_percent="0.70"
-            />
-
-        <!-- title -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_title_todo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TODO"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/et_title_todo"
-            />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_title_todo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="목표를 입력해보세요(최대 28자)"
-            android:maxLength="28"
-            android:textSize="14sp"
-            android:textColor="@color/mono600"
-            android:textColorHint="@color/mono400"
-            app:layout_constraintTop_toBottomOf="@+id/tv_title_todo"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tv_memo_title"
-            android:layout_marginVertical="12dp"
-            android:includeFontPadding="false"
-            android:afterTextChanged="@{(e)->textWatcher.afterTextChanged(e)}"
-            android:onEditorActionListener="@{(t,c,e)->textListener.onEditorAction(t,c,e)}"
-            android:onKeyListener="@{(v,c,e)->onKeyListener.onKey(v,c,e)}"
-            android:singleLine="true"
-            />
-
-        <!-- memo -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_memo_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="메모"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/et_title_todo"
-            app:layout_constraintBottom_toTopOf="@id/et_memo_todo"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_memo_title_desc"
-            />
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_memo_title_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="memo"
-            android:textSize="12sp"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@id/tv_memo_title"
-            app:layout_constraintBottom_toBottomOf="@id/tv_memo_title"
-            android:layout_marginLeft="6dp"
-            />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_memo_todo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/mono600"
-            android:textColorHint="@color/mono400"
-            android:hint="메모를 입력해보세요"
-            app:layout_constraintTop_toBottomOf="@id/tv_memo_title"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="12dp"
-            android:includeFontPadding="false"
-            />
-
-        <!-- 기한 설정 -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_todo_limit_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:text="기한 설정"
-            app:layout_constraintEnd_toStartOf="@id/sw_todo_limit"
-            app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
-            app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
-            android:layout_marginRight="8dp"
-            />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/sw_todo_limit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/gl_horizontal"
-            app:layout_constraintBottom_toTopOf="@id/et_limit_input"
-            android:layout_marginBottom="10dp"
-            android:checked="@{isLimit}"
-            android:onClick="@{(v)->click.onViewClick(v)}"
-            />
-
-        <!-- 마감기한 선택창 -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_todo_limit_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{limitDescription}"
-            android:textColor="@color/mono700"
-            android:textSize="8sp"
-            app:layout_constraintBottom_toTopOf="@id/et_limit_input"
-            app:layout_constraintEnd_toEndOf="@id/sw_todo_limit"
-            app:layout_constraintTop_toBottomOf="@id/sw_todo_limit"
-            android:layout_marginBottom="10dp"
-            />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_limit_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="마감 기한"
-            android:textSize="14sp"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toStartOf="@id/et_limit_input"
-            app:layout_constraintTop_toTopOf="@id/et_limit_input"
-            app:layout_constraintBottom_toBottomOf="@id/et_limit_input"
-            android:layout_marginRight="12dp"
-            android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
-            />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_limit_input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{limitText}"
-            android:textSize="14sp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/mono100"
-            android:textAlignment="center"
-            android:drawableRight="@drawable/ic_time"
-            android:drawablePadding="4dp"
-            android:ems="5"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:inputType="time"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_todo_limit_desc"
-            app:layout_constraintBottom_toBottomOf="@id/et_limit_input"
-            android:layout_marginBottom="24dp"
-            android:onClick="@{(v)->click.onViewClick(v)}"
-            android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
-            tools:text="12:34"
-            />
-
-
-        <!-- 등록 버튼 -->
         <include
-            android:id="@+id/l_btn_write_todo"
-            android:layout_width="0dp"
+            android:id="@+id/l_board_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            layout="@layout/layout_btn_circle"
-            bind:click="@{click}"
-            bind:btnName="@{btnName}"
-            bind:bgColor="@{bgColor}"
-            bind:strokeColor="@{strokeColor}"
-            bind:textColor="@{textColor}"
-            bind:rippleColor="@{rippleColor}"
+            layout="@layout/layout_action_top"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:onClick="@{(v)->click.onViewClick(v)}"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/cl_write_content"
+            bind:title="@{title}"
+            bind:actionName="@{actionName}"
+            bind:click="@{click}"
             />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_write_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/l_board_header"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:onClick="@{(v)->click.onViewClick(v)}"
+            >
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/gl_horizontal"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintGuide_percent="0.70"
+                />
+
+            <!-- title -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_title_todo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TODO"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/et_title_todo"
+                />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_title_todo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="목표를 입력해보세요(최대 28자)"
+                android:maxLength="28"
+                android:textSize="14sp"
+                android:textColor="@color/mono600"
+                android:textColorHint="@color/mono400"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_todo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/tv_memo_title"
+                android:layout_marginVertical="12dp"
+                android:includeFontPadding="false"
+                android:afterTextChanged="@{(e)->textWatcher.afterTextChanged(e)}"
+                android:onEditorActionListener="@{(t,c,e)->textListener.onEditorAction(t,c,e)}"
+                android:onKeyListener="@{(v,c,e)->onKeyListener.onKey(v,c,e)}"
+                android:singleLine="true"
+                />
+
+            <!-- memo -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_memo_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="메모"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toBottomOf="@id/et_title_todo"
+                app:layout_constraintBottom_toTopOf="@id/et_memo_todo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_memo_title_desc"
+                />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_memo_title_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="memo"
+                android:textSize="12sp"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@id/tv_memo_title"
+                app:layout_constraintBottom_toBottomOf="@id/tv_memo_title"
+                android:layout_marginLeft="6dp"
+                />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_memo_todo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/mono600"
+                android:textColorHint="@color/mono400"
+                android:hint="메모를 입력해보세요"
+                app:layout_constraintTop_toBottomOf="@id/tv_memo_title"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="12dp"
+                android:includeFontPadding="false"
+                />
+
+            <!-- 기한 설정 -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_todo_limit_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="기한 설정"
+                app:layout_constraintEnd_toStartOf="@id/sw_todo_limit"
+                app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
+                app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
+                android:layout_marginRight="8dp"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sw_todo_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/gl_horizontal"
+                app:layout_constraintBottom_toTopOf="@id/et_limit_input"
+                android:layout_marginBottom="10dp"
+                android:checked="@{isLimit}"
+                android:onClick="@{(v)->click.onViewClick(v)}"
+                />
+
+            <!-- 마감기한 선택창 -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_todo_limit_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{limitDescription}"
+                android:textColor="@color/mono700"
+                android:textSize="8sp"
+                app:layout_constraintBottom_toTopOf="@id/et_limit_input"
+                app:layout_constraintEnd_toEndOf="@id/sw_todo_limit"
+                app:layout_constraintTop_toBottomOf="@id/sw_todo_limit"
+                android:layout_marginBottom="10dp"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_limit_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="마감 기한"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toStartOf="@id/et_limit_input"
+                app:layout_constraintTop_toTopOf="@id/et_limit_input"
+                app:layout_constraintBottom_toBottomOf="@id/et_limit_input"
+                android:layout_marginRight="12dp"
+                android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
+                />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_limit_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{limitText}"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/mono100"
+                android:textAlignment="center"
+                android:drawableRight="@drawable/ic_time"
+                android:drawablePadding="4dp"
+                android:ems="5"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:inputType="time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_todo_limit_desc"
+                app:layout_constraintBottom_toBottomOf="@id/et_limit_input"
+                android:layout_marginBottom="24dp"
+                android:onClick="@{(v)->click.onViewClick(v)}"
+                android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
+                tools:text="12:34"
+                />
+
+
+            <!-- 등록 버튼 -->
+            <include
+                android:id="@+id/l_btn_write_todo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                layout="@layout/layout_btn_circle"
+                bind:click="@{click}"
+                bind:btnName="@{btnName}"
+                bind:bgColor="@{bgColor}"
+                bind:strokeColor="@{strokeColor}"
+                bind:textColor="@{textColor}"
+                bind:rippleColor="@{rippleColor}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:onClick="@{(v)->click.onViewClick(v)}"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

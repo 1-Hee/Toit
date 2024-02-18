@@ -73,6 +73,8 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
             override fun afterTextChanged(editable: Editable) {}
         }
         return DataBindingConfig(R.layout.fragment_board_write)
+            .addBindingParam(BR.title, "To It! 목표 작성하기")
+            .addBindingParam(BR.actionName, "")
             .addBindingParam(BR.limitDescription, "")
             .addBindingParam(BR.isLimit, false)
             .addBindingParam(BR.click, viewClickListener)
@@ -115,8 +117,13 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     private val viewClickListener = object : ViewClickListener {
         override fun onViewClick(view: View) {
             when(view.id){
+                R.id.iv_back -> {
+                    val activity = requireActivity()
+                    activity.setResult(Activity.RESULT_CANCELED)
+                    activity.finish()
+                }
                 // 현재 페이지 배경
-                R.id.cl_write_board -> {
+                R.id.cl_write_content -> {
                     // 일단 포커즈 제거
                     AppUtil.UIManager.hideKeyPad(requireActivity())
                 }
@@ -143,7 +150,9 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                     val context = requireContext()
                     val msg:String = if(titleString.isNotBlank()){
                         lifecycleScope.launch(Dispatchers.IO){
-                            val taskRegister = TaskRegister()
+                            val taskRegister = TaskRegister(
+                                createAt = AppUtil.Time.dateString
+                            )
                             val taskId = taskRegisterViewModel.addTaskRegister(taskRegister)
                             Timber.i("taskId : %s", taskId)
                             val taskInfo = getTaskInfo(taskId, titleString)

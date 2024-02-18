@@ -25,27 +25,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-        <!-- 일반 재생 -->
-        <include
-            android:id="@+id/l_board_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/layout_action_top"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/board_fragment_host"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            bind:title="@{title}"
-            bind:actionName="@{actionName}"
-            bind:click="@{click}"
-            />
-
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/board_fragment_host"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:fitsSystemWindows="true"
-            app:layout_constraintTop_toBottomOf="@id/l_board_header"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

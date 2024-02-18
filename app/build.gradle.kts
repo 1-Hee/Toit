@@ -99,6 +99,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.camera:camera-core:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -214,4 +216,10 @@ dependencies {
     // admobs
     val admob_version = "22.6.0"
     implementation("com.google.android.gms:play-services-ads:$admob_version")
+
+    // camerax
+//    implementation("androidx.camera:camera-camera2:1.1.0")
+//    implementation("androidx.camera:camera-lifecycle:1.1.0")
+//    implementation("androidx.camera:camera-view:1.1.0-alpha03")
+//    implementation("com.google.guava:guava:29.0-jre")
 }

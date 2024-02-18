@@ -26,25 +26,20 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
-import com.one.toit.data.model.TaskRegister
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono200
@@ -54,12 +49,15 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
-import com.one.toit.ui.viewmodel.TaskInfoViewModel
-import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.ui.viewmodel.TaskViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+
+/**
+ *  TODO DB쪽과의 시간 차이로 인해서 렌더링 이슈가 살짝 있음
+ */
 
 @Composable
 fun TodoPage(
@@ -84,6 +82,7 @@ fun TodoPage(
                 TaskDTO(
                     task.register.taskId,
                     task.register.createAt,
+                    task.info.infoId,
                     task.info.taskTitle,
                     task.info.taskMemo,
                     task.info.taskLimit,
@@ -95,7 +94,6 @@ fun TodoPage(
     }
     // taskDTOListState를 사용하여 UI 업데이트
     val taskDTOList = taskDTOListState.value
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -110,7 +108,6 @@ fun TodoPage(
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .height(32.dp)){
-
                 Row(modifier = Modifier
                     .wrapContentSize()
                     .align(Alignment.CenterEnd)

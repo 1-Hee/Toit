@@ -52,20 +52,7 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
     }
 
     private val viewClickListener = object : ViewClickListener {
-        override fun onViewClick(view: View) {
-            when(view.id){
-                // 뒤로 가기
-                R.id.iv_back -> {
-                    setResult(RESULT_CANCELED)
-                    finish()
-                }
-                // 액션 버튼
-                R.id.tv_action -> {
-                    setResult(RESULT_OK)
-                    finish()
-                }
-            }
-        }
+        override fun onViewClick(view: View) {}
     }
 
     private fun getActionName(pgIndex: Int):String{

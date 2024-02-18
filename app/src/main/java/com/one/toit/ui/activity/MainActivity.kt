@@ -2,14 +2,12 @@ package com.one.toit.ui.activity
 
 import android.Manifest
 import android.app.Activity
-import android.app.TaskInfo
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,22 +25,18 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -50,14 +44,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
-import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.coroutine.TedPermission
 import com.one.toit.R
 import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.ui.BaseComposeActivity
-import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.compose.nav.MainRoute
-import com.one.toit.ui.compose.style.MyApplicationTheme
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
@@ -71,9 +61,6 @@ import com.one.toit.ui.viewmodel.MainMenuViewModel
 import com.one.toit.ui.viewmodel.TaskInfoViewModel
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.ui.viewmodel.TaskViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
