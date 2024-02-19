@@ -1,5 +1,6 @@
 package com.one.toit.ui.compose.ui.page
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
-import com.one.toit.ui.compose.nav.MainRoute
+import com.one.toit.ui.activity.StatisticsActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.purple200
@@ -43,7 +45,10 @@ import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
 fun StatisticsPage(
     navController : NavHostController
 ){
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val intent = Intent(context, StatisticsActivity::class.java)
+    // StatisticsActivity
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -58,7 +63,6 @@ fun StatisticsPage(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
             // Preview with sample data
             val data = mapOf<String, ChartEntry>(
                 Pair(
@@ -74,7 +78,6 @@ fun StatisticsPage(
                     )
                 )
             )
-
             // 차트
             PerforatedPieChart(
                 data = data,
@@ -105,10 +108,9 @@ fun StatisticsPage(
                         .wrapContentSize()
                 )
             }
-
             // 버튼
             Button(onClick = {
-                navController.navigate(MainRoute.Graph.route)
+                context.startActivity(intent)
             },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = purple200,

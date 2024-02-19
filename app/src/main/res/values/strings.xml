@@ -7,6 +7,7 @@
     <string name="sample_guide">성공은 작은 노력의 쌓임입니다.\n오늘 하루도 조금 더 나아가세요.</string>
 
     <string name="p_app_setting">환경 설정</string>
+    <string name="p_app_statistics">상세 통계</string>
 
     <string-array name="arr_board_title">
         <item>목표 작성 하기, Write It!</item>

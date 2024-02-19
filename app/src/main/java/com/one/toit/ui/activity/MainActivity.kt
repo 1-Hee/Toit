@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -53,7 +52,6 @@ import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
-import com.one.toit.ui.compose.ui.page.GraphPage
 import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
@@ -61,7 +59,6 @@ import com.one.toit.ui.viewmodel.MainMenuViewModel
 import com.one.toit.ui.viewmodel.TaskInfoViewModel
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
 import com.one.toit.ui.viewmodel.TaskViewModel
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainActivity : BaseComposeActivity(), LifecycleObserver {
@@ -72,6 +69,7 @@ class MainActivity : BaseComposeActivity(), LifecycleObserver {
     // 자식 엔티티
     private lateinit var taskInfoViewModel: TaskInfoViewModel
     private lateinit var taskViewModel:TaskViewModel
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {} // 광고 init
@@ -79,10 +77,10 @@ class MainActivity : BaseComposeActivity(), LifecycleObserver {
         setContent {
             MainScreenView(mainMenuViewModel, taskViewModel)
         }
-        lifecycleScope.launch {
-            val data = taskViewModel.readTaskList()
-            Timber.i("taskList .. %s", data)
-        }
+//        lifecycleScope.launch {
+//            val data = taskViewModel.readTaskList()
+//            Timber.i("taskList .. %s", data)
+//        }
     }
     override fun initViewModel() {
         super.initViewModel()
@@ -155,7 +153,6 @@ fun MainScreenView(
         }
     }
 }
-
 @Composable
 fun MainTopBarComponent(
     viewModel:MainMenuViewModel,
@@ -212,9 +209,6 @@ fun MainNavGraph(
         composable(MainRoute.Profile.route) {
             ProfilePage()
         }
-        composable(MainRoute.Graph.route){
-            GraphPage(navController)
-        }
     }
 }
 
@@ -222,7 +216,6 @@ fun MainNavGraph(
 fun MainBottomNavigation(
     navController: NavHostController,
     menuViewModel:MainMenuViewModel,
-
 ) {
     val items = listOf<MainRoute>(
         MainRoute.Todo,

@@ -62,7 +62,7 @@ import timber.log.Timber
 @Composable
 fun TodoPage(
     navController: NavHostController,
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
 ){
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)

@@ -73,6 +73,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     private var mFileName:String = ""
     // 카메라로부터 받은 비트맵
     private var acceptedBitmap:Bitmap? = null
+    private var mImageUri:Uri? = null
     override fun getDataBindingConfig(): DataBindingConfig {
         mBundle = Bundle() // bundle init
         return DataBindingConfig(R.layout.fragment_board_read)
@@ -159,6 +160,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
             // val pictureUri = Uri.parse(picturePath) // 이건 안되는듯...
             // MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            this.mImageUri = imageUri
             imageUri?.let {
                 resolver.openOutputStream(it)?.use { outputStream ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
@@ -315,15 +317,15 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                         }
                         val dto = mTaskDTO!!
                         val timeString = AppUtil.Time.dateString
-                        mTaskDTO?.taskCertification = mFileName
+                        mTaskDTO?.taskCertification = mImageUri?.toString()
                         mTaskDTO?.taskComplete = timeString
                         dto.taskComplete = timeString
-                        dto.taskCertification = mFileName
+                        dto.taskCertification = mImageUri?.toString()
                         val mTaskInfo = getTaskInfo(dto)
                         val modifyResult = lifecycleScope.async(Dispatchers.IO){
                             taskInfoViewModel.modifyTaskInfo(mTaskInfo)
                             msg = "목표가 완료되었습니다."
-                            mTaskDTO?.taskCertification = mFileName
+                            mTaskDTO?.taskCertification = mImageUri?.toString()
                             mBinding.setVariable(BR.taskDTO, mTaskDTO)
                             mBinding.setVariable(BR.isCertified, true)
                             mBinding.notifyChange()

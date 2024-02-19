@@ -140,7 +140,9 @@ fun ItemTodo(
                 )
             }
             // 남은 시간
-            if(taskDTO.taskLimit?.isNotBlank() == true){
+            val mTimeFlag = taskDTO.taskLimit?.isNotBlank() == true
+                                && taskDTO.taskComplete?.isBlank() == true
+            if(mTimeFlag){
                 Row(
                     modifier = Modifier
                         .wrapContentSize()

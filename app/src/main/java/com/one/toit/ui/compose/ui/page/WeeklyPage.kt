@@ -26,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
+import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono600
@@ -42,17 +45,54 @@ import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.red300
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.graph.BarGraphChart
-import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.TodayAchieveUnit
-import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
+import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
+import com.one.toit.ui.viewmodel.TaskViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.random.Random
 
 // @Preview(showBackground = true)
 @Composable
-fun GraphPage(
-    navController: NavHostController
+fun WeeklyPage(
+    navController: NavHostController,
+    taskViewModel: TaskViewModel
 ){
+    val context = LocalContext.current
+    // MutableState를 사용하여 taskDTOList를 감싸기
+    val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.Main) {
+            val taskList = taskViewModel.readTaskList()
+            Timber.i("[할일 목록] : %s", taskList)
+            // 데이터 변화를 감지하기 위해 MutableState를 업데이트
+            taskDTOListState.value = taskList.map { task ->
+                TaskDTO(
+                    task.register.taskId,
+                    task.register.createAt,
+                    task.info.infoId,
+                    task.info.taskTitle,
+                    task.info.taskMemo,
+                    task.info.taskLimit,
+                    task.info.taskComplete,
+                    task.info.taskCertification
+                )
+            }
+        }
+    }
+    // taskDTOListState를 사용하여 UI 업데이트
+    val taskDTOList = taskDTOListState.value
+    // 현재 높이를 저장하기 위한 상태 변수
+    var deviceHeight by remember { mutableStateOf(0) }
+    // LocalDensity를 사용하여 현재 디바이스의 화면 밀도를 가져옴
+    val density = LocalDensity.current.density
+    // 현재 높이를 구하는 코드
+    LaunchedEffect(Unit) {
+        val displayMetrics = context.resources.displayMetrics
+        deviceHeight = (displayMetrics.heightPixels / density).toInt()
+    }
     val outerScrollState = rememberScrollState()
     val innerScrollState = rememberScrollState()
     // dummy
@@ -156,18 +196,23 @@ fun GraphPage(
                     .wrapContentHeight()
             )
             Spacer(modifier = Modifier.height(24.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(328.dp)
-                    .verticalScroll(innerScrollState),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Spacer(modifier = Modifier.height(4.dp))
-//                repeat(12){
-//                    ItemTodo()
-//                }
-                Spacer(modifier = Modifier.height(16.dp))
+            // content
+            // 등록한 List가 있을 경우
+            if(taskDTOList.isNotEmpty()){
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height((deviceHeight-128).dp)
+                        .verticalScroll(innerScrollState)
+                    ,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    repeat(taskDTOList.size){
+                        ItemTodo(taskDTO = taskDTOList[it])
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }

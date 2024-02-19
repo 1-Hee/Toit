@@ -41,6 +41,9 @@
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.activity.StatisticsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.SettingActivity"
             android:exported="false" />
         <activity

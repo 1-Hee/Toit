@@ -102,7 +102,7 @@ class AppUtil {
                 val mediaDTO = MediaDTO(
                     fileName = dpName,
                     mimeType =  mimeType,
-                    savedAddress = contentUri.toString(),
+                    path = contentUri.toString(),
                     lastUpdate = date,
                     fileSize = fileSize
                 )

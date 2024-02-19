@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -56,20 +57,24 @@ import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import com.skydoves.landscapist.CircularReveal
+import com.skydoves.landscapist.glide.GlideImage
+import timber.log.Timber
 
 @Composable
 fun TodoPreviewDialog(
     taskDTO: TaskDTO,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
-//    onEdit: (id:Int) -> Unit
 ) {
     val context = LocalContext.current
+    val intent = Intent(context, BoardActivity::class.java)
     val completeSuffix = stringResource(R.string.suffix_complete)
     val completeDateString by remember { mutableStateOf(
         (taskDTO.taskComplete ?: "") + completeSuffix)
     }
     val scrollState = rememberScrollState()
+    Timber.i("fileName : %s", taskDTO.taskCertification)
 
     Dialog(
         onDismissRequest = onDismiss
@@ -95,18 +100,19 @@ fun TodoPreviewDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-//                Icon(
-//                    imageVector = Icons.Rounded.Edit,
-//                    contentDescription = "iconEdit",
-//                    modifier = Modifier
-//                        .size(18.dp)
-//                        .clickable {
-//                            onEdit(0)
-//                            onDismiss()
-//                        },
-//                    tint = white
-//                )
-//                Spacer(modifier = Modifier.width(16.dp))
+                Icon(
+                    imageVector = Icons.Rounded.Edit,
+                    contentDescription = "iconEdit",
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clickable {
+                            intent.putExtra("pageIndex", 1)
+                            intent.putExtra("taskDTO", taskDTO)
+                            context.startActivity(intent)
+                        },
+                    tint = white
+                )
+                Spacer(modifier = Modifier.width(16.dp))
                 Icon(
                     imageVector = Icons.Rounded.Delete,
                     contentDescription = "iconEdit",
@@ -205,10 +211,24 @@ fun TodoPreviewDialog(
                 // 이미지
                 if(taskDTO.taskCertification?.isNotBlank() == true){
                     // TODO Uri 파싱 함수로 이미지 바인딩
-                    Image(
-                        painter = painterResource(id = R.drawable.img_sample),
-                        contentDescription = "photo",
+//                    Image(
+//                        painter = painterResource(id = R.drawable.img_sample),
+//                        contentDescription = "photo",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(216.dp)
+//                    )
+
+                    GlideImage(
+                        imageModel = taskDTO.taskCertification,
+                        // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
                         contentScale = ContentScale.Crop,
+                        circularReveal = CircularReveal(duration = 0),
+                        // 이미지 로딩 전 표시할 place holder 이미지
+                        placeHolder = painterResource(id = R.drawable.img_sample),
+                        // 에러 발생 시 표시할 이미지
+                        error = painterResource(id = R.drawable.img_sample),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(216.dp)
