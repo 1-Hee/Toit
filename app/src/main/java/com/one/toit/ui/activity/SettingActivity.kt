@@ -394,6 +394,7 @@ fun AppSettingPage(
                     .padding(vertical = 8.dp)
                     .clickable { openLicenses() }
             )
+            // TODO 개인 정보 처리 방침
             Spacer(modifier = Modifier.height(16.dp))
             // 앱 설정 복원하기
             Text(
@@ -424,6 +425,7 @@ fun AppSettingPage(
                         showDeleteDialog = true
                     }
             )
+            // TODO 표시 문구 추가하기..?
             Spacer(modifier = Modifier.height(16.dp))
             // 광고 제거 하기
             Text(

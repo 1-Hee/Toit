@@ -105,8 +105,10 @@ fun ItemTodo(
                 if (isSuccess) {
                     showPreViewDialog = true
                 } else {
+                    // TODO 이쪽에 콜백으로 바꾸기
                     intent.putExtra("pageIndex", 2)
                     intent.putExtra("taskDTO", taskDTO)
+                    intent.putExtra("isComplete", false)
                     context.startActivity(intent)
                 }
             }

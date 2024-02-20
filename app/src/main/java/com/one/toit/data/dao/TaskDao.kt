@@ -10,4 +10,9 @@ interface TaskDao {
             "INNER JOIN table_task_information" +
             " ON task_id = fk_task_id")
     fun readTaskList(): List<Task>
+
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information" +
+            " ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
+    fun readNotCompleteTaskList(): List<Task>
 }

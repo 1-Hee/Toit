@@ -45,6 +45,10 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         if(mTaskDTO!=null){
             bundle.putParcelable("taskDTO", mTaskDTO)
         }
+        // 할일 완료 여부
+        val isComplete = intent?.extras?.getBoolean("isComplete")?:false
+        bundle.putBoolean("isComplete", isComplete)
+        Timber.i("isComplete : %s", isComplete)
         navFragment(pgIndex = pageIndex, bundle = bundle)
         mBinding.setVariable(BR.title, titleArr[pageIndex])
         mBinding.setVariable(BR.actionName, actionName)

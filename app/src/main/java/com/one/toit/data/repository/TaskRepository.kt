@@ -11,4 +11,7 @@ class TaskRepository(
     suspend fun readTaskList():List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readTaskList()
     }
+    suspend fun readNotCompleteTaskList():List<Task> = withContext(Dispatchers.IO){
+        return@withContext taskDao.readNotCompleteTaskList()
+    }
 }

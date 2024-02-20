@@ -72,23 +72,42 @@ fun TodoPage(
 
     // MutableState를 사용하여 taskDTOList를 감싸기
     val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
-    // LaunchedEffect를 통해 비동기 작업을 수행하고 결과를 MutableState에 반영
-    LaunchedEffect(Unit) {
+    LaunchedEffect(checked) {
         withContext(Dispatchers.Main) {
-            val taskList = taskViewModel.readTaskList()
-            Timber.i("[할일 목록] : %s", taskList)
-            // 데이터 변화를 감지하기 위해 MutableState를 업데이트
-            taskDTOListState.value = taskList.map { task ->
-                TaskDTO(
-                    task.register.taskId,
-                    task.register.createAt,
-                    task.info.infoId,
-                    task.info.taskTitle,
-                    task.info.taskMemo,
-                    task.info.taskLimit,
-                    task.info.taskComplete,
-                    task.info.taskCertification
-                )
+            Timber.i("토글 상태 : %s", checked)
+            if(checked){
+                // TODO dao 수정해서 오늘 날짜 기준의 todo만 불러오도록...
+                val taskList = taskViewModel.readNotCompleteTaskList()
+                Timber.i("[할일 목록 (필터) ] : %s", taskList)
+                // 데이터 변화를 감지하기 위해 MutableState를 업데이트
+                taskDTOListState.value = taskList.map { task ->
+                    TaskDTO(
+                        task.register.taskId,
+                        task.register.createAt,
+                        task.info.infoId,
+                        task.info.taskTitle,
+                        task.info.taskMemo,
+                        task.info.taskLimit,
+                        task.info.taskComplete,
+                        task.info.taskCertification
+                    )
+                }
+            }else {
+                val taskList = taskViewModel.readTaskList()
+                Timber.i("[할일 목록] : %s", taskList)
+                // 데이터 변화를 감지하기 위해 MutableState를 업데이트
+                taskDTOListState.value = taskList.map { task ->
+                    TaskDTO(
+                        task.register.taskId,
+                        task.register.createAt,
+                        task.info.infoId,
+                        task.info.taskTitle,
+                        task.info.taskMemo,
+                        task.info.taskLimit,
+                        task.info.taskComplete,
+                        task.info.taskCertification
+                    )
+                }
             }
         }
     }
@@ -171,6 +190,7 @@ fun TodoPage(
             contentColor = contentColorFor(white),
             elevation = FloatingActionButtonDefaults.elevation(4.dp),
             onClick = {
+                // TODO 이쪽에 콜백으로 바꿔서, 리컴포지션 일어나게 하기
                 intent.putExtra("pageIndex", 0)
                 context.startActivity(intent)
             }

@@ -90,6 +90,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             .addBindingParam(BR.textWatcher, textWatcher)
             .addBindingParam(BR.taskDTO, TaskDTO())
             .addBindingParam(BR.deadLineString, "제한 없음")
+            .addBindingParam(BR.isComplete, false)
     }
 
     override fun initViewModel() {
@@ -100,6 +101,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     override fun initView() {
         guideArray = requireContext().resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
         setGuideDesc(mBinding.isLimit == true)
+        mBinding.notifyChange()
         parseArguments()
     }
     private fun parseArguments(){
@@ -138,16 +140,25 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             }else {
                 deadLineString = "제한 없음"
             }
+            // 완료 여부 판정
+            val isComplete = bundle.getBoolean("isComplete")
+            if(isComplete){
+                val suffixStr = requireContext().resources.getString(R.string.suffix_complete)
+                mBinding.setVariable(BR.limitDescription, "${mTaskDTO?.taskComplete} $suffixStr")
+            }else{
+                setGuideDesc(mHasLimit)
+            }
+            Timber.i("FRAGMENT : %s", isComplete)
+            mBinding.setVariable(BR.isComplete, isComplete)
             mBinding.setVariable(BR.deadLineString, deadLineString)
             mBinding.setVariable(BR.isLimit, mHasLimit)
-            setGuideDesc(mHasLimit)
         }
+        mBinding.notifyChange()
     }
 
     private fun setGuideDesc(flag:Boolean){
         val guideText = if(flag) guideArray[0] else guideArray[1]
         mBinding.setVariable(BR.limitDescription, guideText)
-        mBinding.notifyChange()
     }
 
     // 클릭 리스너

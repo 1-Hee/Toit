@@ -106,8 +106,10 @@ fun TodoPreviewDialog(
                     modifier = Modifier
                         .size(18.dp)
                         .clickable {
+                            // TODO 이쪽에 콜백으로 바꿔서, 리컴포지션 일어나게 하기
                             intent.putExtra("pageIndex", 1)
                             intent.putExtra("taskDTO", taskDTO)
+                            intent.putExtra("isComplete", true)
                             context.startActivity(intent)
                         },
                     tint = white
