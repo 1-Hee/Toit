@@ -1,4 +1,4 @@
-package com.one.toit.ui.viewmodel
+package com.one.toit.data.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -29,13 +29,9 @@ class TaskInfoViewModel (
         repository.addAllTaskInfo(*taskInfo)
     }
     // read
-    suspend fun readTaskInfoList(): LiveData<List<TaskInfo>> {
+    suspend fun readTaskInfoList(): List<TaskInfo> {
         Timber.d("vm.. readTaskInfoList...")
         return repository.readTaskInfoList()
-    }
-    suspend fun readTaskInfoListWithTaskId(fkTaskId:Long): LiveData<TaskInfo>{
-        Timber.d("vm.. readTaskInfoListWithTaskId... %s", fkTaskId)
-        return repository.readTaskInfoListWithTaskId(fkTaskId)
     }
     // update
     suspend fun modifyTaskInfo(taskInfo: TaskInfo){

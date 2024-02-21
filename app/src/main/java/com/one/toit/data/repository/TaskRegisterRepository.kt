@@ -22,7 +22,7 @@ class TaskRegisterRepository(
         taskRegistrationDao.addAllTaskRegister(*taskRegisters)
     }
     // read
-    suspend fun readTaskRegisterList(): LiveData<List<TaskRegister>>
+    suspend fun readTaskRegisterList(): List<TaskRegister>
         = withContext(Dispatchers.IO){
         Timber.d("readTaskRegisterList...")
         taskRegistrationDao.readTaskRegisterList()

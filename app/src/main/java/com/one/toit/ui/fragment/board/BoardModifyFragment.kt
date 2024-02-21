@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
@@ -22,9 +19,8 @@ import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.model.TaskInfo
 import com.one.toit.databinding.FragmentBoardModifyBinding
 import com.one.toit.ui.dialog.CustomTimeDialog
-import com.one.toit.ui.viewmodel.TaskInfoViewModel
+import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.util.AppUtil
-import com.patrykandpatrick.vico.core.extension.setFieldValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch

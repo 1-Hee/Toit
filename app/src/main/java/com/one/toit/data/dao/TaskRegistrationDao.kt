@@ -18,7 +18,7 @@ interface TaskRegistrationDao {
     fun addAllTaskRegister(vararg taskRegisters: TaskRegister)
     // read
     @Query("SELECT * FROM table_task_registration")
-    fun readTaskRegisterList(): LiveData<List<TaskRegister>>
+    fun readTaskRegisterList(): List<TaskRegister>
     // update
     @Update
     fun modifyTaskRegister(taskRegister: TaskRegister)

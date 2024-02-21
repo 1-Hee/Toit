@@ -1,6 +1,7 @@
 package com.one.toit.ui.compose.ui.page
 
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,9 +50,8 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
-import com.one.toit.ui.viewmodel.TaskViewModel
+import com.one.toit.data.viewmodel.TaskViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -63,7 +63,9 @@ import timber.log.Timber
 fun TodoPage(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
 ){
+    // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
     var checked by remember { mutableStateOf(false) }
@@ -83,7 +85,7 @@ fun TodoPage(
                 taskDTOListState.value = taskList.map { task ->
                     TaskDTO(
                         task.register.taskId,
-                        task.register.createAt,
+                        task.register.createAt.toString(),
                         task.info.infoId,
                         task.info.taskTitle,
                         task.info.taskMemo,
@@ -99,7 +101,7 @@ fun TodoPage(
                 taskDTOListState.value = taskList.map { task ->
                     TaskDTO(
                         task.register.taskId,
-                        task.register.createAt,
+                        task.register.createAt.toString(),
                         task.info.infoId,
                         task.info.taskTitle,
                         task.info.taskMemo,
@@ -172,7 +174,7 @@ fun TodoPage(
                 ) {
                     Spacer(modifier = Modifier.height(4.dp))
                     repeat(taskDTOList.size){
-                        ItemTodo(taskDTO = taskDTOList[it])
+                        ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -192,7 +194,7 @@ fun TodoPage(
             onClick = {
                 // TODO 이쪽에 콜백으로 바꿔서, 리컴포지션 일어나게 하기
                 intent.putExtra("pageIndex", 0)
-                context.startActivity(intent)
+                launcher?.launch(intent)
             }
         ){
             Icon(

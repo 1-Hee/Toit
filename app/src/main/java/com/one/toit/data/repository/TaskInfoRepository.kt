@@ -22,15 +22,10 @@ class TaskInfoRepository(
         taskInfoDao.addAllTaskInfo(*taskInfo)
     }
     // read
-    suspend fun readTaskInfoList(): LiveData<List<TaskInfo>>
+    suspend fun readTaskInfoList(): List<TaskInfo>
             = withContext(Dispatchers.IO){
         Timber.d("readTaskInfoList...")
         taskInfoDao.readTaskInfoList()
-    }
-    suspend fun readTaskInfoListWithTaskId(fkTaskId:Long): LiveData<TaskInfo>
-        = withContext(Dispatchers.IO){
-        Timber.d("readTaskInfoListWithTaskId... %s", fkTaskId)
-        taskInfoDao.readTaskInfoListWithTaskId(fkTaskId)
     }
     // update
     suspend fun modifyTaskInfo(taskInfo: TaskInfo)

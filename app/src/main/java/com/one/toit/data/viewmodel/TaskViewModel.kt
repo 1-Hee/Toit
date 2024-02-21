@@ -1,4 +1,4 @@
-package com.one.toit.ui.viewmodel
+package com.one.toit.data.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

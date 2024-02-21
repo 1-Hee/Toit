@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
@@ -20,15 +19,13 @@ import com.one.toit.data.model.TaskInfo
 import com.one.toit.data.model.TaskRegister
 import com.one.toit.databinding.FragmentBoardWriteBinding
 import com.one.toit.ui.dialog.CustomTimeDialog
-import com.one.toit.ui.viewmodel.TaskInfoViewModel
-import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import com.one.toit.data.viewmodel.TaskInfoViewModel
+import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDateTime
-import java.util.Arrays
 import java.util.Date
 
 
@@ -155,9 +152,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                     val context = requireContext()
                     val msg:String = if(titleString.isNotBlank()){
                         lifecycleScope.launch(Dispatchers.IO){
-                            val taskRegister = TaskRegister(
-                                createAt = AppUtil.Time.dateString
-                            )
+                            val taskRegister = TaskRegister()
                             val taskId = taskRegisterViewModel.addTaskRegister(taskRegister)
                             Timber.i("taskId : %s", taskId)
                             val taskInfo = getTaskInfo(taskId, titleString)

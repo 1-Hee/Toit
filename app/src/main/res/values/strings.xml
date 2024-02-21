@@ -63,5 +63,6 @@
     <string name="msg_input_title">할일 제목을 입력해주세요</string>
     <string name="msg_success_todo">할 일이 등록되었습니다. 😀</string>
     <string name="suffix_complete"> 에 완료 됨</string>
+    <string name="suffix_create"> 에 작성 됨</string>
     <string name="msg_modify_ok">수정이 완료되었습니다.</string>
 </resources>

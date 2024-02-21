@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.one.toit.data.dao.TaskDao
 import com.one.toit.data.dao.TaskInfoDao
 import com.one.toit.data.dao.TaskRegistrationDao
@@ -11,6 +13,7 @@ import com.one.toit.data.model.TaskInfo
 import com.one.toit.data.model.TaskRegister
 
 @Database(entities = [TaskRegister::class, TaskInfo::class], version = 1, exportSchema = false)
+@TypeConverters(TaskConverter::class)
 abstract class TaskDataBase : RoomDatabase(){
     // dao
     abstract fun TaskInfoDao(): TaskInfoDao

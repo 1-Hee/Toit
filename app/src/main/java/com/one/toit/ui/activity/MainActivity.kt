@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleObserver
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -56,26 +57,37 @@ import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.MainMenuViewModel
-import com.one.toit.ui.viewmodel.TaskInfoViewModel
-import com.one.toit.ui.viewmodel.TaskRegisterViewModel
-import com.one.toit.ui.viewmodel.TaskViewModel
+import com.one.toit.data.viewmodel.TaskInfoViewModel
+import com.one.toit.data.viewmodel.TaskRegisterViewModel
+import com.one.toit.data.viewmodel.TaskViewModel
 import timber.log.Timber
 
-class MainActivity : BaseComposeActivity(), LifecycleObserver {
+class MainActivity : BaseComposeActivity(){
     // viewModel
     private lateinit var mainMenuViewModel: MainMenuViewModel
     // 부모 엔티티
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     // 자식 엔티티
     private lateinit var taskInfoViewModel: TaskInfoViewModel
-    private lateinit var taskViewModel:TaskViewModel
-    
+    private lateinit var taskViewModel: TaskViewModel
+    private lateinit var launcher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {} // 광고 init
         requestPermission(this) // 권한 체크
+        // 액티비티 호출용 콜백 함수 런처
+        launcher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
+                result -> Timber.d("onActivityResult.......")
+            if (result.resultCode == Activity.RESULT_OK) {
+                Timber.i("OK......")
+            }else if(result.resultCode == Activity.RESULT_CANCELED){
+                Timber.i("CANCEL......")
+            }
+        }
         setContent {
-            MainScreenView(mainMenuViewModel, taskViewModel)
+            MainScreenView(mainMenuViewModel, taskViewModel, launcher)
         }
 //        lifecycleScope.launch {
 //            val data = taskViewModel.readTaskList()
@@ -141,7 +153,8 @@ class MainActivity : BaseComposeActivity(), LifecycleObserver {
 @Composable
 fun MainScreenView(
     viewModel: MainMenuViewModel,
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -149,7 +162,7 @@ fun MainScreenView(
         bottomBar = { MainBottomNavigation(navController = navController, menuViewModel = viewModel) }
     ) {
         Box(Modifier.padding(it)){
-            MainNavGraph(navController, taskViewModel)
+            MainNavGraph(navController, taskViewModel, launcher)
         }
     }
 }
@@ -193,14 +206,15 @@ fun MainTopBarComponent(
 @Composable
 fun MainNavGraph(
     navController: NavHostController,
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
 ) {
     NavHost(
         navController,
         startDestination = MainRoute.Todo.route
     )  {
         composable(route = MainRoute.Todo.route) {
-            TodoPage(navController, taskViewModel)
+            TodoPage(navController, taskViewModel, launcher)
         }
         composable(MainRoute.Statistics.route) {
             // GraphPage(navController)

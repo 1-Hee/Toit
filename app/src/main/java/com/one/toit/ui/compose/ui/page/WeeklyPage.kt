@@ -1,5 +1,7 @@
 package com.one.toit.ui.compose.ui.page
 
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -48,7 +49,7 @@ import com.one.toit.ui.compose.ui.unit.graph.BarGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.TodayAchieveUnit
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
-import com.one.toit.ui.viewmodel.TaskViewModel
+import com.one.toit.data.viewmodel.TaskViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -58,7 +59,8 @@ import kotlin.random.Random
 @Composable
 fun WeeklyPage(
     navController: NavHostController,
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
 ){
     val context = LocalContext.current
     // MutableState를 사용하여 taskDTOList를 감싸기
@@ -71,7 +73,7 @@ fun WeeklyPage(
             taskDTOListState.value = taskList.map { task ->
                 TaskDTO(
                     task.register.taskId,
-                    task.register.createAt,
+                    task.register.createAt.toString(),
                     task.info.infoId,
                     task.info.taskTitle,
                     task.info.taskMemo,
@@ -184,32 +186,32 @@ fun WeeklyPage(
             Spacer(modifier = Modifier.height(24.dp))
             TodayAchieveUnit(5, 10)
             Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = stringResource(id = R.string.header_todo_list),
-                style = MaterialTheme.typography.subtitle1
-                    .copy(
-                        fontSize = 16.sp,
-                        color = black
-                    ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            )
-            Spacer(modifier = Modifier.height(24.dp))
             // content
             // 등록한 List가 있을 경우
             if(taskDTOList.isNotEmpty()){
+                Text(
+                    text = stringResource(id = R.string.header_todo_list),
+                    style = MaterialTheme.typography.subtitle1
+                        .copy(
+                            fontSize = 16.sp,
+                            color = black
+                        ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
+                Spacer(modifier = Modifier.height(24.dp))
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height((deviceHeight-128).dp)
+                        .height((deviceHeight - 128).dp)
                         .verticalScroll(innerScrollState)
                     ,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Spacer(modifier = Modifier.height(4.dp))
                     repeat(taskDTOList.size){
-                        ItemTodo(taskDTO = taskDTOList[it])
+                        ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }

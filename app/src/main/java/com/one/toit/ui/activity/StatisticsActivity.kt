@@ -1,8 +1,11 @@
 package com.one.toit.ui.activity
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,15 +36,28 @@ import com.one.toit.ui.compose.nav.StatisticsRoute
 import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.page.WeeklyPage
-import com.one.toit.ui.viewmodel.TaskViewModel
+import com.one.toit.data.viewmodel.TaskViewModel
+import timber.log.Timber
 
 class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
 
-    private lateinit var taskViewModel:TaskViewModel
+    private lateinit var taskViewModel: TaskViewModel
+    private lateinit var launcher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 액티비티 호출용 콜백 함수 런처
+        launcher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
+                result -> Timber.d("onActivityResult.......")
+            if (result.resultCode == Activity.RESULT_OK) {
+                Timber.i("OK......")
+            }else if(result.resultCode == Activity.RESULT_CANCELED){
+                Timber.i("CANCEL......")
+            }
+        }
         setContent {
-            StatisticsScreenView(taskViewModel)
+            StatisticsScreenView(taskViewModel, launcher = launcher)
         }
     }
     override fun initViewModel() {
@@ -53,14 +69,15 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
 
 @Composable
 fun StatisticsScreenView(
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
 ){
     val navController = rememberNavController()
     Scaffold(
         topBar = { StatisticsTopBarComponent() }
     ) {
         Box(Modifier.padding(it)){
-            StatisticsNavGraph(navController, taskViewModel)
+            StatisticsNavGraph(navController, taskViewModel, launcher)
         }
     }
 }
@@ -104,14 +121,15 @@ fun StatisticsTopBarComponent()
 @Composable
 fun StatisticsNavGraph(
     navController: NavHostController,
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
 ) {
     NavHost(
         navController,
         startDestination = StatisticsRoute.Weekly.route
     )  {
         composable(route = StatisticsRoute.Weekly.route) {
-            WeeklyPage(navController, taskViewModel)
+            WeeklyPage(navController, taskViewModel, launcher)
         }
     }
 }

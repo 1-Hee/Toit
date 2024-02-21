@@ -1,4 +1,4 @@
-package com.one.toit.ui.viewmodel
+package com.one.toit.data.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -27,12 +27,12 @@ class TaskRegisterViewModel(
         Timber.d("vm.. addTaskRegister : %s", taskRegister)
        return repository.addTaskRegister(taskRegister)
     }
-    suspend fun addAllTaskRegister(vararg taskRegisters : TaskRegister){
+    suspend fun addAllTaskRegister(vararg taskRegisters : TaskRegister) {
         Timber.d("vm.. addAllTaskRegister : %s", taskRegisters)
         repository.addAllTaskRegister(*taskRegisters)
     }
     // read
-    suspend fun readTaskRegisterList():LiveData<List<TaskRegister>>{
+    suspend fun readTaskRegisterList():List<TaskRegister> {
         Timber.d("vm.. readTaskRegisterList ...")
         return repository.readTaskRegisterList()
     }

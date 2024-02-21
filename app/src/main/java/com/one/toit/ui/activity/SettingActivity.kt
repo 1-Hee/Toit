@@ -76,7 +76,7 @@ import com.one.toit.ui.compose.style.red400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.SimpleTopBar
 import com.one.toit.ui.compose.ui.unit.WarningDialog
-import com.one.toit.ui.viewmodel.TaskRegisterViewModel
+import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +85,7 @@ import kotlinx.coroutines.launch
 
 class SettingActivity : BaseComposeActivity() {
     // vm
-    private lateinit var taskRegisterViewModel:TaskRegisterViewModel
+    private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
     private lateinit var launcher: ActivityResultLauncher<Intent>
 

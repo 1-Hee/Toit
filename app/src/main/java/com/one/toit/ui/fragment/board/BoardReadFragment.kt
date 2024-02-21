@@ -1,29 +1,19 @@
 package com.one.toit.ui.fragment.board
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.view.TextureView
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
 import com.one.toit.R
@@ -36,27 +26,19 @@ import com.one.toit.data.dto.WarningDTO
 import com.one.toit.data.model.TaskInfo
 import com.one.toit.databinding.FragmentBoardReadBinding
 import com.one.toit.ui.dialog.WarningDialog
-import com.one.toit.ui.viewmodel.TaskInfoViewModel
-import com.one.toit.ui.viewmodel.TaskRegisterViewModel
-import com.one.toit.ui.viewmodel.TaskViewModel
+import com.one.toit.data.viewmodel.TaskInfoViewModel
+import com.one.toit.data.viewmodel.TaskRegisterViewModel
+import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.util.AppUtil
-import com.patrykandpatrick.vico.core.extension.setFieldValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
-import java.io.OutputStreamWriter
 import java.lang.Exception
-import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // bundle
@@ -68,7 +50,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // vm
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     private lateinit var taskInfoViewModel: TaskInfoViewModel
-    private lateinit var taskViewModel:TaskViewModel
+    private lateinit var taskViewModel: TaskViewModel
     // 저장된 파일 이름
     private var mFileName:String = ""
     // 카메라로부터 받은 비트맵
