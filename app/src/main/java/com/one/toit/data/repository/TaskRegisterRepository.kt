@@ -6,6 +6,7 @@ import com.one.toit.data.model.TaskRegister
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Date
 
 class TaskRegisterRepository(
     private val taskRegistrationDao: TaskRegistrationDao
@@ -26,6 +27,11 @@ class TaskRegisterRepository(
         = withContext(Dispatchers.IO){
         Timber.d("readTaskRegisterList...")
         taskRegistrationDao.readTaskRegisterList()
+    }
+    suspend fun readTaskRegisterListByDate(mDate: Date): List<TaskRegister>
+        = withContext(Dispatchers.IO){
+        Timber.d("readTaskRegisterListByDate... %s", mDate)
+        taskRegistrationDao.readTaskRegisterListByDate(mDate)
     }
     // update
     suspend fun modifyTaskRegister(taskRegister: TaskRegister)

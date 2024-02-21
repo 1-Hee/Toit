@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,9 +62,11 @@ import com.one.toit.ui.viewmodel.MainMenuViewModel
 import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
 
-class MainActivity : BaseComposeActivity(){
+class MainActivity : BaseComposeActivity(), LifecycleOwner {
     // viewModel
     private lateinit var mainMenuViewModel: MainMenuViewModel
     // 부모 엔티티
@@ -89,10 +93,11 @@ class MainActivity : BaseComposeActivity(){
         setContent {
             MainScreenView(mainMenuViewModel, taskViewModel, launcher)
         }
-//        lifecycleScope.launch {
-//            val data = taskViewModel.readTaskList()
-//            Timber.i("taskList .. %s", data)
-//        }
+        lifecycleScope.launch {
+            val date = Date()
+            val data = taskRegisterViewModel.readTaskRegisterListByDate(date)
+            Timber.i("taskList .. %s", data)
+        }
     }
     override fun initViewModel() {
         super.initViewModel()

@@ -54,6 +54,7 @@ import com.one.toit.data.viewmodel.TaskViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Date
 
 /**
  *  TODO DB쪽과의 시간 차이로 인해서 렌더링 이슈가 살짝 있음
@@ -76,10 +77,10 @@ fun TodoPage(
     val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
     LaunchedEffect(checked) {
         withContext(Dispatchers.Main) {
+            val date = Date() // 오늘 기준으로 필터링 할 것임!
             Timber.i("토글 상태 : %s", checked)
             if(checked){
-                // TODO dao 수정해서 오늘 날짜 기준의 todo만 불러오도록...
-                val taskList = taskViewModel.readNotCompleteTaskList()
+                val taskList = taskViewModel.readNotCompleteTaskListByDate(date)
                 Timber.i("[할일 목록 (필터) ] : %s", taskList)
                 // 데이터 변화를 감지하기 위해 MutableState를 업데이트
                 taskDTOListState.value = taskList.map { task ->
@@ -95,7 +96,7 @@ fun TodoPage(
                     )
                 }
             }else {
-                val taskList = taskViewModel.readTaskList()
+                val taskList = taskViewModel.readTaskListByDate(date)
                 Timber.i("[할일 목록] : %s", taskList)
                 // 데이터 변화를 감지하기 위해 MutableState를 업데이트
                 taskDTOListState.value = taskList.map { task ->

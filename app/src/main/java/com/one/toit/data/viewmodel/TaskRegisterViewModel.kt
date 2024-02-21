@@ -10,6 +10,7 @@ import com.one.toit.data.repository.TaskRegisterRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
 
 class TaskRegisterViewModel(
     private val application: Application
@@ -35,6 +36,10 @@ class TaskRegisterViewModel(
     suspend fun readTaskRegisterList():List<TaskRegister> {
         Timber.d("vm.. readTaskRegisterList ...")
         return repository.readTaskRegisterList()
+    }
+    suspend fun readTaskRegisterListByDate(mDate: Date):List<TaskRegister> {
+        Timber.d("vm..readTaskRegisterListByDate..%s", mDate)
+        return repository.readTaskRegisterListByDate(mDate)
     }
     // update
     suspend fun modifyTaskRegister(taskRegister: TaskRegister){

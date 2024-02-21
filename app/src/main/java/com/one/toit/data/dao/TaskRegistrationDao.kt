@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.one.toit.data.model.TaskRegister
+import java.util.Date
 
 @Dao
 interface TaskRegistrationDao {
@@ -19,6 +20,8 @@ interface TaskRegistrationDao {
     // read
     @Query("SELECT * FROM table_task_registration")
     fun readTaskRegisterList(): List<TaskRegister>
+    @Query("SELECT * FROM table_task_registration WHERE date(create_at) = date(:mDate)")
+    fun readTaskRegisterListByDate(mDate:Date): List<TaskRegister>
     // update
     @Update
     fun modifyTaskRegister(taskRegister: TaskRegister)

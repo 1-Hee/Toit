@@ -200,13 +200,18 @@ fun ItemTodo(
             // 로그 시간
             val suffix = stringResource(id = R.string.suffix_create)
             val mTaskCreateAt = taskDTO.createAt
-            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            Timber.d("time : %s ", mTaskCreateAt)
+
+            val locale =  Locale.getDefault()
+            Timber.d("locale : %s", locale)
+            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
+            val outputFormat = SimpleDateFormat("HH:mm:ss", locale)
             val timeString = try {
                 val date = inputFormat.parse(mTaskCreateAt)
                 val formattedTime = outputFormat.format(date)
-                formattedTime.toString()+suffix
+                "$formattedTime $suffix"
             } catch (e: ParseException) {
+                e.printStackTrace()
                 " $suffix"
             }
 

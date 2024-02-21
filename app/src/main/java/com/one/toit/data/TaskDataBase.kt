@@ -23,7 +23,7 @@ abstract class TaskDataBase : RoomDatabase(){
         @Volatile
         private var INSTANCE:TaskDataBase? = null
         fun getInstance(context: Context):TaskDataBase{
-            // context.deleteDatabase("task_data_base")
+//             context.deleteDatabase("task_data_base")
             if(INSTANCE==null){
                 synchronized(this){
                     val instance = Room

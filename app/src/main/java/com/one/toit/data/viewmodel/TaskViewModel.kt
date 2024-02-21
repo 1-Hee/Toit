@@ -9,6 +9,7 @@ import com.one.toit.data.model.Task
 import com.one.toit.data.repository.TaskInfoRepository
 import com.one.toit.data.repository.TaskRepository
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class TaskViewModel(
     private val application: Application
@@ -30,5 +31,13 @@ class TaskViewModel(
     suspend fun readNotCompleteTaskList():List<Task>{
         return repository.readNotCompleteTaskList()
     }
-    
+
+    suspend fun readTaskListByDate(targetDate: Date): List<Task>{
+        return repository.readTaskListByDate(targetDate)
+    }
+
+    suspend fun readNotCompleteTaskListByDate(targetDate: Date): List<Task>{
+        return repository.readNotCompleteTaskListByDate(targetDate)
+    }
+
 }
