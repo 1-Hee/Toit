@@ -223,7 +223,7 @@ fun MainNavGraph(
         }
         composable(MainRoute.Statistics.route) {
             // GraphPage(navController)
-            StatisticsPage(navController)
+            StatisticsPage(navController, launcher)
         }
         composable(MainRoute.Profile.route) {
             ProfilePage()

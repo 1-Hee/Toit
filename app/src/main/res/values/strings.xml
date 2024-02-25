@@ -65,4 +65,11 @@
     <string name="suffix_complete"> 에 완료 됨</string>
     <string name="suffix_create"> 에 작성 됨</string>
     <string name="msg_modify_ok">수정이 완료되었습니다.</string>
+    <string name="txt_today_task">오늘의 할 일</string>
+    <string name="txt_today_task_state">달성한 목표</string>
+    <string name="txt_day_count1">Toit 과 함께한 지</string>
+    <string name="txt_day_count2">일 째!</string>
+    <string name="txt_day_count3">하루씩 쌓아가는 나만의 작은 성공 이야기,</string>
+    <string name="txt_day_count4">%1$s 님의 성장에 ToIt이 함께 할께요 😀</string>
+    <string name="txt_user_name_tail">%1$s 님</string>
 </resources>

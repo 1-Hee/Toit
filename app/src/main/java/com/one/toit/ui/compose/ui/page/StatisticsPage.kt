@@ -1,6 +1,7 @@
 package com.one.toit.ui.compose.ui.page
 
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +44,9 @@ import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
 // @Preview(showBackground = true)
 @Composable
 fun StatisticsPage(
-    navController : NavHostController
+    navController : NavHostController,
+    launcher: ActivityResultLauncher<Intent>? = null
+
 ){
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -64,23 +67,24 @@ fun StatisticsPage(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             // Preview with sample data
-            val data = mapOf<String, ChartEntry>(
-                Pair(
-                    "완성", ChartEntry(
-                        volume = 7,
-                        color = colorResource(id = R.color.purple200)
-                    )
+            // TODO
+            // 변수 1 : 전체 개수, 성공 개수 엔트리
+            // 변수 2 : 일일 목표 개수
+            // 변수 3 : 달성 목표 개수
+            // 차트
+            val dataList = listOf(
+                ChartEntry(
+                    volume = 7,
+                    color = colorResource(id = R.color.purple200)
                 ),
-                Pair(
-                    "미완성", ChartEntry(
-                        volume = 3,
-                        color = colorResource(id = R.color.mono200)
-                    )
+                ChartEntry(
+                    volume = 3,
+                    color = colorResource(id = R.color.mono200)
                 )
             )
-            // 차트
+
             PerforatedPieChart(
-                data = data,
+                data = dataList,
                 radiusOuter = 64.dp,
                 chartBarWidth = 16.dp,
                 animDuration = 700,
@@ -110,7 +114,7 @@ fun StatisticsPage(
             }
             // 버튼
             Button(onClick = {
-                context.startActivity(intent)
+                launcher?.launch(intent)
             },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = purple200,

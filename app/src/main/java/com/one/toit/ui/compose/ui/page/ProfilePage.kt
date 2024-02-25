@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -44,23 +45,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.one.toit.R
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono300
+import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.mono800
 import com.one.toit.ui.compose.style.mono900
+import com.one.toit.ui.compose.style.none
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
+import com.one.toit.ui.compose.style.purple400
+import com.one.toit.ui.compose.style.purple50
+import com.one.toit.ui.compose.style.purple500
+import com.one.toit.ui.compose.style.purple600
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.AdmobBanner
 import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
@@ -71,6 +81,7 @@ import com.one.toit.util.PreferenceUtil
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import timber.log.Timber
+import java.text.NumberFormat
 
 @Preview(showBackground = true)
 @Composable
@@ -91,13 +102,9 @@ fun ProfilePage() {
      */
     var todoState by remember { mutableStateOf(5) }
     var todoGoal by remember { mutableStateOf(10) }
-    var toitPoint by remember { mutableStateOf(2024) }
-    var totalTodo by remember { mutableStateOf(127) }
-    var avgTodo by remember { mutableStateOf(8.7) }
-    var minRecord by remember { mutableStateOf(780) } // second
-    var maxRecord by remember { mutableStateOf(26580) } // second
-    var avgRecord by remember { mutableStateOf(11460) } // second
-    var axiomString by remember { mutableStateOf("성공은 작은 노력의 쌓임입니다.\n오늘 하루도 조금 더 나아가세요.") }
+    var toitPoint by remember { mutableStateOf(123456) }
+    var dayCnt by remember { mutableStateOf(123) }
+
     // 다이얼로그 창 상태관리 변수
     var showMenuProfile by remember { mutableStateOf(false) }
     var showEditNickName by remember { mutableStateOf(false) }
@@ -170,7 +177,8 @@ fun ProfilePage() {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 사용자 프로필 부분
             Row(
@@ -207,7 +215,7 @@ fun ProfilePage() {
                 }
                 // 프로필 명
                 Text(
-                    text = "$userNickname 님",
+                    text = stringResource(R.string.txt_user_name_tail, userNickname),
                     style = MaterialTheme.typography.caption
                         .copy(
                             fontSize = 16.sp,
@@ -245,7 +253,7 @@ fun ProfilePage() {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "편집",
+                            text = stringResource(id = R.string.txt_edit),
                             fontSize = 10.sp,
                             style = MaterialTheme.typography.caption.copy(
                                 color = white
@@ -264,7 +272,7 @@ fun ProfilePage() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "일일 분석",
+                    text = stringResource(R.string.txt_today_task),
                     style = MaterialTheme.typography.subtitle1.copy(
                         color = black,
                         textAlign = TextAlign.Start
@@ -282,7 +290,7 @@ fun ProfilePage() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     Text(
-                        text = "목표 달성",
+                        text = stringResource(R.string.txt_today_task_state),
                         style = MaterialTheme.typography.caption
                             .copy(
                                 color = black,
@@ -298,72 +306,44 @@ fun ProfilePage() {
                     )
                 }
             }
-            // 레코드 보드
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 12.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "레코드 보드",
-                    style = MaterialTheme.typography.subtitle1
-                        .copy(
-                            color = black,
-                            textAlign = TextAlign.Start
-                        ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                )
-                // toit, 전체 목표, 평균 목표
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    RecordBox("Toit!", "$toitPoint", true)
-                    Box(modifier = Modifier
-                        .width(1.dp)
-                        .height(24.dp)
-                        .background(mono300))
-                    RecordBox("전체 목표", "$totalTodo" )
-                    Box(modifier = Modifier
-                        .width(1.dp)
-                        .height(24.dp)
-                        .background(mono300))
-                    RecordBox("평균 목표", "$avgTodo" )
-                }
-                // 최단기록, 최장기록, 평균 기록
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    RecordBox("최단 기록", calcTimeString(minRecord.toLong()))
-                    Box(modifier = Modifier
-                        .width(1.dp)
-                        .height(24.dp)
-                        .background(mono300))
-                    RecordBox("최장 기록", calcTimeString(maxRecord.toLong()))
-                    Box(modifier = Modifier
-                        .width(1.dp)
-                        .height(24.dp)
-                        .background(mono300))
-                    RecordBox("평균 기록", calcTimeString(avgRecord.toLong()))
-                }
-            }
-            // 격언
+            ToitPointCard(toitPoint)
+            Spacer(modifier = Modifier.height(32.dp))
+            UserPhrasesUnit(dayCnt, userNickname)
+            Spacer(modifier = Modifier.height(32.dp))
+
+        }
+
+        // admobs
+        AdmobBanner(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun UserPhrasesUnit(
+    dayCnt:Int,
+    userNickname:String
+){
+    // 문구
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Row(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(bottom = 12.dp),
+            verticalAlignment = Alignment.Bottom
+        ){
+            // ToIt 과 함께한지 123 일 째!
             Text(
-                text = axiomString,
+                text = stringResource(R.string.txt_day_count1),
                 style = MaterialTheme.typography.caption
                     .copy(
                         mono900,
@@ -371,61 +351,132 @@ fun ProfilePage() {
                         textAlign = TextAlign.Center
                     ),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 48.dp)
+                    .wrapContentSize()
             )
-            // admobs
-            AdmobBanner(modifier = Modifier.fillMaxWidth())
-        }
-    }
-}
-
-
-@Composable
-fun RecordBox(title:String, content:String, hasHelp:Boolean = false){
-    Box(modifier = Modifier
-        .wrapContentWidth()
-        .height(48.dp)){
-        Row(
-            modifier = Modifier
-                .wrapContentSize()
-                .align(Alignment.TopCenter),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
             Text(
-                text = title,
+                text = parseNumberString(dayCnt),
                 style = MaterialTheme.typography.caption
                     .copy(
-                        color = black,
-                        fontSize = 16.sp
-                    )
+                        mono900,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Medium
+                    ),
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(horizontal = 4.dp)
             )
-            if(hasHelp){
-                Icon(
-                    Icons.Rounded.Info,
-                    contentDescription = "icon",
-                    tint = mono900,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+            Text(
+                text = stringResource(R.string.txt_day_count2),
+                style = MaterialTheme.typography.caption
+                    .copy(
+                        mono900,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    ),
+                modifier = Modifier.wrapContentSize()
+            )
         }
         Text(
-            text = content,
+            text = stringResource(R.string.txt_day_count3),
             style = MaterialTheme.typography.caption
                 .copy(
-                    color = mono900
+                    mono900,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
                 ),
             modifier = Modifier
                 .wrapContentSize()
-                .align(Alignment.BottomCenter)
+                .padding(vertical = 4.dp)
+        )
+        Text(
+            text = stringResource(R.string.txt_day_count4, userNickname),
+            style = MaterialTheme.typography.caption
+                .copy(
+                    mono900,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                ),
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(vertical = 4.dp)
         )
     }
 }
 
-fun calcTimeString(time:Long):String{
-    val hour  = ( time / 60 ) / 60;
-    val min = (time / 60) % 60;
-    return "$hour:$min"
+@Composable
+fun ToitPointCard(toitPoint:Int){
+    // 뱃지 배경
+    val colorList = listOf(purple200, purple500, purple400, purple300)
+    val brush = Brush.linearGradient(colorList)
+    Card(
+        elevation = 1.dp,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .width(256.dp)
+            .wrapContentHeight()
+            .background(brush = brush, shape = RoundedCornerShape(12.dp)),
+        backgroundColor = none
+    ){
+        Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 16.dp, bottom = 4.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Toit Point \uD83D\uDD25",
+                    style = MaterialTheme.typography.caption
+                        .copy(
+                            white,
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 4.dp, bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = parseNumberString(toitPoint),
+                    style = MaterialTheme.typography.caption
+                        .copy(
+                            white,
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                    modifier = Modifier
+                        .wrapContentSize()
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "point",
+                    style = MaterialTheme.typography.caption
+                        .copy(
+                            white,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                    modifier = Modifier
+                        .wrapContentSize()
+                )
+            }
+        }
+    }
+}
+
+fun parseNumberString(point:Int):String{
+    val numberFormat = NumberFormat.getInstance()
+    return numberFormat.format(point)
 }

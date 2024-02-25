@@ -43,7 +43,7 @@ import com.one.toit.ui.compose.style.mono900
 
 @Composable
 fun PerforatedPieChart(
-    data: Map<String, ChartEntry>,
+    data: List<ChartEntry>,
     radiusOuter: Dp = 140.dp,
     chartBarWidth: Dp = 35.dp,
     animDuration: Int = 1000,
@@ -56,7 +56,7 @@ fun PerforatedPieChart(
     PerformChartEntry
      */
     var totalSum = 0
-    for(entry in data.values){
+    for(entry in data){
         totalSum += entry.volume
         colors.add(entry.color)
     }
@@ -66,7 +66,7 @@ fun PerforatedPieChart(
     // the value given in the data, we have used a simple formula.
     // For a detailed explanation check out the Medium Article.
     // The link is in the about section and readme file of this GitHub Repository
-    data.values.forEachIndexed { index, entry ->
+    data.forEachIndexed { index, entry ->
         floatValue.add(index, 360 * entry.volume.toFloat() / totalSum.toFloat())
     }
     var animationPlayed by remember { mutableStateOf(false) }
@@ -155,12 +155,12 @@ fun PerforatedPieChart(
             }
         }
 
-        // To see the data in more structured way
-        // Compose Function in which Items are showing data
-        DetailsPieChart(
-            data = data,
-            colors = colors
-        )
+//        // To see the data in more structured way
+//        // Compose Function in which Items are showing data
+//        DetailsPieChart(
+//            data = data,
+//            colors = colors
+//        )
 
     }
 }
