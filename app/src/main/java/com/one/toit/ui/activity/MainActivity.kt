@@ -27,7 +27,11 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,7 +62,7 @@ import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
-import com.one.toit.ui.viewmodel.MainMenuViewModel
+import com.one.toit.ui.viewmodel.PageViewModel
 import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
@@ -68,7 +72,7 @@ import java.util.Date
 
 class MainActivity : BaseComposeActivity(), LifecycleOwner {
     // viewModel
-    private lateinit var mainMenuViewModel: MainMenuViewModel
+    private lateinit var pageViewModel: PageViewModel
     // 부모 엔티티
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     // 자식 엔티티
@@ -91,7 +95,7 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
             }
         }
         setContent {
-            MainScreenView(mainMenuViewModel, taskViewModel, launcher)
+            MainScreenView(pageViewModel, taskViewModel, launcher)
         }
         lifecycleScope.launch {
             val date = Date()
@@ -101,9 +105,9 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
     }
     override fun initViewModel() {
         super.initViewModel()
-        mainMenuViewModel = getApplicationScopeViewModel(MainMenuViewModel::class.java)
-        mainMenuViewModel.init()
-        mainMenuViewModel.setPageName(baseContext.getString(R.string.p_todo))
+        pageViewModel = getApplicationScopeViewModel(PageViewModel::class.java)
+        pageViewModel.init()
+        pageViewModel.setPageName(baseContext.getString(R.string.p_todo))
         val factory = ApplicationFactory(this.application)
         taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
         taskInfoViewModel = getApplicationScopeViewModel(TaskInfoViewModel::class.java, factory)
@@ -157,14 +161,14 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
 }
 @Composable
 fun MainScreenView(
-    viewModel: MainMenuViewModel,
+    pageViewModel: PageViewModel,
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ) {
     val navController = rememberNavController()
     Scaffold(
-        topBar = { MainTopBarComponent(viewModel) },
-        bottomBar = { MainBottomNavigation(navController = navController, menuViewModel = viewModel) }
+        topBar = { MainTopBarComponent(pageViewModel) },
+        bottomBar = { MainBottomNavigation(navController, pageViewModel) }
     ) {
         Box(Modifier.padding(it)){
             MainNavGraph(navController, taskViewModel, launcher)
@@ -173,10 +177,15 @@ fun MainScreenView(
 }
 @Composable
 fun MainTopBarComponent(
-    viewModel:MainMenuViewModel,
+    viewModel:PageViewModel,
 ){
     val context = LocalContext.current
     val intent = Intent(context, SettingActivity::class.java)
+    var pageTitle by remember { mutableStateOf("") }
+    LaunchedEffect(viewModel.pageName.value){
+        pageTitle = viewModel.pageName.value
+    }
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .height(48.dp)
@@ -185,7 +194,7 @@ fun MainTopBarComponent(
     ){
         // 타이틀
         Text(
-            text = "${viewModel.pageName.value}",
+            text = pageTitle,
             style = MaterialTheme.typography.subtitle1
                 .copy(
                     fontSize = 16.sp
@@ -234,7 +243,7 @@ fun MainNavGraph(
 @Composable
 fun MainBottomNavigation(
     navController: NavHostController,
-    menuViewModel:MainMenuViewModel,
+    pageViewModel:PageViewModel,
 ) {
     val items = listOf<MainRoute>(
         MainRoute.Todo,
@@ -296,8 +305,8 @@ fun MainBottomNavigation(
                         }
                         launchSingleTop = true
                         restoreState = true
-                        menuViewModel.setPageName(itemTitle)
-                        Timber.i("bottom : %s : ", menuViewModel.pageName)
+                        pageViewModel.setPageName(itemTitle)
+                        Timber.i("bottom : %s : ", pageViewModel.pageName)
                     }
                 }
             )

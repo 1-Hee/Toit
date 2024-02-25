@@ -5,5 +5,7 @@ import com.one.toit.R
 sealed class StatisticsRoute(
     val title: Int, val route:String
 ){
-    object Weekly:StatisticsRoute(title = R.string.p_app_statistics, route = "WeeklyPage")
+    object DailyOutline:StatisticsRoute(title = R.string.title_dilay_outline, route = "DailyOutlinePage")
+    object WeeklyPage:StatisticsRoute(title = R.string.title_weekly, route = "WeeklyPage")
+    object AllStatisticsPage:StatisticsRoute(title = R.string.title_statistics_all, route = "AllStatisticsPage")
 }

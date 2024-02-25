@@ -8,6 +8,9 @@
 
     <string name="p_app_setting">환경 설정</string>
     <string name="p_app_statistics">상세 통계</string>
+    <string name="title_dilay_outline">일일 통계</string>
+    <string name="title_weekly">주간 통계</string>
+    <string name="title_statistics_all">전체 통계</string>
 
     <string-array name="arr_board_title">
         <item>목표 작성 하기, Write It!</item>
@@ -49,8 +52,8 @@
 
     <string name="ts_picked_img">프로필 사진이 저장되었습니다.</string>
     <string name="ts_error_pick_img">프로필 사진을 불러오던 중 오류가 발생했습니다.</string>
-    <string name="header_todo_list">TODO! List</string>
-    <string name="txt_guide_graph">최근 2주간의 목표 달성 통계 그래프로 확인하실 수 있습니다.</string>
+    <string name="header_todo_list">🗒️ 오늘의 할 일</string>
+    <string name="txt_guide_graph">지난 1주 간의 목표 달성 현황을 그래프로 확인하실 수 있습니다.</string>
     <string name="txt_daily_circle_graph">목표 달성</string>
     <string name="txt_h_app_version">앱 버전</string>
     <string name="txt_oss">오픈 소스 라이선스</string>
@@ -72,4 +75,7 @@
     <string name="txt_day_count3">하루씩 쌓아가는 나만의 작은 성공 이야기,</string>
     <string name="txt_day_count4">%1$s 님의 성장에 ToIt이 함께 할께요 😀</string>
     <string name="txt_user_name_tail">%1$s 님</string>
+    <string name="txt_bar_graph">막대 그래프</string>
+    <string name="txt_line_graph">선형 그래프</string>
+    <string name="title_daily_todo_graph">일일 목표 달성 추이</string>
 </resources>

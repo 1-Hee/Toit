@@ -3,7 +3,7 @@ package com.one.toit.ui.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-class MainMenuViewModel : ViewModel() {
+class PageViewModel : ViewModel() {
     val pageName = mutableStateOf<String>("")
     fun init(){
         pageName.value = ""

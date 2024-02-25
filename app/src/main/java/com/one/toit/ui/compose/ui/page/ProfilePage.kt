@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,13 +29,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,21 +52,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.one.toit.R
 import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.green300
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono300
-import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.mono800
 import com.one.toit.ui.compose.style.mono900
+import com.one.toit.ui.compose.style.navy300
 import com.one.toit.ui.compose.style.none
+import com.one.toit.ui.compose.style.orange200
+import com.one.toit.ui.compose.style.orange300
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.purple400
-import com.one.toit.ui.compose.style.purple50
 import com.one.toit.ui.compose.style.purple500
-import com.one.toit.ui.compose.style.purple600
+import com.one.toit.ui.compose.style.red100
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.AdmobBanner
 import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
@@ -407,70 +404,80 @@ fun UserPhrasesUnit(
 @Composable
 fun ToitPointCard(toitPoint:Int){
     // 뱃지 배경
-    val colorList = listOf(purple200, purple500, purple400, purple300)
+    val colorList = listOf(red100, navy300, purple200, orange200)
     val brush = Brush.linearGradient(colorList)
     Card(
         elevation = 1.dp,
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .width(256.dp)
-            .wrapContentHeight()
-            .background(brush = brush, shape = RoundedCornerShape(12.dp)),
-        backgroundColor = none
+            .wrapContentHeight(),
+//        backgroundColor = none
     ){
-        Column {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(brush = brush)
+        ){
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(top = 16.dp, bottom = 4.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .align(Alignment.TopStart)
             ) {
-                Text(
-                    text = "Toit Point \uD83D\uDD25",
-                    style = MaterialTheme.typography.caption
-                        .copy(
-                            white,
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center
-                        ),
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                )
-            }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(top = 4.dp, bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = parseNumberString(toitPoint),
-                    style = MaterialTheme.typography.caption
-                        .copy(
-                            white,
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center
-                        ),
-                    modifier = Modifier
-                        .wrapContentSize()
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = "point",
-                    style = MaterialTheme.typography.caption
-                        .copy(
-                            white,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center
-                        ),
-                    modifier = Modifier
-                        .wrapContentSize()
-                )
+                        .padding(top = 16.dp, bottom = 4.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Toit Point \uD83D\uDD25",
+                        style = MaterialTheme.typography.caption
+                            .copy(
+                                white,
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                    )
+                }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(top = 4.dp, bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = parseNumberString(toitPoint),
+                        style = MaterialTheme.typography.caption
+                            .copy(
+                                white,
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "point",
+                        style = MaterialTheme.typography.caption
+                            .copy(
+                                white,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                }
             }
         }
     }
