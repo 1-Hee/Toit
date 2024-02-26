@@ -27,15 +27,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.one.toit.R
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono200
 import com.one.toit.ui.compose.style.mono300
+import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple300
+import timber.log.Timber
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun TodayAchieveUnit(
@@ -64,10 +72,11 @@ fun TodayAchieveUnit(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.Start
     ) {
+        val dailyRatio = stringResource(R.string.txt_daily_ratio)
         Text(
-            text = "2023년 4월 13일", // TODO date로 변환
+            text = dailyRatio,
             style = MaterialTheme.typography.caption.copy(
-                color = mono600,
+                color = black,
                 fontSize = 16.sp
             ),
             textAlign = TextAlign.Center,
@@ -115,7 +124,6 @@ fun TodayAchieveUnit(
                 textAlign = TextAlign.Center,
             )
         }
-
         // 그래프
         Column (
             modifier = Modifier
@@ -140,7 +148,28 @@ fun TodayAchieveUnit(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(32.dp))
+        val currentDate = Date()
+        val locale =  Locale.getDefault()
+        val outputFormat = SimpleDateFormat(stringResource(R.string.txt_yyyy_mm_dd), locale)
+        val timeString = try {
+            outputFormat.format(currentDate)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+            ""
+        }
+        //  시간
+        Text(
+            text = timeString,
+            style = MaterialTheme.typography.caption.copy(
+                color = mono400,
+                fontSize = 12.sp
+            ),
+            textAlign = TextAlign.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        )
+        Spacer(modifier = Modifier.height(24.dp))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,8 +178,7 @@ fun TodayAchieveUnit(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "성공은 작은 노력의 쌓임입니다. \n" +
-                        "오늘 하루도 조금 더 나아가세요",
+                text = stringResource(R.string.txt_acheive_comment, total - current),
                 style = MaterialTheme.typography.caption.copy(
                     color = mono600,
                     fontSize = 14.sp

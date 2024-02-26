@@ -1,6 +1,7 @@
 package com.one.toit.ui.compose.ui.unit.todo
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
@@ -20,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +41,8 @@ import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.green400
+import com.one.toit.ui.compose.style.green600
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.purple200
@@ -141,12 +146,13 @@ fun ItemTodo(
             // 달성 여부
             if(isSuccess){
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    Icons.Rounded.Check,
                     contentDescription = "",
                     modifier = Modifier
                         .width(24.dp)
                         .height(24.dp)
-                        .align(Alignment.TopEnd)
+                        .align(Alignment.TopEnd),
+                    tint = green600
                 )
             }
             // 남은 시간
@@ -197,26 +203,9 @@ fun ItemTodo(
                     )
                 }
             }
-            // 로그 시간
-            val suffix = stringResource(id = R.string.suffix_create)
-            val mTaskCreateAt = taskDTO.createAt
-            Timber.d("time : %s ", mTaskCreateAt)
-
-            val locale =  Locale.getDefault()
-            Timber.d("locale : %s", locale)
-            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
-            val outputFormat = SimpleDateFormat("HH:mm:ss", locale)
-            val timeString = try {
-                val date = inputFormat.parse(mTaskCreateAt)
-                val formattedTime = outputFormat.format(date)
-                "$formattedTime $suffix"
-            } catch (e: ParseException) {
-                e.printStackTrace()
-                " $suffix"
-            }
-
+            // 로그 시간 파싱
+            val timeString = getTimeString(context, taskDTO)
             Text(
-                // TODO 시간 파싱 함수 작성
                 text = timeString,
                 style = MaterialTheme.typography.subtitle1
                     .copy(
@@ -225,9 +214,50 @@ fun ItemTodo(
                     ),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(8.dp)
             )
         }
     }
 }
 
+fun getTimeString(
+    context:Context,
+    taskDTO:TaskDTO
+):String {
+    // 저장된 문자열을 Date 객체로 파싱
+    val savedDate = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(taskDTO.createAt)
+    // 오늘 날짜를 가져옴
+    val today = Calendar.getInstance().time
+    // 오늘과 저장된 날짜가 같은지 여부를 반환
+    val isToday = SimpleDateFormat("yyyy-MM-dd").format(today) == SimpleDateFormat("yyyy-MM-dd").format(savedDate)
+
+    val suffix = context.resources.getString(R.string.suffix_create)
+    val mTaskCreateAt = taskDTO.createAt
+    Timber.d("time : %s ", mTaskCreateAt)
+    val locale =  Locale.getDefault()
+    Timber.d("locale : %s", locale)
+    val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
+
+    val timeString:String
+    if(isToday){
+        val outputFormat = SimpleDateFormat("HH:mm:ss", locale)
+        timeString = try {
+            val date = inputFormat.parse(mTaskCreateAt)
+            val formattedTime = outputFormat.format(date)
+            "$formattedTime $suffix"
+        } catch (e: ParseException) {
+            Timber.e("[MSG] e : %s", e.message)
+            " $suffix"
+        }
+    }else {
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd", locale)
+        timeString = try {
+            val date = inputFormat.parse(mTaskCreateAt)
+            val formattedTime = outputFormat.format(date)
+            "$formattedTime $suffix"
+        } catch (e: ParseException) {
+            Timber.e("[MSG] e : %s", e.message)
+            " $suffix"
+        }
+    }
+    return timeString
+}

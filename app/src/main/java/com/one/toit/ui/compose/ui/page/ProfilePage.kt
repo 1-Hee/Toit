@@ -1,7 +1,9 @@
 package com.one.toit.ui.compose.ui.page
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,17 +24,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,22 +58,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
 import com.one.toit.ui.compose.style.black
-import com.one.toit.ui.compose.style.green300
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono800
 import com.one.toit.ui.compose.style.mono900
-import com.one.toit.ui.compose.style.navy300
-import com.one.toit.ui.compose.style.none
-import com.one.toit.ui.compose.style.orange200
-import com.one.toit.ui.compose.style.orange300
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
-import com.one.toit.ui.compose.style.purple400
-import com.one.toit.ui.compose.style.purple500
-import com.one.toit.ui.compose.style.red100
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.AdmobBanner
+import com.one.toit.ui.compose.ui.unit.ToitPointCard
 import com.one.toit.ui.compose.ui.unit.profile.EditNickNameDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
@@ -79,6 +76,8 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import timber.log.Timber
 import java.text.NumberFormat
+import java.util.Calendar
+import java.util.Date
 
 @Preview(showBackground = true)
 @Composable
@@ -100,7 +99,8 @@ fun ProfilePage() {
     var todoState by remember { mutableStateOf(5) }
     var todoGoal by remember { mutableStateOf(10) }
     var toitPoint by remember { mutableStateOf(123456) }
-    var dayCnt by remember { mutableStateOf(123) }
+    var dayCnt by remember { mutableStateOf(getDiffTime(context)) }
+
 
     // 다이얼로그 창 상태관리 변수
     var showMenuProfile by remember { mutableStateOf(false) }
@@ -217,7 +217,10 @@ fun ProfilePage() {
                         .copy(
                             fontSize = 16.sp,
                             color = mono800
-                        )
+                        ),
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(horizontal = 8.dp)
                 )
                 // 편집 버튼
                 Button(
@@ -243,10 +246,11 @@ fun ProfilePage() {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_create_todo),
+                        Icon(
+                            Icons.Rounded.Edit,
                             contentDescription = "",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
+                            tint = white
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -260,11 +264,11 @@ fun ProfilePage() {
                 }
             }
             // 일일 달성 목표
+            Spacer(modifier = Modifier.height(16.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 12.dp),
+                    .wrapContentHeight(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -303,7 +307,8 @@ fun ProfilePage() {
                     )
                 }
             }
-            ToitPointCard(toitPoint)
+            Spacer(modifier = Modifier.height(16.dp))
+            ToitPointCard(toitPoint=toitPoint)
             Spacer(modifier = Modifier.height(32.dp))
             UserPhrasesUnit(dayCnt, userNickname)
             Spacer(modifier = Modifier.height(32.dp))
@@ -320,11 +325,32 @@ fun ProfilePage() {
     }
 }
 
+fun getInstallationDate(context: Context): Date {
+    return try {
+        val packageManager = context.packageManager
+        val packageInfo = packageManager.getPackageInfo(context.packageName, 0)
+        val firstInstallTime = packageInfo.firstInstallTime
+        return Date(firstInstallTime)
+    } catch (e: PackageManager.NameNotFoundException) {
+        Timber.e("[ERROR] :%s", e.message)
+        Date()
+    }
+}
+
+fun getDiffTime(context: Context): Long {
+    val installationDate = getInstallationDate(context)
+    val currentDate = Calendar.getInstance().time
+    val timeDifference = currentDate.time - installationDate.time
+    // timeDifference를 millisecond에서 day로 변환
+    return timeDifference / (24 * 60 * 60 * 1000)
+}
+
 @Composable
 fun UserPhrasesUnit(
-    dayCnt:Int,
+    dayCnt:Long,
     userNickname:String
 ){
+    val numberFormat = NumberFormat.getInstance()
     // 문구
     Column(
         modifier = Modifier
@@ -351,7 +377,7 @@ fun UserPhrasesUnit(
                     .wrapContentSize()
             )
             Text(
-                text = parseNumberString(dayCnt),
+                text = numberFormat.format(dayCnt),
                 style = MaterialTheme.typography.caption
                     .copy(
                         mono900,
@@ -399,91 +425,4 @@ fun UserPhrasesUnit(
                 .padding(vertical = 4.dp)
         )
     }
-}
-
-@Composable
-fun ToitPointCard(toitPoint:Int){
-    // 뱃지 배경
-    val colorList = listOf(red100, navy300, purple200, orange200)
-    val brush = Brush.linearGradient(colorList)
-    Card(
-        elevation = 1.dp,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .width(256.dp)
-            .wrapContentHeight(),
-//        backgroundColor = none
-    ){
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .background(brush = brush)
-        ){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .align(Alignment.TopStart)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(top = 16.dp, bottom = 4.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Toit Point \uD83D\uDD25",
-                        style = MaterialTheme.typography.caption
-                            .copy(
-                                white,
-                                fontSize = 16.sp,
-                                textAlign = TextAlign.Center
-                            ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                    )
-                }
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(top = 4.dp, bottom = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = parseNumberString(toitPoint),
-                        style = MaterialTheme.typography.caption
-                            .copy(
-                                white,
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center
-                            ),
-                        modifier = Modifier
-                            .wrapContentSize()
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "point",
-                        style = MaterialTheme.typography.caption
-                            .copy(
-                                white,
-                                fontSize = 14.sp,
-                                textAlign = TextAlign.Center
-                            ),
-                        modifier = Modifier
-                            .wrapContentSize()
-                    )
-                }
-            }
-        }
-    }
-}
-
-fun parseNumberString(point:Int):String{
-    val numberFormat = NumberFormat.getInstance()
-    return numberFormat.format(point)
 }

@@ -78,4 +78,41 @@
     <string name="txt_bar_graph">막대 그래프</string>
     <string name="txt_line_graph">선형 그래프</string>
     <string name="title_daily_todo_graph">일일 목표 달성 추이</string>
+    <string name="txt_daily_ratio">일일 목표 달성율</string>
+    <string name="txt_yyyy_mm_dd">yyyy-MM-dd 기준</string>
+    <string name="title_weekly_ratio">주간 목표 달성율</string>
+    <string name="txt_guide_weekly_ratio">지난 1주간의 목표 달성율을 추산한 값입니다.</string>
+    <string name="title_average_daily_ratio">일일 평균 목표 달성율</string>
+    <string name="txt_guide_average_daily_ratio">지난 1주간의 하루 평균 목표 달성율을 추산한 값입니다.</string>
+    <string name="title_toit_heatmap">ToIt! 히트맵</string>
+    <string name="txt_guide_heatmap">지난 65일 간의 일일 목표 등록 빈도를 확인하실 수 있습니다.</string>
+    <string name="title_statistics_chart">ToIt! 통계 요약</string>
+    <string name="txt_hint_search_todo">등록하신 목표 명을 검색해보세요</string>
+    <string name="txt_sort_standard">정렬 기준</string>
+    <string name="txt_acheive_comment">목표 달성 까지 단 %1$s 개\n조금만 더 힘내 보세요😁</string>
+    <string name="txt_guide_daily_todo_graph">현재 시간 까지의 목표 달성 추이를 확인해보세요.</string>
+
+    <!-- 통계 값 리스트 -->
+    <string-array name="statistics_chart_item_list">
+        <item>전체 목표 수</item>
+        <item>평균 일일 목표 수</item>
+        <item>일일 목표 중앙값</item>
+        <item>전체 목표 달성률</item>
+        <item>평균 일일 목표 달성률</item>
+        <item>일일 목표 달성율 중앙값</item>
+        <item>최장 목표 달성 시간</item>
+        <item>평균 목표 달성 시간</item>
+        <item>목표 달성 시간 중앙값</item>
+    </string-array>
+
+    <!-- 정렬 옵션 -->
+    <string-array name="option_todo_sort">
+        <item>선택 안함</item>
+        <item>최신순</item>
+        <item>과거 순</item>
+        <item>목표 상태</item>
+        <item>시간 짧은 순</item>
+        <item>시간 긴 순</item>
+    </string-array>
+    
 </resources>

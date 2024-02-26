@@ -64,9 +64,11 @@ fun LineGraphChart(
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(maxValue.dp)
+                .height(maxValue.dp),
         ) {
-            val unit = (size.width / data.values.size)
+            var unit = (size.width / data.values.size)
+            unit += unit/data.values.size
+
             val valueList = data.values.toList()
             val center = (size.height/2)
             for (idx in valueList.indices){
@@ -102,7 +104,7 @@ fun LineGraphChart(
                     val startValue = valueList[index-1].volume.toFloat()
                     drawText(
                         textMeasurer = textMeasurer,
-                        text = startValue.toString(),
+                        text = startValue.toInt().toString(),
                         topLeft = startingPoint * animatedProgress.value,
                         style = TextStyle.Default.copy(
                             color = textColor,
@@ -121,17 +123,24 @@ fun LineGraphChart(
                         )
                     )
                 }
+
+                // 날짜
+                val lastX = if(idx < valueList.size -2) {
+                    endingPoint.x
+                }else {
+                    endingPoint.x-24f
+                }
+                val lastValue = Offset(lastX, endingPoint.y)
                 drawText(
                     textMeasurer = textMeasurer,
                     text = chartEntry.volume.toString(),
-                    topLeft = endingPoint * animatedProgress.value,
+                    topLeft = lastValue * animatedProgress.value,
                     style = TextStyle.Default.copy(
                         color = textColor,
                         fontSize = 8.sp
                     )
                 )
-                // 날짜
-                val mEndPoint = Offset(endingPoint.x, size.height - 64f)
+                val mEndPoint = Offset(lastX, size.height - 64f)
                 drawText(
                     textMeasurer = textMeasurer,
                     text = keyList[index],
@@ -139,7 +148,7 @@ fun LineGraphChart(
                     style = TextStyle.Default.copy(
                         color = textColor,
                         fontSize = 8.sp
-                    )
+                    ),
                 )
             }
         }
