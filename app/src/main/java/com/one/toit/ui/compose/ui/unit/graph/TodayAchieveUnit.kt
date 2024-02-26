@@ -177,8 +177,13 @@ fun TodayAchieveUnit(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val stateComment = if(total > current){
+                stringResource(R.string.txt_acheive_comment, total - current)
+            }else {
+                stringResource(R.string.txt_task_complete)
+            }
             Text(
-                text = stringResource(R.string.txt_acheive_comment, total - current),
+                text = stateComment ,
                 style = MaterialTheme.typography.caption.copy(
                     color = mono600,
                     fontSize = 14.sp

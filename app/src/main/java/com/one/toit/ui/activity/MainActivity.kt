@@ -60,12 +60,12 @@ import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.page.ProfilePage
-import com.one.toit.ui.compose.ui.page.StatisticsPage
 import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.PageViewModel
 import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
+import com.one.toit.ui.compose.ui.page.NavStatisticsPage
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
@@ -230,12 +230,12 @@ fun MainNavGraph(
         composable(route = MainRoute.Todo.route) {
             TodoPage(navController, taskViewModel, launcher)
         }
-        composable(MainRoute.Statistics.route) {
+        composable(MainRoute.NavStatistics.route) {
             // GraphPage(navController)
-            StatisticsPage(navController, launcher)
+            NavStatisticsPage(navController, taskViewModel, launcher)
         }
         composable(MainRoute.Profile.route) {
-            ProfilePage()
+            ProfilePage(navController, taskViewModel, launcher)
         }
     }
 }
@@ -247,7 +247,7 @@ fun MainBottomNavigation(
 ) {
     val items = listOf<MainRoute>(
         MainRoute.Todo,
-        MainRoute.Statistics,
+        MainRoute.NavStatistics,
         MainRoute.Profile
     )
     BottomNavigation(

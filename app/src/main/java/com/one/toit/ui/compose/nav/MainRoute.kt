@@ -13,7 +13,6 @@ sealed class MainRoute(
     val title: Int, val icon: ImageVector? = null, val route:String
 ){
     object Todo: MainRoute(title = R.string.p_todo, icon = Icons.Rounded.List, route = "TodoPage")
-    object Statistics: MainRoute(title = R.string.p_statistics, icon = Icons.Rounded.Favorite, route = "StatisticsPage")
+    object NavStatistics: MainRoute(title = R.string.p_statistics, icon = Icons.Rounded.Favorite, route = "NavStatisticsPage")
     object Profile: MainRoute(title = R.string.p_profile, icon = Icons.Rounded.Person, route = "ProfilePage")
-    object Graph: MainRoute(title = R.string.p_graph, icon = Icons.Rounded.Refresh, route = "GraphPage")
 }

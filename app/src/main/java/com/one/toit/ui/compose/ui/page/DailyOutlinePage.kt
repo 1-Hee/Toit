@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,6 +57,9 @@ fun DailyOutlinePage(
     val context = LocalContext.current
     // MutableState를 사용하여 taskDTOList를 감싸기
     val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
+    // 오늘 taskValue 값!
+    var totalCnt by remember { mutableIntStateOf(0) }
+    var completeCnt by remember { mutableIntStateOf(0) }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.Main) {
             val taskList = taskViewModel.readTaskListByDate(currentDate)
@@ -73,6 +77,10 @@ fun DailyOutlinePage(
                     task.info.taskCertification
                 )
             }
+            val date = Date()
+            totalCnt = taskViewModel.getAllTodayTaskCount(date)
+            completeCnt = taskViewModel.getCompleteTodayTaskCount(date)
+            Timber.i("total : %s | complete : %s", totalCnt, completeCnt)
         }
     }
     // taskDTOListState를 사용하여 UI 업데이트
@@ -151,7 +159,7 @@ fun DailyOutlinePage(
                 .padding(vertical = 4.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        TodayAchieveUnit(5, 10)
+        TodayAchieveUnit(completeCnt, totalCnt)
         Spacer(modifier = Modifier.height(12.dp))
         // content
         // 등록한 List가 있을 경우

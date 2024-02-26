@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,7 +40,9 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,7 +59,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.one.toit.R
+import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono300
@@ -74,14 +79,19 @@ import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Date
 
-@Preview(showBackground = true)
 @Composable
-fun ProfilePage() {
+fun ProfilePage(
+    navController : NavHostController,
+    taskViewModel: TaskViewModel,
+    launcher: ActivityResultLauncher<Intent>? = null
+) {
     Timber.plant(Timber.DebugTree())
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -96,11 +106,22 @@ fun ProfilePage() {
     /**
      * 사용자 프로필 통계 정보
      */
-    var todoState by remember { mutableStateOf(5) }
-    var todoGoal by remember { mutableStateOf(10) }
     var toitPoint by remember { mutableStateOf(123456) }
     var dayCnt by remember { mutableStateOf(getDiffTime(context)) }
 
+    // 오늘 taskValue 값!
+    var totalCnt by remember { mutableIntStateOf(0) }
+    var completeCnt by remember { mutableIntStateOf(0) }
+    var updateState by remember { mutableStateOf(false) }
+    LaunchedEffect(updateState) {
+        withContext(Dispatchers.Main) {
+            val date = Date()
+            totalCnt = taskViewModel.getAllTodayTaskCount(date)
+            completeCnt = taskViewModel.getCompleteTodayTaskCount(date)
+            Timber.i("total : %s / complete : %s", totalCnt, completeCnt)
+            updateState = true
+        }
+    }
 
     // 다이얼로그 창 상태관리 변수
     var showMenuProfile by remember { mutableStateOf(false) }
@@ -299,7 +320,7 @@ fun ProfilePage() {
                     )
                     // 목표 달성량
                     Text(
-                        text = "$todoState / $todoGoal",
+                        text = "$completeCnt / $totalCnt",
                         style = MaterialTheme.typography.caption
                             .copy(
                                 color = black,

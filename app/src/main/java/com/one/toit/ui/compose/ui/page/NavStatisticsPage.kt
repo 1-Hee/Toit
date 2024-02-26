@@ -22,6 +22,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
+import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.activity.StatisticsActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -40,18 +47,36 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.util.Date
 
 // @Preview(showBackground = true)
 @Composable
-fun StatisticsPage(
+fun NavStatisticsPage(
     navController : NavHostController,
+    taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 
 ){
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val intent = Intent(context, StatisticsActivity::class.java)
-    // StatisticsActivity
+    // 오늘 taskValue 값!
+    var totalCnt by remember { mutableIntStateOf(0) }
+    var completeCnt by remember { mutableIntStateOf(0) }
+    var updateState by remember { mutableStateOf(false) }
+    LaunchedEffect(updateState) {
+        withContext(Dispatchers.Main) {
+            val date = Date()
+            totalCnt = taskViewModel.getAllTodayTaskCount(date)
+            completeCnt = taskViewModel.getCompleteTodayTaskCount(date)
+            Timber.i("total : %s | complete : %s", totalCnt, completeCnt)
+            updateState = true
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -67,29 +92,27 @@ fun StatisticsPage(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             // Preview with sample data
-            // TODO
             // 변수 1 : 전체 개수, 성공 개수 엔트리
             // 변수 2 : 일일 목표 개수
             // 변수 3 : 달성 목표 개수
             // 차트
             val dataList = listOf(
                 ChartEntry(
-                    volume = 7,
+                    volume = completeCnt,
                     color = colorResource(id = R.color.purple200)
                 ),
                 ChartEntry(
-                    volume = 3,
+                    volume = totalCnt-completeCnt,
                     color = colorResource(id = R.color.mono200)
                 )
             )
-
             PerforatedPieChart(
                 data = dataList,
                 radiusOuter = 64.dp,
                 chartBarWidth = 16.dp,
                 animDuration = 700,
-                total = 10,
-                success = 7
+                total = totalCnt,
+                success = completeCnt
             )
             // 격언
             val sentence = stringResource(id = R.string.sample_guide)

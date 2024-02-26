@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.mono50
+import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.mono900
@@ -115,15 +117,26 @@ fun PerforatedPieChart(
                     .rotate(animateRotation)
             ) {
                 // draw each Arc for each data entry in Pie Chart
-                floatValue.forEachIndexed { index, value ->
+                if(total>0){
+                    floatValue.forEachIndexed { index, value ->
+                        drawArc(
+                            color = colors[index],
+                            lastValue,
+                            value,
+                            useCenter = false,
+                            style = Stroke(chartBarWidth.toPx(), cap = StrokeCap.Butt)
+                        )
+                        lastValue += value
+                    }
+
+                }else {
                     drawArc(
-                        color = colors[index],
-                        lastValue,
-                        value,
+                        color = mono50,
+                        0f,
+                        360f,
                         useCenter = false,
                         style = Stroke(chartBarWidth.toPx(), cap = StrokeCap.Butt)
                     )
-                    lastValue += value
                 }
             }
             Column(modifier = Modifier
@@ -142,19 +155,25 @@ fun PerforatedPieChart(
                     modifier = Modifier
                         .wrapContentSize()
                 )
-                Text(
-                    text = stringResource(R.string.txt_daily_circle_graph),
-                    style = MaterialTheme.typography.caption.copy(
-                        fontSize = 12.sp,
-                        color = mono600,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    modifier = Modifier
-                        .wrapContentSize()
-                )
+                if(total>0){
+                    val comment = if(total > success){
+                        stringResource(R.string.txt_daily_circle_graph)
+                    }else {
+                        stringResource(R.string.txt_daily_circle_complete)
+                    }
+                    Text(
+                        text = comment,
+                        style = MaterialTheme.typography.caption.copy(
+                            fontSize = 12.sp,
+                            color = mono600,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                }
             }
         }
-
 //        // To see the data in more structured way
 //        // Compose Function in which Items are showing data
 //        DetailsPieChart(
