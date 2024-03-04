@@ -27,17 +27,34 @@ class TaskViewModel(
     suspend fun readTaskList():List<Task>{
         return repository.readTaskList()
     }
+    // 페이징 추가
+    suspend fun readTaskList(page:Int):List<Task>{
+        return repository.readTaskList(page)
+    }
 
     suspend fun readNotCompleteTaskList():List<Task>{
         return repository.readNotCompleteTaskList()
+    }
+    // 페이징 추가
+    suspend fun readNotCompleteTaskList(page:Int):List<Task>{
+        return repository.readNotCompleteTaskList(page)
     }
 
     suspend fun readTaskListByDate(targetDate: Date): List<Task>{
         return repository.readTaskListByDate(targetDate)
     }
 
+    // 페이징 추가
+    suspend fun readTaskListByDate(page:Int, targetDate: Date): List<Task>{
+        return repository.readTaskListByDate(page, targetDate)
+    }
+
     suspend fun readNotCompleteTaskListByDate(targetDate: Date): List<Task>{
         return repository.readNotCompleteTaskListByDate(targetDate)
+    }
+    // 페이징 추가
+    suspend fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task>{
+        return repository.readNotCompleteTaskListByDate(page, targetDate)
     }
 
     // 통계 관련

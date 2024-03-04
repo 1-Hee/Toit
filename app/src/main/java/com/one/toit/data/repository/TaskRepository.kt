@@ -12,16 +12,34 @@ class TaskRepository(
     suspend fun readTaskList():List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readTaskList()
     }
+    // 페이징 추가
+    suspend fun readTaskList(page:Int):List<Task> = withContext(Dispatchers.IO){
+        return@withContext taskDao.readTaskList(page)
+    }
+
     suspend fun readNotCompleteTaskList():List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readNotCompleteTaskList()
+    }
+    // 페이징 추가
+    suspend fun readNotCompleteTaskList(page:Int):List<Task> = withContext(Dispatchers.IO){
+        return@withContext taskDao.readNotCompleteTaskList(page)
     }
 
     suspend fun readTaskListByDate(targetDate: Date): List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readTaskListByDate(targetDate)
     }
+    // 페이징 추가
+    suspend fun readTaskListByDate(page:Int, targetDate: Date): List<Task> = withContext(Dispatchers.IO){
+        return@withContext taskDao.readTaskListByDate(page, targetDate)
+    }
 
     suspend fun readNotCompleteTaskListByDate(targetDate: Date): List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readNotCompleteTaskListByDate(targetDate)
+    }
+
+    // 페이징 추가
+    suspend fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task> = withContext(Dispatchers.IO){
+        return@withContext taskDao.readNotCompleteTaskListByDate(page, targetDate)
     }
 
     // 통계 관련

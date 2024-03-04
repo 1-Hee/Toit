@@ -15,16 +15,26 @@ interface TaskDao {
             "INNER JOIN table_task_information" +
             " ON task_id = fk_task_id")
     fun readTaskList(): List<Task>
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id "+
+            "LIMIT 20 OFFSET (:page-1)*20")
+    fun readTaskList(page:Int): List<Task> // 페이징 추가한 메서드
 
     @Query("SELECT * FROM table_task_registration " +
-            "INNER JOIN table_task_information" +
-            " ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
     fun readNotCompleteTaskList(): List<Task>
+
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = '' " +
+            "LIMIT 20 OFFSET(:page-1)*20")
+    fun readNotCompleteTaskList(page:Int): List<Task> // 페이징 추가한 메서드
 
     /**
      *  일일 조회
      */
-    // TODO 정렬 옵션(생성 날짜), 페이징 추가하기
     @Query("SELECT * FROM table_task_registration a " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
@@ -34,9 +44,25 @@ interface TaskDao {
     @Query("SELECT * FROM table_task_registration a " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
+            "WHERE DATE(a.create_at) = DATE(:targetDate) " +
+            "LIMIT 20 OFFSET(:page-1)*20")
+    fun readTaskListByDate(page: Int, targetDate: Date): List<Task> // 페이징 추가
+
+    @Query("SELECT * FROM table_task_registration a " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
             "WHERE COALESCE(task_complete, '') = '' " +
             "AND DATE(a.create_at) = DATE(:targetDate)")
     fun readNotCompleteTaskListByDate(targetDate: Date): List<Task>
+
+    @Query("SELECT * FROM table_task_registration a " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE COALESCE(task_complete, '') = '' " +
+            "AND DATE(a.create_at) = DATE(:targetDate)" +
+            "LIMIT 20 OFFSET(:page-1)*20")
+    fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task> // 페이징 추가
+
 
     // 통계 관련...
     // 일일 전체 Task 개수

@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +64,8 @@ import java.util.Date
  *  TODO DB쪽과의 시간 차이로 인해서 렌더링 이슈가 살짝 있음
  */
 
+
+
 @Composable
 fun TodoPage(
     navController: NavHostController,
@@ -71,49 +77,58 @@ fun TodoPage(
     val intent = Intent(context, BoardActivity::class.java)
     var checked by remember { mutableStateOf(false) }
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
-    val scrollState = rememberScrollState()
+    // val scrollState = rememberScrollState()
 
-    // MutableState를 사용하여 taskDTOList를 감싸기
-    val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
+    // 리컴포저블을 위한 상태 변수
+    val taskDTOListState = remember { mutableStateOf<MutableList<TaskDTO>>(mutableListOf()) }
+    // 페이지 계수 관리를 위한 mutable state
+    var pageIndex by remember { mutableStateOf(1) } // 페이지 계수
+    // lazy 컬럼과 함께 관리될 누적 dto list
+    val mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
+    val lazyListState = rememberLazyListState()
+
+    // checked
     LaunchedEffect(checked) {
         withContext(Dispatchers.Main) {
-            val date = Date() // 오늘 기준으로 필터링 할 것임!
             Timber.i("토글 상태 : %s", checked)
-            if(checked){
-                val taskList = taskViewModel.readNotCompleteTaskListByDate(date)
-                Timber.i("[할일 목록 (필터) ] : %s", taskList)
-                // 데이터 변화를 감지하기 위해 MutableState를 업데이트
-                taskDTOListState.value = taskList.map { task ->
-                    TaskDTO(
-                        task.register.taskId,
-                        task.register.createAt.toString(),
-                        task.info.infoId,
-                        task.info.taskTitle,
-                        task.info.taskMemo,
-                        task.info.taskLimit,
-                        task.info.taskComplete,
-                        task.info.taskCertification
-                    )
-                }
-            }else {
-                val taskList = taskViewModel.readTaskListByDate(date)
-                Timber.i("[할일 목록] : %s", taskList)
-                // 데이터 변화를 감지하기 위해 MutableState를 업데이트
-                taskDTOListState.value = taskList.map { task ->
-                    TaskDTO(
-                        task.register.taskId,
-                        task.register.createAt.toString(),
-                        task.info.infoId,
-                        task.info.taskTitle,
-                        task.info.taskMemo,
-                        task.info.taskLimit,
-                        task.info.taskComplete,
-                        task.info.taskCertification
-                    )
-                }
-            }
+            // 초기화 부분...
+            mTaskDTOList.clear()
+            taskDTOListState.value = mutableListOf()
+            pageIndex = 1
+            Timber.i("초기화... idx : %s, size : %s",pageIndex, mTaskDTOList.size)
         }
     }
+    LaunchedEffect(pageIndex, checked) {
+        withContext(Dispatchers.Main) {
+            val date = Date()
+            val taskList = if(checked){
+                taskViewModel.readNotCompleteTaskListByDate(pageIndex, date)
+            }else {
+                taskViewModel.readTaskListByDate(pageIndex, date)
+            }
+            val parsedTaskDTOList = mutableListOf<TaskDTO>()
+            // 데이터 변화를 감지하기 위해 MutableState를 업데이트
+            taskList.map { task ->
+                val dto = TaskDTO(
+                    task.register.taskId,
+                    task.register.createAt.toString(),
+                    task.info.infoId,
+                    task.info.taskTitle,
+                    task.info.taskMemo,
+                    task.info.taskLimit,
+                    task.info.taskComplete,
+                    task.info.taskCertification
+                )
+                parsedTaskDTOList.add(dto)
+            }
+            mTaskDTOList.addAll(parsedTaskDTOList)
+            taskDTOListState.value = mTaskDTOList
+            Timber.i("$checked > parsedTaskDTOList size : %s", parsedTaskDTOList.size)
+            Timber.i("$checked > mTaskDTOList : %s", mTaskDTOList.size)
+        }
+    }
+
+
     // taskDTOListState를 사용하여 UI 업데이트
     val taskDTOList = taskDTOListState.value
     Box(
@@ -165,19 +180,33 @@ fun TodoPage(
                 }
             }
             // content
-            // 등록한 List가 있을 경우
+            // observe list scrolling
+            val reachedBottom: Boolean by remember {
+                derivedStateOf {
+                    val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+                    lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
+                }
+            }
+
+            // load more if scrolled to bottom
+            LaunchedEffect(reachedBottom) {
+                if (reachedBottom) {
+                    pageIndex = (pageIndex+1) % Int.MAX_VALUE
+                }
+            }
+
+
             if(taskDTOList.isNotEmpty()){
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    repeat(taskDTOList.size){
-                        ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
+                LazyColumn(state = lazyListState) {
+                    item {
+                        // header?
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    items(mTaskDTOList) { item ->
+                        // Main items content
+                        Spacer(modifier = Modifier.height(4.dp))
+                        ItemTodo(taskDTO = item, launcher = launcher)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }else {
                 ItemNoContent()

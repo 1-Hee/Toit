@@ -160,6 +160,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                             val taskInfo = getTaskInfo(taskId, titleString)
                             val infoId = taskInfoViewModel.addTaskInfo(taskInfo)
                             Timber.i("info : %s", infoId)
+
                             requireActivity().setResult(Activity.RESULT_OK)
                             requireActivity().finish()
                         }

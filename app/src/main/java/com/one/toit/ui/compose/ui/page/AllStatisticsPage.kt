@@ -24,6 +24,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,6 +53,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -113,7 +118,7 @@ fun AllStatisticsPage(
 ){
     val context = LocalContext.current
     // scroll state
-    val outerScrollState = rememberScrollState()
+    // val outerScrollState = rememberScrollState()
     // tab index
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -196,8 +201,9 @@ fun AllStatisticsPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(outerScrollState),
+                //.verticalScroll(outerScrollState),
         ) {
+            val lazyListState = rememberLazyListState()
             // Content of each tab
             when (selectedTabIndex) {
                 0 -> {
@@ -214,10 +220,10 @@ fun AllStatisticsPage(
                         "09:14", // 평균 목표 달성 시간 중앙 값
                         )
                     val mSummaryMap = getSummaryMap(context, mList)
-                    TotalSummaryUnit(mSummaryMap)
+                    TotalSummaryUnit(mSummaryMap, lazyListState)
                 }
                 1 -> {
-                    TodoSearchUnit(context, taskViewModel, launcher)
+                    TodoSearchUnit(context, taskViewModel, launcher, lazyListState)
                 }
             }
         }
@@ -229,16 +235,23 @@ fun AllStatisticsPage(
 fun TodoSearchUnit(
     context: Context,
     taskViewModel:TaskViewModel,
-    launcher: ActivityResultLauncher<Intent>? = null
+    launcher: ActivityResultLauncher<Intent>? = null,
+    lazyListState: LazyListState = rememberLazyListState()
 ){
-    val scrollState = rememberScrollState()
-    // MutableState를 사용하여 taskDTOList를 감싸기
-    val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
-    LaunchedEffect(Unit) {
+    // val scrollState = rememberScrollState()
+    // 리컴포저블을 위한 상태 변수
+    val taskDTOListState = remember { mutableStateOf<MutableList<TaskDTO>>(mutableListOf()) }
+    // 페이지 계수 관리를 위한 mutable state
+    var pageIndex by remember { mutableStateOf(1) } // 페이지 계수
+    // lazy 컬럼과 함께 관리될 누적 dto list
+    val mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
+
+    LaunchedEffect(pageIndex) {
         withContext(Dispatchers.Main) {
-            val taskList = taskViewModel.readTaskList()
-            taskDTOListState.value = taskList.map { task ->
-                TaskDTO(
+            val taskList = taskViewModel.readTaskList(pageIndex)
+            val parsedTaskDTOList = mutableListOf<TaskDTO>()
+            taskList.map { task ->
+                val dto = TaskDTO(
                     task.register.taskId,
                     task.register.createAt.toString(),
                     task.info.infoId,
@@ -248,11 +261,16 @@ fun TodoSearchUnit(
                     task.info.taskComplete,
                     task.info.taskCertification
                 )
+                parsedTaskDTOList.add(dto)
             }
+            mTaskDTOList.addAll(parsedTaskDTOList)
+            taskDTOListState.value = mTaskDTOList
+            Timber.i("parsedTaskDTOList size : %s", parsedTaskDTOList.size)
+            Timber.i("mTaskDTOList : %s", mTaskDTOList.size)
         }
     }
     // taskDTOListState를 사용하여 UI 업데이트
-    val taskDTOList = taskDTOListState.value
+     val taskDTOList = taskDTOListState.value
     SearchUnit()
     sortOption(context)
 
@@ -265,21 +283,54 @@ fun TodoSearchUnit(
         val displayMetrics = context.resources.displayMetrics
         deviceHeight = (displayMetrics.heightPixels / density).toInt()
     }
-    // 등록한 List가 있을 경우
-    if(taskDTOList.isNotEmpty()){
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((deviceHeight * 0.7).dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Spacer(modifier = Modifier.height(4.dp))
-            repeat(taskDTOList.size){
-                ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+
+    // observe list scrolling
+    val reachedBottom: Boolean by remember {
+        derivedStateOf {
+            val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
         }
+    }
+
+    // load more if scrolled to bottom
+    LaunchedEffect(reachedBottom) {
+        if (reachedBottom) {
+            val mAvailScroll = taskDTOList.size%20 == 0
+            if(mAvailScroll){
+                pageIndex++
+                Timber.i("스크롤 인덱스 : %s", pageIndex)
+            }else {
+                Timber.i("더이상 스크롤할 것이 없음....")
+            }
+            Timber.i("스크롤 끝 감지....")
+        }
+    }
+    if(taskDTOList.isNotEmpty()){
+        // display our list
+        LazyColumn(state = lazyListState) {
+            item {
+                // header?
+            }
+            items(mTaskDTOList) { item ->
+                // Main items content
+                Spacer(modifier = Modifier.height(4.dp))
+                ItemTodo(taskDTO = item, launcher = launcher)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height((deviceHeight * 0.7).dp)
+//                .verticalScroll(scrollState),
+//            verticalArrangement = Arrangement.spacedBy(12.dp)
+//        ) {
+//            Spacer(modifier = Modifier.height(4.dp))
+//            repeat(taskDTOList.size){
+//                ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
+//            }
+//            Spacer(modifier = Modifier.height(16.dp))
+//        }
     }else {
         ItemNoContent()
     }
@@ -489,59 +540,67 @@ fun getSummaryMap(context: Context, valueList:List<String>):Map<String, String>{
 // 전체 통계 대쉬보드
 @Composable
 fun TotalSummaryUnit(
-    statisticDataMap:Map<String, String>
+    statisticDataMap:Map<String, String>,
+    lazyListState: LazyListState = rememberLazyListState()
+
 ){
-    // TODO dummy 제거...
-    Text(
-        text = stringResource(R.string.title_toit_heatmap),
-        style = MaterialTheme.typography.caption.copy(
-            color = black,
-            fontSize = 16.sp
-        ),
-        modifier = Modifier.padding(vertical = 16.dp)
-    )
-    FlowRow(
-        modifier = Modifier
-            .wrapContentWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalArrangement = Arrangement.End
-    ){
-        repeat(65){
-            HeatMapUnit()
+
+    LazyColumn(state = lazyListState) {
+        item {
+            // TODO dummy 제거...
+            Text(
+                text = stringResource(R.string.title_toit_heatmap),
+                style = MaterialTheme.typography.caption.copy(
+                    color = black,
+                    fontSize = 16.sp
+                ),
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+            FlowRow(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalArrangement = Arrangement.End
+            ){
+                repeat(65){
+                    HeatMapUnit()
+                }
+            }
+            Text(
+                text = stringResource(R.string.txt_guide_heatmap),
+                style = MaterialTheme.typography.caption.copy(
+                    color = mono600,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.End
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            )
+            // Toit point...
+            val toitPoint = 123456 // todo 계산 하여 실제 값으로...
+            Spacer(modifier = Modifier.height(32.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+            ){
+                ToitPointCard(
+                    modifier = Modifier.align(Alignment.Center),
+                    toitPoint = toitPoint
+                )
+            }
+            Spacer(modifier = Modifier.height(48.dp))
+            // 통계 차트
+            /**
+             * 통계 데이터
+             */
+            StatisticalSummary(statisticDataMap)
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
-    Text(
-        text = stringResource(R.string.txt_guide_heatmap),
-        style = MaterialTheme.typography.caption.copy(
-            color = mono600,
-            fontSize = 12.sp,
-            textAlign = TextAlign.End
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-    )
-    // Toit point...
-    val toitPoint = 123456 // todo 계산 하여 실제 값으로...
-    Spacer(modifier = Modifier.height(32.dp))
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-    ){
-        ToitPointCard(
-            modifier = Modifier.align(Alignment.Center),
-            toitPoint = toitPoint
-        )
-    }
-    Spacer(modifier = Modifier.height(48.dp))
-    // 통계 차트
-    /**
-     * 통계 데이터
-     */
-    StatisticalSummary(statisticDataMap)
-    Spacer(modifier = Modifier.height(32.dp))
+
 }
 @Composable
 // 통계 차트
