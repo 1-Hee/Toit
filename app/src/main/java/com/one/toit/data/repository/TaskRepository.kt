@@ -16,6 +16,10 @@ class TaskRepository(
     suspend fun readTaskList(page:Int):List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readTaskList(page)
     }
+    // 카운트 함수
+    suspend fun getAllTaskCnt(): Int = withContext(Dispatchers.IO){
+        return@withContext taskDao.getAllTaskCnt()
+    }
 
     suspend fun readNotCompleteTaskList():List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readNotCompleteTaskList()
@@ -33,6 +37,9 @@ class TaskRepository(
         return@withContext taskDao.readTaskListByDate(page, targetDate)
     }
 
+    suspend fun getTaskCntByDate(targetDate: Date): Int = withContext(Dispatchers.IO){
+        return@withContext taskDao.getTaskCntByDate(targetDate)
+    }
     suspend fun readNotCompleteTaskListByDate(targetDate: Date): List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readNotCompleteTaskListByDate(targetDate)
     }
@@ -40,6 +47,9 @@ class TaskRepository(
     // 페이징 추가
     suspend fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readNotCompleteTaskListByDate(page, targetDate)
+    }
+    suspend fun getNotCompleteTaskCntByDate(targetDate: Date): Int = withContext(Dispatchers.IO){
+        return@withContext taskDao.getNotCompleteTaskCntByDate(targetDate)
     }
 
     // 통계 관련

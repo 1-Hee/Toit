@@ -123,8 +123,8 @@ fun TodoPage(
             }
             mTaskDTOList.addAll(parsedTaskDTOList)
             taskDTOListState.value = mTaskDTOList
-            Timber.i("$checked > parsedTaskDTOList size : %s", parsedTaskDTOList.size)
-            Timber.i("$checked > mTaskDTOList : %s", mTaskDTOList.size)
+            // Timber.i("$checked > parsedTaskDTOList size : %s", parsedTaskDTOList.size)
+            // Timber.i("$checked > mTaskDTOList : %s", mTaskDTOList.size)
         }
     }
 
@@ -194,7 +194,6 @@ fun TodoPage(
                     pageIndex = (pageIndex+1) % Int.MAX_VALUE
                 }
             }
-
 
             if(taskDTOList.isNotEmpty()){
                 LazyColumn(state = lazyListState) {

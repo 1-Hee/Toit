@@ -21,6 +21,12 @@ interface TaskDao {
             "LIMIT 20 OFFSET (:page-1)*20")
     fun readTaskList(page:Int): List<Task> // 페이징 추가한 메서드
 
+    // 카운트 함수
+    @Query("SELECT COUNT(ti.info_id) FROM table_task_registration tr " +
+            "INNER JOIN table_task_information ti " +
+            "ON task_id = fk_task_id ")
+    fun getAllTaskCnt(): Int
+
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
@@ -48,6 +54,13 @@ interface TaskDao {
             "LIMIT 20 OFFSET(:page-1)*20")
     fun readTaskListByDate(page: Int, targetDate: Date): List<Task> // 페이징 추가
 
+    // 카운트 함수
+    @Query("SELECT COUNT(ti.info_id) FROM table_task_registration tr " +
+            "INNER JOIN table_task_information ti " +
+            "ON task_id = fk_task_id " +
+            "WHERE DATE(tr.create_at) = DATE(:targetDate) ")
+    fun getTaskCntByDate(targetDate: Date): Int
+
     @Query("SELECT * FROM table_task_registration a " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
@@ -63,6 +76,13 @@ interface TaskDao {
             "LIMIT 20 OFFSET(:page-1)*20")
     fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task> // 페이징 추가
 
+    // 카운트 계수
+    @Query("SELECT COUNT(ti.info_id) FROM table_task_registration tr " +
+            "INNER JOIN table_task_information ti " +
+            "ON task_id = fk_task_id " +
+            "WHERE COALESCE(task_complete, '') = '' " +
+            "AND DATE(tr.create_at) = DATE(:targetDate) ")
+    fun getNotCompleteTaskCntByDate(targetDate: Date): Int
 
     // 통계 관련...
     // 일일 전체 Task 개수

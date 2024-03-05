@@ -105,8 +105,10 @@ import com.one.toit.ui.compose.ui.unit.ToitPointCard
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -203,7 +205,6 @@ fun AllStatisticsPage(
                 .fillMaxSize()
                 //.verticalScroll(outerScrollState),
         ) {
-            val lazyListState = rememberLazyListState()
             // Content of each tab
             when (selectedTabIndex) {
                 0 -> {
@@ -220,10 +221,10 @@ fun AllStatisticsPage(
                         "09:14", // 평균 목표 달성 시간 중앙 값
                         )
                     val mSummaryMap = getSummaryMap(context, mList)
-                    TotalSummaryUnit(mSummaryMap, lazyListState)
+                    TotalSummaryUnit(mSummaryMap)
                 }
                 1 -> {
-                    TodoSearchUnit(context, taskViewModel, launcher, lazyListState)
+                    TodoSearchUnit(context, taskViewModel, launcher)
                 }
             }
         }
@@ -235,17 +236,23 @@ fun AllStatisticsPage(
 fun TodoSearchUnit(
     context: Context,
     taskViewModel:TaskViewModel,
-    launcher: ActivityResultLauncher<Intent>? = null,
-    lazyListState: LazyListState = rememberLazyListState()
+    launcher: ActivityResultLauncher<Intent>? = null
 ){
     // val scrollState = rememberScrollState()
+    val lazyListState: LazyListState = rememberLazyListState()
     // 리컴포저블을 위한 상태 변수
     val taskDTOListState = remember { mutableStateOf<MutableList<TaskDTO>>(mutableListOf()) }
     // 페이지 계수 관리를 위한 mutable state
     var pageIndex by remember { mutableStateOf(1) } // 페이지 계수
+    var maxCnt by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit){
+        withContext(Dispatchers.Main) {
+            maxCnt = taskViewModel.getAllTaskCnt()
+        }
+    }
+
     // lazy 컬럼과 함께 관리될 누적 dto list
     val mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
-
     LaunchedEffect(pageIndex) {
         withContext(Dispatchers.Main) {
             val taskList = taskViewModel.readTaskList(pageIndex)
@@ -265,25 +272,14 @@ fun TodoSearchUnit(
             }
             mTaskDTOList.addAll(parsedTaskDTOList)
             taskDTOListState.value = mTaskDTOList
-            Timber.i("parsedTaskDTOList size : %s", parsedTaskDTOList.size)
-            Timber.i("mTaskDTOList : %s", mTaskDTOList.size)
+            // Timber.i("parsedTaskDTOList size : %s", parsedTaskDTOList.size)
+            // Timber.i("mTaskDTOList : %s", mTaskDTOList.size)
         }
     }
     // taskDTOListState를 사용하여 UI 업데이트
-     val taskDTOList = taskDTOListState.value
+    val taskDTOList = taskDTOListState.value
     SearchUnit()
     sortOption(context)
-
-    // 현재 높이를 저장하기 위한 상태 변수
-    var deviceHeight by remember { mutableIntStateOf(0) }
-    // LocalDensity를 사용하여 현재 디바이스의 화면 밀도를 가져옴
-    val density = LocalDensity.current.density
-    // 현재 높이를 구하는 코드
-    LaunchedEffect(Unit) {
-        val displayMetrics = context.resources.displayMetrics
-        deviceHeight = (displayMetrics.heightPixels / density).toInt()
-    }
-
     // observe list scrolling
     val reachedBottom: Boolean by remember {
         derivedStateOf {
@@ -291,26 +287,19 @@ fun TodoSearchUnit(
             lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
         }
     }
-
     // load more if scrolled to bottom
     LaunchedEffect(reachedBottom) {
         if (reachedBottom) {
-            val mAvailScroll = taskDTOList.size%20 == 0
-            if(mAvailScroll){
+            if(maxCnt > mTaskDTOList.size){
+                Timber.i("스크롤 할 수 있음 ....")
                 pageIndex++
-                Timber.i("스크롤 인덱스 : %s", pageIndex)
-            }else {
-                Timber.i("더이상 스크롤할 것이 없음....")
+                lazyListState.scrollToItem(taskDTOList.size)
             }
-            Timber.i("스크롤 끝 감지....")
         }
     }
     if(taskDTOList.isNotEmpty()){
         // display our list
         LazyColumn(state = lazyListState) {
-            item {
-                // header?
-            }
             items(mTaskDTOList) { item ->
                 // Main items content
                 Spacer(modifier = Modifier.height(4.dp))
@@ -318,19 +307,6 @@ fun TodoSearchUnit(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height((deviceHeight * 0.7).dp)
-//                .verticalScroll(scrollState),
-//            verticalArrangement = Arrangement.spacedBy(12.dp)
-//        ) {
-//            Spacer(modifier = Modifier.height(4.dp))
-//            repeat(taskDTOList.size){
-//                ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
-//            }
-//            Spacer(modifier = Modifier.height(16.dp))
-//        }
     }else {
         ItemNoContent()
     }
@@ -541,10 +517,9 @@ fun getSummaryMap(context: Context, valueList:List<String>):Map<String, String>{
 @Composable
 fun TotalSummaryUnit(
     statisticDataMap:Map<String, String>,
-    lazyListState: LazyListState = rememberLazyListState()
 
 ){
-
+    val lazyListState: LazyListState = rememberLazyListState()
     LazyColumn(state = lazyListState) {
         item {
             // TODO dummy 제거...

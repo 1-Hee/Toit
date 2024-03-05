@@ -232,9 +232,9 @@ fun getTimeString(
 
     val suffix = context.resources.getString(R.string.suffix_create)
     val mTaskCreateAt = taskDTO.createAt
-    Timber.d("time : %s ", mTaskCreateAt)
+    //Timber.d("time : %s ", mTaskCreateAt)
     val locale =  Locale.getDefault()
-    Timber.d("locale : %s", locale)
+    // Timber.d("locale : %s", locale)
     val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
 
     val timeString:String
