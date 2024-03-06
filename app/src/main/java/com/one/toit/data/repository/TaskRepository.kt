@@ -16,6 +16,12 @@ class TaskRepository(
     suspend fun readTaskList(page:Int):List<Task> = withContext(Dispatchers.IO){
         return@withContext taskDao.readTaskList(page)
     }
+
+    // 페이징 & 검색
+    suspend fun readTaskListByQuery(page:Int, query:String): List<Task> = withContext(Dispatchers.IO){
+        return@withContext taskDao.readTaskListByQuery(page, query)
+    }
+
     // 카운트 함수
     suspend fun getAllTaskCnt(): Int = withContext(Dispatchers.IO){
         return@withContext taskDao.getAllTaskCnt()

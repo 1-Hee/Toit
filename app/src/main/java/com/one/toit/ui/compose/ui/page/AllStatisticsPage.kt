@@ -28,11 +28,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -78,10 +77,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,10 +104,11 @@ import com.one.toit.ui.compose.ui.unit.ToitPointCard
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.math.max
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -224,7 +224,7 @@ fun AllStatisticsPage(
                     TotalSummaryUnit(mSummaryMap)
                 }
                 1 -> {
-                    TodoSearchUnit(context, taskViewModel, launcher)
+                    AllToitListUnit(context, taskViewModel, launcher)
                 }
             }
         }
@@ -233,29 +233,33 @@ fun AllStatisticsPage(
 }
 
 @Composable
-fun TodoSearchUnit(
+fun AllToitListUnit(
     context: Context,
     taskViewModel:TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
-    // val scrollState = rememberScrollState()
-    val lazyListState: LazyListState = rememberLazyListState()
-    // 리컴포저블을 위한 상태 변수
-    val taskDTOListState = remember { mutableStateOf<MutableList<TaskDTO>>(mutableListOf()) }
     // 페이지 계수 관리를 위한 mutable state
-    var pageIndex by remember { mutableStateOf(1) } // 페이지 계수
-    var maxCnt by remember { mutableStateOf(0) }
+    var pageIndex by remember { mutableIntStateOf(1) } // 페이지 계수
+    var maxCnt by remember { mutableIntStateOf(0) }
+    var mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
+    val lazyListState: LazyListState = rememberLazyListState()
+    var searchedKeyword by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit){
         withContext(Dispatchers.Main) {
             maxCnt = taskViewModel.getAllTaskCnt()
         }
     }
 
-    // lazy 컬럼과 함께 관리될 누적 dto list
-    val mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
-    LaunchedEffect(pageIndex) {
+    LaunchedEffect(pageIndex, searchedKeyword) {
         withContext(Dispatchers.Main) {
-            val taskList = taskViewModel.readTaskList(pageIndex)
+            val taskList = if(searchedKeyword.isBlank()){
+                taskViewModel.readTaskList(pageIndex)
+            }else {
+                val searchedList = taskViewModel.readTaskListByQuery(pageIndex, searchedKeyword)
+                Timber.i("items :%s", searchedList)
+                searchedList
+            }
             val parsedTaskDTOList = mutableListOf<TaskDTO>()
             taskList.map { task ->
                 val dto = TaskDTO(
@@ -270,16 +274,28 @@ fun TodoSearchUnit(
                 )
                 parsedTaskDTOList.add(dto)
             }
-            mTaskDTOList.addAll(parsedTaskDTOList)
-            taskDTOListState.value = mTaskDTOList
-            // Timber.i("parsedTaskDTOList size : %s", parsedTaskDTOList.size)
-            // Timber.i("mTaskDTOList : %s", mTaskDTOList.size)
+            mTaskDTOList = if(pageIndex == 1){
+                Timber.i("첫 로드...")
+                parsedTaskDTOList
+            }else {
+                val tempList = mTaskDTOList
+                tempList.addAll(parsedTaskDTOList)
+                tempList
+            }
+
         }
     }
-    // taskDTOListState를 사용하여 UI 업데이트
-    val taskDTOList = taskDTOListState.value
-    SearchUnit()
-    sortOption(context)
+    SearchUnit(){ query ->
+        if(query.isNotBlank()){
+            pageIndex = 1
+        }
+        searchedKeyword = query
+        Timber.i("searchedKeyword : %s", searchedKeyword)
+    }
+    if(mTaskDTOList.isNotEmpty()){
+        mTaskDTOList = sortOption(context, mTaskDTOList).toMutableList()
+    }
+
     // observe list scrolling
     val reachedBottom: Boolean by remember {
         derivedStateOf {
@@ -293,11 +309,10 @@ fun TodoSearchUnit(
             if(maxCnt > mTaskDTOList.size){
                 Timber.i("스크롤 할 수 있음 ....")
                 pageIndex++
-                lazyListState.scrollToItem(taskDTOList.size)
             }
         }
     }
-    if(taskDTOList.isNotEmpty()){
+    if(mTaskDTOList.isNotEmpty()){
         // display our list
         LazyColumn(state = lazyListState) {
             items(mTaskDTOList) { item ->
@@ -311,14 +326,71 @@ fun TodoSearchUnit(
         ItemNoContent()
     }
 }
+// 정렬 함수
+// 정렬 함수
+private fun sortList(sIndex:Int, list: List<TaskDTO>): List<TaskDTO> {
+    // todo..  완료 문자열도 포멧 통일하기...
+    // SimpleDateFormat을 사용하여 문자열을 Date로 파싱
+    val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy", Locale.ENGLISH)
+    val taskList:List<TaskDTO> = when(sIndex){
+        1 -> {  // 이름순
+            list.sortedBy { it.taskTitle }
+        }
+        2 -> { // 최신순
+            list.sortedByDescending {
+                val createAt = inputFormat.parse(it.createAt)
+                createAt?.time
+            }
+        }
+        3 -> { // 과거 순
+            list.sortedBy {
+                val createAt = inputFormat.parse(it.createAt)
+                createAt?.time
+            }
+        }
+        4 -> { // 목표 상태
+            list.sortedByDescending { it.taskComplete }
+        }
+        5 -> { // 시간 짧은 순
+            list.sortedBy {
+                val mValue = if(it.taskComplete == null){
+                    Long.MAX_VALUE
+                }else {
+                    val createAt = inputFormat.parse(it.createAt)
+                    val mInputFormat = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
+                    val completeAt = mInputFormat.parse(it.taskComplete)
+                    (completeAt?.time ?: 0) - (createAt?.time ?: 0)
+                }
+                mValue
+            }
+        }
+        6 -> { // 시간 긴 순
+            list.sortedBy {
+                val mValue = if(it.taskComplete == null){
+                    Long.MAX_VALUE
+                }else {
+                    val createAt = inputFormat.parse(it.createAt)
+                    val mInputFormat = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
+                    val completeAt = mInputFormat.parse(it.taskComplete)
+                    (createAt?.time ?: 0) - (completeAt?.time ?: 0)
+                }
+                mValue
+            }
+        }
+        else -> list
+    }
+    return taskList
+}
 
 @Composable
 fun sortOption(
-    context: Context
-){
+    context: Context,
+    taskDTOList:List<TaskDTO>
+):List<TaskDTO>{
     var expanded by remember { mutableStateOf(false) }
     val options = context.resources.getStringArray(R.array.option_todo_sort)
     var selectedOption by remember { mutableStateOf(options[0]) }
+    var mTaskDTOList by remember { mutableStateOf(taskDTOList) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -376,11 +448,12 @@ fun sortOption(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            options.forEach { option ->
+            options.forEachIndexed { index, option ->
                 DropdownMenuItem(
                     onClick = {
                         selectedOption = option
                         expanded = false
+                        mTaskDTOList = sortList(index, mTaskDTOList)
                     },
                 ) {
                     Text(
@@ -390,6 +463,7 @@ fun sortOption(
             }
         }
     }
+    return mTaskDTOList
 }
 
 // 바닥 선만 그려주는 메서드
@@ -411,7 +485,7 @@ private fun getBottomLineShape(lineThicknessDp: Dp) : Shape {
 // 검색 창
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchUnit(){
+fun SearchUnit(onSearch: (String) -> Unit){
     var searchKeyWord by remember { mutableStateOf("") }
     val searchHint = stringResource(R.string.txt_hint_search_todo)
     val searchBoxColors =  TextFieldDefaults.textFieldColors(
@@ -454,6 +528,10 @@ fun SearchUnit(){
                 ,
                 value = searchKeyWord,
                 onValueChange = { searchKeyWord = it },
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                    onSearch(searchKeyWord)
+                }),
                 placeholder = {
                     Text(
                         text = searchHint,

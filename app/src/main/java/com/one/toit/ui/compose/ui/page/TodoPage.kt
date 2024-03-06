@@ -33,6 +33,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,8 +66,6 @@ import java.util.Date
  *  TODO DB쪽과의 시간 차이로 인해서 렌더링 이슈가 살짝 있음
  */
 
-
-
 @Composable
 fun TodoPage(
     navController: NavHostController,
@@ -80,24 +80,12 @@ fun TodoPage(
     // val scrollState = rememberScrollState()
 
     // 리컴포저블을 위한 상태 변수
-    val taskDTOListState = remember { mutableStateOf<MutableList<TaskDTO>>(mutableListOf()) }
     // 페이지 계수 관리를 위한 mutable state
-    var pageIndex by remember { mutableStateOf(1) } // 페이지 계수
+    var pageIndex by remember { mutableIntStateOf(1) } // 페이지 계수
     // lazy 컬럼과 함께 관리될 누적 dto list
-    val mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
+    var mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
     val lazyListState = rememberLazyListState()
 
-    // checked
-    LaunchedEffect(checked) {
-        withContext(Dispatchers.Main) {
-            Timber.i("토글 상태 : %s", checked)
-            // 초기화 부분...
-            mTaskDTOList.clear()
-            taskDTOListState.value = mutableListOf()
-            pageIndex = 1
-            Timber.i("초기화... idx : %s, size : %s",pageIndex, mTaskDTOList.size)
-        }
-    }
     LaunchedEffect(pageIndex, checked) {
         withContext(Dispatchers.Main) {
             val date = Date()
@@ -121,16 +109,18 @@ fun TodoPage(
                 )
                 parsedTaskDTOList.add(dto)
             }
-            mTaskDTOList.addAll(parsedTaskDTOList)
-            taskDTOListState.value = mTaskDTOList
-            // Timber.i("$checked > parsedTaskDTOList size : %s", parsedTaskDTOList.size)
-            // Timber.i("$checked > mTaskDTOList : %s", mTaskDTOList.size)
+            mTaskDTOList = if(pageIndex == 1){
+                Timber.i("첫 로드...")
+                parsedTaskDTOList
+            }else {
+                val tempList = mTaskDTOList
+                tempList.addAll(parsedTaskDTOList)
+                tempList
+            }
+
         }
     }
 
-
-    // taskDTOListState를 사용하여 UI 업데이트
-    val taskDTOList = taskDTOListState.value
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -165,6 +155,8 @@ fun TodoPage(
                     Switch(
                         checked = checked,
                         onCheckedChange = {
+                            mTaskDTOList = mutableListOf()
+                            pageIndex = 1
                             checked = it
                         },
                         modifier = Modifier
@@ -195,7 +187,7 @@ fun TodoPage(
                 }
             }
 
-            if(taskDTOList.isNotEmpty()){
+            if(mTaskDTOList.isNotEmpty()){
                 LazyColumn(state = lazyListState) {
                     item {
                         // header?
