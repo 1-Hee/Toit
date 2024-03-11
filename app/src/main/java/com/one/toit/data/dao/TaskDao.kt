@@ -24,7 +24,7 @@ interface TaskDao {
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
-            "WHERE task_title LIKE '%'+:query+'%' " +
+            "WHERE task_title LIKE '%'||:query||'%' " +
             "LIMIT 20 OFFSET (:page-1)*20")
     fun readTaskListByQuery(page:Int, query:String): List<Task> // 페이징 & 검색
 
