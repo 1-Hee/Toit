@@ -315,15 +315,22 @@ fun ProfilePage(
                         text = stringResource(R.string.txt_today_task_state),
                         style = MaterialTheme.typography.caption
                             .copy(
-                                color = black,
+                                fontSize = 14.sp,
+                                color = black
                             )
                     )
                     // 목표 달성량
+                    val targetString = if(totalCnt == 0) {
+                        stringResource(R.string.txt_empty_task)
+                    } else {
+                        "$completeCnt / $totalCnt"
+                    }
                     Text(
-                        text = "$completeCnt / $totalCnt",
+                        text = targetString,
                         style = MaterialTheme.typography.caption
                             .copy(
-                                color = black,
+                                fontSize = 12.sp,
+                                color = mono900,
                             )
                     )
                 }
@@ -377,12 +384,12 @@ fun UserPhrasesUnit(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Row(
             modifier = Modifier
-                .wrapContentSize()
-                .padding(bottom = 12.dp),
+                .wrapContentSize(),
             verticalAlignment = Alignment.Bottom
         ){
             // ToIt 과 함께한지 123 일 째!
@@ -431,7 +438,6 @@ fun UserPhrasesUnit(
                 ),
             modifier = Modifier
                 .wrapContentSize()
-                .padding(vertical = 4.dp)
         )
         Text(
             text = stringResource(R.string.txt_day_count4, userNickname),
@@ -443,7 +449,6 @@ fun UserPhrasesUnit(
                 ),
             modifier = Modifier
                 .wrapContentSize()
-                .padding(vertical = 4.dp)
         )
     }
 }

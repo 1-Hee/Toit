@@ -27,9 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.one.toit.R
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -94,7 +96,7 @@ fun AllStatisticsPage(
                     onClick = { selectedTabIndex = 0 },
                     text = {
                         Text(
-                            text = "ToIt! Dashboard",
+                            text = stringResource(R.string.tab_statistics_summary),
                             style = MaterialTheme.typography.caption.copy(
                                 color = black,
                                 fontSize = 16.sp
@@ -112,7 +114,7 @@ fun AllStatisticsPage(
                     onClick = { selectedTabIndex = 1 },
                     text = {
                         Text(
-                            text = "ToIt LIST",
+                            text = stringResource(R.string.tab_todo_all),
                             style = MaterialTheme.typography.caption.copy(
                                 color = black,
                                 fontSize = 16.sp
