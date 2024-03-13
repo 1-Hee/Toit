@@ -178,21 +178,9 @@ fun ItemTodo(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     val mTaskLimit = taskDTO.taskLimit.toString()
-                    val limitString =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val ldt = AppUtil.Time.parseToLocalDateTime(mTaskLimit)
-                        val mHour = if(ldt.hour > 9) ldt.hour.toString() else "0${ldt.hour}"
-                        val mMin = if(ldt.minute > 9) ldt.minute.toString() else "0${ldt.minute}"
-                        "${mHour}:${mMin}"
-                    }else {
-                        val date = AppUtil.Time.parseToDate(mTaskLimit)
-                        val calendar: Calendar = Calendar.getInstance()
-                        calendar.time = date
-                        val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
-                        val minute: Int = calendar.get(Calendar.MINUTE)
-                        val mHour = if(hour > 9) hour.toString() else "0$hour"
-                        val mMin = if(minute > 9) minute.toString() else "0$minute"
-                        "${mHour}:${mMin}"
-                    }
+
+                    val limitString = "" // todo here...
+
                     Text(
                         text = limitString,
                         style = MaterialTheme.typography.subtitle1

@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.util.Date
+
 @Entity(
     tableName = "table_task_information",
     foreignKeys = [
@@ -27,9 +29,9 @@ data class TaskInfo(
     @ColumnInfo(name="task_memo", defaultValue = "")
     var taskMemo:String = "",
     @ColumnInfo(name = "task_limit")
-    var taskLimit:String? = null,
+    var taskLimit:Date? = null, // 마감기한
     @ColumnInfo(name = "task_complete")
-    var taskComplete:String? = null,
+    var taskComplete: Date? = null, // 마감 시간
     @ColumnInfo(name="task_certification")
     var taskCertification:String? = null
 )

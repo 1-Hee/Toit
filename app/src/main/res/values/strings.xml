@@ -112,6 +112,7 @@
     <string name="txt_desc_todo_avg">%1$s 님이 할 일을 완료하기 위해 필요한 시간의 평균입니다.</string>
     <string name="tab_statistics_summary">통계 요약</string>
     <string name="tab_todo_all">전체 보기</string>
+    <string name="txt_no_limit">제한 없음</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

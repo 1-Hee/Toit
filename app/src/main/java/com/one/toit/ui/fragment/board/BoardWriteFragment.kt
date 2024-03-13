@@ -40,7 +40,6 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     private lateinit var taskInfoViewModel: TaskInfoViewModel
 
     private lateinit var guideArray:Array<String>
-    private var mDeadLDT:LocalDateTime? = null
     private var mDeadDate:Date? = null
 
     override fun getDataBindingConfig(): DataBindingConfig {
@@ -85,7 +84,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
             .addBindingParam(BR.onKeyListener, onKeyListener)
             .addBindingParam(BR.textListener, textListener)
             .addBindingParam(BR.textWatcher, textWatcher)
-            .addBindingParam(BR.limitText, "00:00")
+            .addBindingParam(BR.limitText, "")
     }
     override fun initViewModel() {
         val factory = ApplicationFactory(requireActivity().application)
@@ -93,6 +92,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
         taskInfoViewModel = getFragmentScopeViewModel(TaskInfoViewModel::class.java, factory)
     }
     override fun initView() {
+        mBinding.limitText = requireContext().getString(R.string.txt_no_limit)
         guideArray = requireContext().resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
         setGuideDesc(mBinding.isLimit == true)
 
@@ -174,51 +174,34 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     }
 
     private fun getTaskInfo(taskId:Long, titleString:String):TaskInfo{
-        val memo = mBinding.etMemoTodo.text.toString()
-        val limitString = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            if(mDeadLDT != null){
-                try {
-                    AppUtil.Time.parseDateString(mDeadLDT!!, true)
-                }catch (e:Exception){
-                    ""
-                }
-            }else {
-                ""
-            }
-        }else {
-            if(mDeadDate != null){
-                try {
-                    AppUtil.Time.parseDateString(mDeadDate!!, true)
-                }catch (e:Exception){
-                    ""
-                }
-            }else {
-                ""
-            }
-        }
         return TaskInfo(
             taskTitle = titleString,
-            taskMemo = memo,
+            taskMemo =  mBinding.etMemoTodo.text.toString(),
             fkTaskId = taskId,
-            taskLimit = limitString
+            taskLimit = mDeadDate
         )
     }
 
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
-            AppUtil.Time.timeFormat = "HH:mm"
-            val mTimeString = AppUtil.Time.getDeadLineString(hour, min, false)
-            Timber.i("deadline .. %s", mTimeString)
-            mBinding.limitText = mTimeString
-            mBinding.notifyChange()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mDeadLDT = AppUtil.Time.getDeadLineLocalDate(hour, min)
+            val limitString = if(hour > 0 || min > 0){
+                // time init...
+                val currentDate = Date();
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate;
+                val lHour = hour + calendar.get(Calendar.HOUR)
+                val lMinute = min + calendar.get(Calendar.MINUTE)
+                calendar.set(Calendar.HOUR, lHour)
+                calendar.set(Calendar.MINUTE, lMinute)
+                mDeadDate = calendar.time
+                String.format("%02d:%02d", lHour, lMinute)
             }else {
-                mDeadDate = AppUtil.Time.getDeadLineDate(hour, min)
+                requireContext().getString(R.string.txt_no_limit)
             }
+            mBinding.limitText = limitString
+            mBinding.notifyChange()
         }
-
         override fun onCancel() {
         }
     }

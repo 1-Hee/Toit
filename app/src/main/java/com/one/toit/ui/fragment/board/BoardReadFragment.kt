@@ -37,8 +37,11 @@ import timber.log.Timber
 import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // bundle
@@ -115,13 +118,18 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     }
 
     private fun getTaskInfo(dto:TaskDTO):TaskInfo{
+        // Date 문자열을 Date 객체로 파싱
+        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+        val mTaskLimit = if(dto.taskLimit == null) null else dateFormat.parse(dto.taskLimit)
+        val mTaskComplete = if(dto.taskComplete == null) null else dateFormat.parse(dto.taskComplete)
+
         return TaskInfo(
             infoId = dto.taskInfoId,
             fkTaskId = dto.taskId,
             taskTitle = dto.taskTitle,
             taskMemo = dto.taskMemo,
-            taskLimit = dto.taskLimit,
-            taskComplete = dto.taskComplete,
+            taskLimit = mTaskLimit,
+            taskComplete = mTaskComplete,
             taskCertification = dto.taskCertification
         )
     }
@@ -177,28 +185,8 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
             mBinding.setVariable(BR.taskDTO, mTaskDTO)
             val mHasLimit = mTaskDTO?.taskLimit?.isNotBlank()==true
             val deadLineString:String
-            if(mHasLimit){
-                val limitString = mTaskDTO?.taskLimit.toString()
-                val parsedLimitString = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val ldt = AppUtil.Time.parseToLocalDateTime(limitString)
-                    val mHour = if(ldt.hour > 9) ldt.hour.toString() else "0${ldt.hour}"
-                    val mMin = if(ldt.minute > 9) ldt.minute.toString() else "0${ldt.minute}"
-                    "${mHour}:${mMin}"
-                }else {
-                    val date = AppUtil.Time.parseToDate(limitString)
-                    val calendar: Calendar = Calendar.getInstance()
-                    calendar.time = date
-                    val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
-                    val minute: Int = calendar.get(Calendar.MINUTE)
-                    val mHour = if(hour > 9) hour.toString() else "0$hour"
-                    val mMin = if(minute > 9) minute.toString() else "0$minute"
-                    "${mHour}:${mMin}"
-                }
-                deadLineString = parsedLimitString
-            }else {
-                deadLineString = "제한 없음"
-            }
-            mBinding.setVariable(BR.deadLineString, deadLineString)
+
+            mBinding.setVariable(BR.deadLineString, "") // todo here
             mBinding.setVariable(BR.hasLimit, mHasLimit)
         }
     }
@@ -297,13 +285,10 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                                 Timber.e("[ERROR] : %s", e.message)
                             }
                         }
-                        val dto = mTaskDTO!!
-                        val timeString = AppUtil.Time.dateString
+                        mTaskDTO?.taskComplete = Date().toString()
                         mTaskDTO?.taskCertification = mImageUri?.toString()
-                        mTaskDTO?.taskComplete = timeString
-                        dto.taskComplete = timeString
-                        dto.taskCertification = mImageUri?.toString()
-                        val mTaskInfo = getTaskInfo(dto)
+                        val mTaskInfo = getTaskInfo(mTaskDTO!!)
+
                         val modifyResult = lifecycleScope.async(Dispatchers.IO){
                             taskInfoViewModel.modifyTaskInfo(mTaskInfo)
                             msg = "목표가 완료되었습니다."

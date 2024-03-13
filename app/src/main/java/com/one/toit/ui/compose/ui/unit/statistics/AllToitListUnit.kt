@@ -63,8 +63,8 @@ fun AllToitListUnit(
                     task.info.infoId,
                     task.info.taskTitle,
                     task.info.taskMemo,
-                    task.info.taskLimit,
-                    task.info.taskComplete,
+//                    task.info.taskLimit,
+//                    task.info.taskComplete,
                     task.info.taskCertification
                 )
                 parsedTaskDTOList.add(dto)
