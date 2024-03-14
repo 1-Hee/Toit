@@ -40,7 +40,7 @@
             type="com.one.toit.data.dto.TaskDTO" />
         <!-- 마감기한 문자열 -->
         <variable
-            name="deadLineString"
+            name="limitText"
             type="String" />
         <!-- 완료 여부 -->
         <variable
@@ -228,7 +228,7 @@
                 android:focusableInTouchMode="false"
                 android:inputType="time"
                 android:onClick="@{(v)->click.onViewClick(v)}"
-                android:text="@{deadLineString}"
+                android:text="@{limitText}"
                 android:textAlignment="center"
                 android:textColor="@{!isComplete?@color/black:@color/mono600}"
                 android:textColorHint="@color/mono100"

@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatEditText
 import com.one.toit.data.dto.MediaDTO
 import timber.log.Timber
+import java.lang.StringBuilder
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -114,6 +115,8 @@ class AppUtil {
 
     // 시간 파싱 작업에 사용할 유틸리티
     object Time {
+        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+        val dbDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         fun getTimeArray(): Array<Int> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val now = LocalDateTime.now()
@@ -139,6 +142,22 @@ class AppUtil {
             }
         }
 
+        fun getFullDateString(calendar: Calendar):String{
+            val mYear = calendar.get(Calendar.YEAR)
+            val mMonth = calendar.get(Calendar.MONTH)+1
+            val mDay = calendar.get(Calendar.DAY_OF_MONTH)
+            val mHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val mMinute = calendar.get(Calendar.MINUTE)
+            val mSecond = calendar.get(Calendar.SECOND)
+            val sb = StringBuilder()
+            sb.append(String.format("%04d", mYear)+"-")
+                .append(String.format("%02d", mMonth)+"-")
+                .append(String.format("%02d", mDay)+" ")
+                .append(String.format("%02d", mHour)+":")
+                .append(String.format("%02d", mMinute)+":")
+                .append(String.format("%02d", mSecond))
+            return sb.toString()
+        }
 
     }
 }

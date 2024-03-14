@@ -29,6 +29,7 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
+import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -88,6 +89,8 @@ fun TodoPage(
 
     LaunchedEffect(pageIndex, checked) {
         withContext(Dispatchers.Main) {
+//            val list = taskViewModel.readTaskList()
+//            Timber.d("list : %s", list)
             val date = Date()
             val taskList = if(checked){
                 taskViewModel.readNotCompleteTaskListByDate(pageIndex, date)
@@ -96,6 +99,7 @@ fun TodoPage(
             }
             val parsedTaskDTOList = mutableListOf<TaskDTO>()
             // 데이터 변화를 감지하기 위해 MutableState를 업데이트
+            Timber.d("taskList : %s", taskList)
             taskList.map { task ->
                 val dto = TaskDTO(
                     task.register.taskId,
@@ -103,8 +107,8 @@ fun TodoPage(
                     task.info.infoId,
                     task.info.taskTitle,
                     task.info.taskMemo,
-//                    task.info.taskLimit,
-//                    task.info.taskComplete,
+                    task.info.taskLimit.toString(),
+                    task.info.taskComplete.toString(),
                     task.info.taskCertification
                 )
                 parsedTaskDTOList.add(dto)

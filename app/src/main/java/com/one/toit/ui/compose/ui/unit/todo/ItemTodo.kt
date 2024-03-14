@@ -58,7 +58,7 @@ import java.util.Locale
 @Composable
 fun ItemTodo(
     taskDTO: TaskDTO,
-    isSuccess:Boolean = taskDTO.taskComplete?.isNotBlank()?:false,
+    isSuccess:Boolean = !(taskDTO.taskComplete?.equals("null")?:false),
     launcher: ActivityResultLauncher<Intent>? = null
 ){
     val context = LocalContext.current

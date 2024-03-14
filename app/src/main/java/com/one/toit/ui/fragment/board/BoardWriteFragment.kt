@@ -150,6 +150,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                 }
                 // 등록 버튼!
                 R.id.l_btn_write_todo -> {
+                    // TODO 기한 설정 부분 로직 이상해짐..db 반영 안됨
                     val titleString = mBinding.etTitleTodo.text.toString()
                     val context = requireContext()
                     val msg:String = if(titleString.isNotBlank()){
@@ -174,9 +175,10 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     }
 
     private fun getTaskInfo(taskId:Long, titleString:String):TaskInfo{
+        val mMemo = mBinding.etMemoTodo.text.toString().ifBlank { "" }
         return TaskInfo(
             taskTitle = titleString,
-            taskMemo =  mBinding.etMemoTodo.text.toString(),
+            taskMemo =  mMemo,
             fkTaskId = taskId,
             taskLimit = mDeadDate
         )
@@ -190,7 +192,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                 val currentDate = Date();
                 val calendar = Calendar.getInstance()
                 calendar.time = currentDate;
-                val lHour = hour + calendar.get(Calendar.HOUR)
+                val lHour = hour + calendar.get(Calendar.HOUR_OF_DAY)
                 val lMinute = min + calendar.get(Calendar.MINUTE)
                 calendar.set(Calendar.HOUR, lHour)
                 calendar.set(Calendar.MINUTE, lMinute)

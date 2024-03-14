@@ -87,7 +87,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             .addBindingParam(BR.textListener, textListener)
             .addBindingParam(BR.textWatcher, textWatcher)
             .addBindingParam(BR.taskDTO, TaskDTO())
-            .addBindingParam(BR.deadLineString, "제한 없음")
+            .addBindingParam(BR.limitText, "")
             .addBindingParam(BR.isComplete, false)
     }
 
@@ -97,6 +97,8 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     }
 
     override fun initView() {
+        mBinding.limitText = requireContext().getString(R.string.txt_no_limit)
+
         guideArray = requireContext().resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
         setGuideDesc(mBinding.isLimit == true)
         mBinding.notifyChange()
@@ -115,22 +117,40 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             }
             Timber.e("[READ FRAGMENT DTO] %s", mTaskDTO)
             mBinding.setVariable(BR.taskDTO, mTaskDTO)
-            val mHasLimit = mTaskDTO?.taskLimit?.isNotBlank()==true
-            val deadLineString:String = "" // todo here...
+            val mHasLimit = !(mTaskDTO?.taskLimit?.equals("null")?:false)
+            val limitText = if(mHasLimit) {
+                val timeStr = AppUtil.Time.dateFormat.parse(mTaskDTO?.taskLimit.toString());
+                val calendar = Calendar.getInstance()
+                calendar.time = timeStr
+                val lHour = calendar.get(Calendar.HOUR_OF_DAY)
+                val lMinute = calendar.get(Calendar.MINUTE)
+                calendar.set(Calendar.HOUR, lHour)
+                calendar.set(Calendar.MINUTE, lMinute)
+                mDeadDate = calendar.time
+                String.format("%02d:%02d", lHour, lMinute)
+            } else {
+                requireContext().getString(R.string.txt_no_limit)
+            }
 
             // 완료 여부 판정
             val isComplete = bundle.getBoolean("isComplete")
             if(isComplete){
-                val suffixStr = requireContext().resources.getString(R.string.suffix_complete)
-                mBinding.setVariable(BR.limitDescription, "${mTaskDTO?.taskComplete} $suffixStr")
+                if(mTaskDTO != null){
+                    val date = AppUtil.Time.dateFormat.parse(mTaskDTO?.taskComplete.toString())
+                    val calendar = Calendar.getInstance()
+                    calendar.time = date
+                    val mDateTimeStr = AppUtil.Time.getFullDateString(calendar)
+                    val suffixStr = requireContext().resources.getString(R.string.suffix_complete)
+                    mBinding.setVariable(BR.limitDescription, "$mDateTimeStr $suffixStr")
+                }
+
             }else{
                 setGuideDesc(mHasLimit)
             }
             Timber.i("FRAGMENT : %s", isComplete)
 
-
             mBinding.setVariable(BR.isComplete, isComplete)
-            mBinding.setVariable(BR.deadLineString, deadLineString)
+            mBinding.setVariable(BR.deadLineString, limitText)
             mBinding.setVariable(BR.isLimit, mHasLimit)
         }
         mBinding.notifyChange()
@@ -152,6 +172,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                 }
                 // 액션 버튼
                 R.id.tv_action -> {
+                    // TODO 기한 설정 부분 로직 이상해짐..db 반영 안됨
                     if(mTaskDTO != null){
                         val todoTitle = mBinding.etTitleTodo.text.toString()
                         val todoMemo = mBinding.etMemoTodo.text.toString()
@@ -201,9 +222,17 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     }
     private fun getTaskInfo(dto:TaskDTO): TaskInfo {
         // Date 문자열을 Date 객체로 파싱
-        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
-        val mTaskLimit = if(dto.taskLimit == null) null else dateFormat.parse(dto.taskLimit)
-        val mTaskComplete = if(dto.taskComplete == null) null else dateFormat.parse(dto.taskComplete)
+        val dateFormat = AppUtil.Time.dateFormat;
+        val mTaskLimit = if(dto.taskLimit == null || dto.taskLimit == "null"){
+            null
+        } else {
+            dateFormat.parse(dto.taskLimit)
+        }
+        val mTaskComplete = if(dto.taskComplete == null || dto.taskComplete == "null") {
+            null
+        } else {
+            dateFormat.parse(dto.taskComplete)
+        }
 
         return TaskInfo(
             infoId = dto.taskInfoId,
@@ -219,21 +248,21 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
-            val limitString = if(mDeadDate == null){
-                requireContext().getString(R.string.txt_no_limit)
-            }else {
+            val limitString = if(hour > 0 || min > 0){
                 // time init...
                 val currentDate = Date();
                 val calendar = Calendar.getInstance()
                 calendar.time = currentDate;
-                val lHour = hour + calendar.get(Calendar.HOUR)
+                val lHour = hour + calendar.get(Calendar.HOUR_OF_DAY)
                 val lMinute = min + calendar.get(Calendar.MINUTE)
                 calendar.set(Calendar.HOUR, lHour)
                 calendar.set(Calendar.MINUTE, lMinute)
                 mDeadDate = calendar.time
                 String.format("%02d:%02d", lHour, lMinute)
+            }else {
+                requireContext().getString(R.string.txt_no_limit)
             }
-            mBinding.deadLineString = limitString
+            mBinding.limitText = limitString
             mBinding.notifyChange()
         }
         override fun onCancel() {

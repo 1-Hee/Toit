@@ -13,6 +13,8 @@ import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.impl.Timebase
+import androidx.compose.material3.TimeInput
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
@@ -118,11 +120,19 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     }
 
     private fun getTaskInfo(dto:TaskDTO):TaskInfo{
+        Timber.d("getTaskInfo ... %s", dto);
         // Date 문자열을 Date 객체로 파싱
-        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
-        val mTaskLimit = if(dto.taskLimit == null) null else dateFormat.parse(dto.taskLimit)
-        val mTaskComplete = if(dto.taskComplete == null) null else dateFormat.parse(dto.taskComplete)
-
+        val dateFormat = AppUtil.Time.dateFormat;
+        val mTaskLimit = if(dto.taskLimit == null || dto.taskLimit == "null"){
+            null
+        } else {
+            dateFormat.parse(dto.taskLimit)
+        }
+        val mTaskComplete = if(dto.taskComplete == null || dto.taskComplete == "null") {
+            null
+        } else {
+            dateFormat.parse(dto.taskComplete)
+        }
         return TaskInfo(
             infoId = dto.taskInfoId,
             fkTaskId = dto.taskId,
