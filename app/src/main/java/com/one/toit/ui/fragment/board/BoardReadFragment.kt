@@ -23,7 +23,7 @@ import com.one.toit.base.bind.DataBindingConfig
 import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseFragment
-import com.one.toit.data.dto.TaskDTO
+//import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.dto.WarningDTO
 import com.one.toit.data.model.TaskInfo
 import com.one.toit.databinding.FragmentBoardReadBinding
@@ -49,7 +49,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // bundle
     private lateinit var mBundle:Bundle
     // bundle로 파싱할 dto 객체
-    private var mTaskDTO: TaskDTO? = null
+//    private var mTaskDTO: TaskDTO? = null
     // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
      private lateinit var launcher: ActivityResultLauncher<Intent>
     // vm
@@ -67,7 +67,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
             .addBindingParam(BR.title, "To It! 목표 완료하기")
             .addBindingParam(BR.actionName, "완료")
             .addBindingParam(BR.click, viewClickListener)
-            .addBindingParam(BR.taskDTO, TaskDTO())
+//            .addBindingParam(BR.taskDTO, TaskDTO())
             .addBindingParam(BR.deadLineString, "제한 없음")
             .addBindingParam(BR.isCertified, false)
             .addBindingParam(BR.hasLimit, false)
@@ -119,64 +119,64 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
         }
     }
 
-    private fun getTaskInfo(dto:TaskDTO):TaskInfo{
-        Timber.d("getTaskInfo ... %s", dto);
-        // Date 문자열을 Date 객체로 파싱
-        val dateFormat = AppUtil.Time.dateFormat;
-        val mTaskLimit = if(dto.taskLimit == null || dto.taskLimit == "null"){
-            null
-        } else {
-            dateFormat.parse(dto.taskLimit)
-        }
-        val mTaskComplete = if(dto.taskComplete == null || dto.taskComplete == "null") {
-            null
-        } else {
-            dateFormat.parse(dto.taskComplete)
-        }
-        return TaskInfo(
-            infoId = dto.taskInfoId,
-            fkTaskId = dto.taskId,
-            taskTitle = dto.taskTitle,
-            taskMemo = dto.taskMemo,
-            taskLimit = mTaskLimit,
-            taskComplete = mTaskComplete,
-            taskCertification = dto.taskCertification
-        )
-    }
+//    private fun getTaskInfo(dto:TaskDTO):TaskInfo{
+//        Timber.d("getTaskInfo ... %s", dto);
+//        // Date 문자열을 Date 객체로 파싱
+//        val dateFormat = AppUtil.Time.dateFormat;
+//        val mTaskLimit = if(dto.taskLimit == null || dto.taskLimit == "null"){
+//            null
+//        } else {
+//            dateFormat.parse(dto.taskLimit)
+//        }
+//        val mTaskComplete = if(dto.taskComplete == null || dto.taskComplete == "null") {
+//            null
+//        } else {
+//            dateFormat.parse(dto.taskComplete)
+//        }
+//        return TaskInfo(
+//            infoId = dto.taskInfoId,
+//            fkTaskId = dto.taskId,
+//            taskTitle = dto.taskTitle,
+//            taskMemo = dto.taskMemo,
+//            taskLimit = mTaskLimit,
+//            taskComplete = mTaskComplete,
+//            taskCertification = dto.taskCertification
+//        )
+//    }
     private fun saveCapturedPhoto(bitmap:Bitmap) {
         /**
          * 파일 이름 저장
          */
-        if(mTaskDTO != null){
-            val resolver = requireActivity().contentResolver
-            // 비트맵을 저장할 경로 생성
-            val contentValues = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, mFileName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.WIDTH, bitmap.width)
-                put(MediaStore.Images.Media.HEIGHT, bitmap.height)
-            }
-            // val picturePath = Environment.DIRECTORY_PICTURES
-            // val pictureUri = Uri.parse(picturePath) // 이건 안되는듯...
-            // MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-            this.mImageUri = imageUri
-            imageUri?.let {
-                resolver.openOutputStream(it)?.use { outputStream ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                    outputStream.flush()
-                }
-            }
-
-            // 파일 생성 후 미디어 스캐닝 기능
-            Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
-                imageUri?.path.let { path ->
-                    val f = File(path)
-                    mediaScanIntent.data = Uri.fromFile(f)
-                    requireActivity().sendBroadcast(mediaScanIntent)
-                }
-            }
-        }
+//        if(mTaskDTO != null){
+//            val resolver = requireActivity().contentResolver
+//            // 비트맵을 저장할 경로 생성
+//            val contentValues = ContentValues().apply {
+//                put(MediaStore.Images.Media.DISPLAY_NAME, mFileName)
+//                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+//                put(MediaStore.Images.Media.WIDTH, bitmap.width)
+//                put(MediaStore.Images.Media.HEIGHT, bitmap.height)
+//            }
+//            // val picturePath = Environment.DIRECTORY_PICTURES
+//            // val pictureUri = Uri.parse(picturePath) // 이건 안되는듯...
+//            // MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+//            val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+//            this.mImageUri = imageUri
+//            imageUri?.let {
+//                resolver.openOutputStream(it)?.use { outputStream ->
+//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+//                    outputStream.flush()
+//                }
+//            }
+//
+//            // 파일 생성 후 미디어 스캐닝 기능
+//            Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
+//                imageUri?.path.let { path ->
+//                    val f = File(path)
+//                    mediaScanIntent.data = Uri.fromFile(f)
+//                    requireActivity().sendBroadcast(mediaScanIntent)
+//                }
+//            }
+//        }
    }
 
     // 매개 변수로 받아온 인자를 파싱하는 함수
@@ -185,19 +185,20 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
         arguments?.let { bundle ->
             mBundle = bundle
             Timber.i("[READ FRAGMENT] %s", bundle)
-            @Suppress("DEPRECATION")
-            mTaskDTO = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                bundle.getParcelable("taskDTO", TaskDTO::class.java)
-            } else {
-                bundle.getParcelable("taskDTO")
-            }
-            Timber.e("[READ FRAGMENT DTO] %s", mTaskDTO)
-            mBinding.setVariable(BR.taskDTO, mTaskDTO)
-            val mHasLimit = mTaskDTO?.taskLimit?.isNotBlank()==true
-            val deadLineString:String
+//            @Suppress("DEPRECATION")
+//            mTaskDTO = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                bundle.getParcelable("taskDTO", TaskDTO::class.java)
+//            } else {
+//                bundle.getParcelable("taskDTO")
+//            }
+//            Timber.e("[READ FRAGMENT DTO] %s", mTaskDTO)
+//            mBinding.setVariable(BR.taskDTO, mTaskDTO)
+//            val mHasLimit = mTaskDTO?.taskLimit?.isNotBlank()==true
+//            val deadLineString:String
 
             mBinding.setVariable(BR.deadLineString, "") // todo here
-            mBinding.setVariable(BR.hasLimit, mHasLimit)
+//            mBinding.setVariable(BR.hasLimit, mHasLimit)
+            mBinding.setVariable(BR.hasLimit, false)
         }
     }
 
@@ -278,75 +279,75 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
             textCancel = "취소",
             textAction = "완료"
         )
-        val dialog = WarningDialog(
-            warningDto = warningDto,
-            listener = object : WarningDialog.OnDialogClickListener {
-                override fun onActionClick(view: View) {
-                    Timber.i("dto : %s", mTaskDTO)
-                    var msg = "목표 완료 실패..."
-                    val context = requireContext()
-                    if(mTaskDTO != null){
-                        // 파일 저장
-                        if(acceptedBitmap != null){
-                            try {
-                                val bitmap = acceptedBitmap!!
-                                saveCapturedPhoto(bitmap)
-                            }catch (e:Exception){
-                                Timber.e("[ERROR] : %s", e.message)
-                            }
-                        }
-                        mTaskDTO?.taskComplete = Date().toString()
-                        mTaskDTO?.taskCertification = mImageUri?.toString()
-                        val mTaskInfo = getTaskInfo(mTaskDTO!!)
-
-                        val modifyResult = lifecycleScope.async(Dispatchers.IO){
-                            taskInfoViewModel.modifyTaskInfo(mTaskInfo)
-                            msg = "목표가 완료되었습니다."
-                            mTaskDTO?.taskCertification = mImageUri?.toString()
-                            mBinding.setVariable(BR.taskDTO, mTaskDTO)
-                            mBinding.setVariable(BR.isCertified, true)
-                            mBinding.notifyChange()
-                        }
-                        lifecycleScope.launch {
-                            modifyResult.await()
-                            AppUtil.toast(context, msg)
-                            requireActivity().setResult(Activity.RESULT_OK)
-                            requireActivity().finish()
-                        }
-                    }
-                }
-            })
-        dialog.show(requireActivity().supportFragmentManager, null)
+//        val dialog = WarningDialog(
+//            warningDto = warningDto,
+//            listener = object : WarningDialog.OnDialogClickListener {
+//                override fun onActionClick(view: View) {
+//                    Timber.i("dto : %s", mTaskDTO)
+//                    var msg = "목표 완료 실패..."
+//                    val context = requireContext()
+//                    if(mTaskDTO != null){
+//                        // 파일 저장
+//                        if(acceptedBitmap != null){
+//                            try {
+//                                val bitmap = acceptedBitmap!!
+//                                saveCapturedPhoto(bitmap)
+//                            }catch (e:Exception){
+//                                Timber.e("[ERROR] : %s", e.message)
+//                            }
+//                        }
+//                        mTaskDTO?.taskComplete = Date().toString()
+//                        mTaskDTO?.taskCertification = mImageUri?.toString()
+//                        val mTaskInfo = getTaskInfo(mTaskDTO!!)
+//
+//                        val modifyResult = lifecycleScope.async(Dispatchers.IO){
+//                            taskInfoViewModel.modifyTaskInfo(mTaskInfo)
+//                            msg = "목표가 완료되었습니다."
+//                            mTaskDTO?.taskCertification = mImageUri?.toString()
+//                            mBinding.setVariable(BR.taskDTO, mTaskDTO)
+//                            mBinding.setVariable(BR.isCertified, true)
+//                            mBinding.notifyChange()
+//                        }
+//                        lifecycleScope.launch {
+//                            modifyResult.await()
+//                            AppUtil.toast(context, msg)
+//                            requireActivity().setResult(Activity.RESULT_OK)
+//                            requireActivity().finish()
+//                        }
+//                    }
+//                }
+//            })
+//        dialog.show(requireActivity().supportFragmentManager, null)
     }
     
     // 삭제 경고 알림창
     private fun showDeleteDialog(){
-        val warningDto = WarningDTO(
-            title = "목표 삭제하기",
-            content = "정말로  등록하신 목표를 삭제 하시겠어요?\n[삭제]를 누르시면 회원님의 목표가 삭제됩니다.",
-            textCancel = "취소",
-            textAction = "삭제"
-        )
-        val dialog = WarningDialog(
-            warningDto = warningDto,
-            listener = object : WarningDialog.OnDialogClickListener {
-                override fun onActionClick(view: View) {
-                    Timber.i("dto : %s", mTaskDTO)
-                    var msg = "목표 삭제 실패..."
-                    val context = requireContext()
-                    if(mTaskDTO != null){
-                        val mTaskId = mTaskDTO?.taskId ?: -1
-                        if(mTaskId > 0){
-                            msg = "목표가 삭제되었습니다."
-                            taskRegisterViewModel.removeTaskRegisterById(mTaskId)
-                        }
-                    }
-                    AppUtil.toast(context, msg)
-                    requireActivity().setResult(Activity.RESULT_OK)
-                    requireActivity().finish()
-                }
-            })
-        dialog.show(requireActivity().supportFragmentManager, null)
+//        val warningDto = WarningDTO(
+//            title = "목표 삭제하기",
+//            content = "정말로  등록하신 목표를 삭제 하시겠어요?\n[삭제]를 누르시면 회원님의 목표가 삭제됩니다.",
+//            textCancel = "취소",
+//            textAction = "삭제"
+//        )
+//        val dialog = WarningDialog(
+//            warningDto = warningDto,
+//            listener = object : WarningDialog.OnDialogClickListener {
+//                override fun onActionClick(view: View) {
+//                    Timber.i("dto : %s", mTaskDTO)
+//                    var msg = "목표 삭제 실패..."
+//                    val context = requireContext()
+//                    if(mTaskDTO != null){
+//                        val mTaskId = mTaskDTO?.taskId ?: -1
+//                        if(mTaskId > 0){
+//                            msg = "목표가 삭제되었습니다."
+//                            taskRegisterViewModel.removeTaskRegisterById(mTaskId)
+//                        }
+//                    }
+//                    AppUtil.toast(context, msg)
+//                    requireActivity().setResult(Activity.RESULT_OK)
+//                    requireActivity().finish()
+//                }
+//            })
+//        dialog.show(requireActivity().supportFragmentManager, null)
     }
     
 }

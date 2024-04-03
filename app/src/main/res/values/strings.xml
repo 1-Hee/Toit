@@ -113,6 +113,9 @@
     <string name="tab_statistics_summary">통계 요약</string>
     <string name="tab_todo_all">전체 보기</string>
     <string name="txt_no_limit">제한 없음</string>
+    <string name="msg_invailid_time_diff">유효한 시간을 선택해 주세요.</string>
+    <string name="msg_invalid_limit">남은 시간이 10분 미만이므로 마감 기한을 설정할 수 없습니다..</string>
+    <string name="msg_no_limit">마감 기한이 초기화 되었습니다.</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

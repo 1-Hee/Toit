@@ -8,6 +8,7 @@ import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseDialog
 import com.one.toit.databinding.DialogCustomTimeBinding
 import com.one.toit.util.AppUtil
+import com.one.toit.util.AppUtil.Time
 import kotlin.math.max
 import kotlin.math.min
 
@@ -32,7 +33,7 @@ class CustomTimeDialog(
         mBinding.npMinute.minValue = 0
         val maxMin = max(min, 59)
         mBinding.npMinute.maxValue = maxMin
-        mBinding.npMinute.value = 0
+        mBinding.npMinute.value = 10
 
         // 값 감지 및 유효성 체크용 리스너
         mBinding.npHour.setOnValueChangedListener { picker, oldVal, newVal ->
@@ -41,8 +42,10 @@ class CustomTimeDialog(
         }
 
         mBinding.npMinute.setOnValueChangedListener { picker, oldVal, newVal ->
-            if(mBinding.npHour.value >= hour && newVal >= min) {
-                mBinding.npMinute.value = 0
+            val isBurstTime = Time.isBurstTime(mBinding.npHour.value, newVal)
+            if(isBurstTime) {
+                mBinding.npHour.value = 0;
+                mBinding.npMinute.value = 10
                 val context = requireContext();
                 AppUtil.toast(context, context.getString(R.string.msg_invalid_time))
             }

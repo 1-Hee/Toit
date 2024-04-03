@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatEditText
+import com.one.toit.R
 import com.one.toit.data.dto.MediaDTO
 import timber.log.Timber
 import java.lang.StringBuilder
@@ -115,34 +116,72 @@ class AppUtil {
 
     // 시간 파싱 작업에 사용할 유틸리티
     object Time {
-        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
-        val dbDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        fun getTimeArray(): Array<Int> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val now = LocalDateTime.now()
-                val midnight = LocalDateTime.of(now.toLocalDate(), LocalTime.MAX)
-                val duration = Duration.between(now, midnight)
-                val hours = duration.toHours().toInt()
-                val minutes = (duration.toMinutes() % 60).toInt()
-                val seconds = (duration.seconds % 60).toInt()
-                return arrayOf(hours, minutes, seconds)
-            } else {
-                val now = Calendar.getInstance()
-                val midnight = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, 23)
-                    set(Calendar.MINUTE, 59)
-                    set(Calendar.SECOND, 59)
-                    set(Calendar.MILLISECOND, 999)
-                }
-                val remainingTime = midnight.timeInMillis - now.timeInMillis
-                val hours = (remainingTime / (1000 * 60 * 60)).toInt()
-                val minutes = ((remainingTime % (1000 * 60 * 60)) / (1000 * 60)).toInt()
-                val seconds = ((remainingTime % (1000 * 60)) / 1000).toInt()
-                return arrayOf(hours, minutes, seconds)
-            }
+        fun getTimeLimit(): Array<Int> {
+            val mDate = Date();
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val min = calendar.get(Calendar.MINUTE)
+            return arrayOf(23-hour, 60-min)
         }
 
-        fun getFullDateString(calendar: Calendar):String{
+        // 선택된 시간이 10분 이상 차이가 나는지 점검하는 메서드
+        fun isEnoughTimeDiff(hour:Int, min:Int):Boolean{
+            val inputTime = hour * 60 * 60 * 1000L + min * 60 * 1000L
+            return inputTime >= 10 * 60 * 1000 // 10분 이상인지 확인
+        }
+
+        /**
+         * 기한 설정 후 ,마감 기한이 내일을 넘기는지 판단하는 메서드
+         */
+        fun isBurstTime(hour: Int, min: Int):Boolean{
+            // 현재 시간과 셈해서
+            val mDate = Date();
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
+            var currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+            var currentMinute = calendar.get(Calendar.MINUTE)
+            currentHour += hour;
+            currentMinute += min;
+            currentHour += currentMinute/60;
+            currentMinute %= 60;
+            return currentHour >= 24
+        }
+
+        /**
+         * 시간과 분을 입력했을때 Date를 리턴해주는 함수
+         */
+        fun getDate(hour: Int, min: Int):Date {
+            val mDate = Date();
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
+            calendar.set(Calendar.HOUR_OF_DAY, hour)
+            calendar.set(Calendar.MINUTE, min)
+            return calendar.time
+        }
+
+        // 시간과 분 정보를 받아 Date 객체 리턴하는 메서드
+        fun getLimitDate(hour: Int, min: Int):Date {
+            val mDate = Date();
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
+            val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val currentMinute = calendar.get(Calendar.MINUTE)
+            var mMinute = (currentMinute + min)
+            val mHour = (currentHour + hour + (mMinute/60))%24
+            mMinute %= 60
+
+            Timber.d("limit hour : $mHour , limit min : $mMinute")
+
+            calendar.set(Calendar.HOUR_OF_DAY,mHour)
+            calendar.set(Calendar.MINUTE, mMinute)
+            return calendar.time
+        }
+        // Date 값을 기준으로 시간을 추출하는 메서드
+        fun getFullLog(context:Context, mDate:Date):String{
+            val suffix = context.getString(R.string.suffix_create)
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
             val mYear = calendar.get(Calendar.YEAR)
             val mMonth = calendar.get(Calendar.MONTH)+1
             val mDay = calendar.get(Calendar.DAY_OF_MONTH)
@@ -150,14 +189,31 @@ class AppUtil {
             val mMinute = calendar.get(Calendar.MINUTE)
             val mSecond = calendar.get(Calendar.SECOND)
             val sb = StringBuilder()
-            sb.append(String.format("%04d", mYear)+"-")
-                .append(String.format("%02d", mMonth)+"-")
-                .append(String.format("%02d", mDay)+" ")
-                .append(String.format("%02d", mHour)+":")
-                .append(String.format("%02d", mMinute)+":")
+            sb.append(String.format("%04d", mYear)) // Year
+                .append("-")
+                .append(String.format("%02d", mMonth)) // Month
+                .append("-")
+                .append(String.format("%02d", mDay)) // Day
+                .append(" ")
+                .append(String.format("%02d", mHour)) // hour
+                .append(":")
+                .append(String.format("%02d", mMinute)) // minute
+                .append(":")
                 .append(String.format("%02d", mSecond))
+                .append(suffix)
             return sb.toString()
         }
-
+        // Date 값을 기준으로 시간 문자열을 추출하는 메서드
+        fun getTimeLog(mDate: Date?):String{
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
+            val mHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val mMinute = calendar.get(Calendar.MINUTE)
+            val sb = StringBuilder()
+            sb.append(String.format("%02d", mHour)) // hour
+                .append(":")
+                .append(String.format("%02d", mMinute)) // minute
+            return sb.toString()
+        }
     }
 }

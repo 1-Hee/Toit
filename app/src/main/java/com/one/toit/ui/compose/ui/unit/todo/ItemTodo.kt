@@ -3,7 +3,6 @@ package com.one.toit.ui.compose.ui.unit.todo
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,21 +33,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
+//import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
-import com.one.toit.ui.compose.style.green400
 import com.one.toit.ui.compose.style.green600
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.ui.unit.WarningDialog
 import com.one.toit.util.AppUtil
+import com.one.toit.util.AppUtil.Time
 import timber.log.Timber
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -58,7 +58,7 @@ import java.util.Locale
 @Composable
 fun ItemTodo(
     taskDTO: TaskDTO,
-    isSuccess:Boolean = !(taskDTO.taskComplete?.equals("null")?:false),
+    isSuccess:Boolean = taskDTO.taskComplete != null,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
     val context = LocalContext.current
@@ -69,24 +69,23 @@ fun ItemTodo(
     var showDeleteDialog by remember { mutableStateOf(false) }
     // 다이얼로그 팝업
     if (showPreViewDialog) {
-        TodoPreviewDialog(
-            taskDTO = taskDTO,
-            onDismiss = {
-                showPreViewDialog = false
-            },
-//            onEdit = { id ->
-//                Timber.i("id : %s", id)
-//                intent.putExtra("pageIndex", 1)
-//                context.startActivity(intent)
+//        TodoPreviewDialog(
+//            taskDTO = taskDTO,
+//            onDismiss = {
+//                showPreViewDialog = false
 //            },
-            onDelete = {
-                showPreViewDialog = false
-                showDeleteDialog = true
-            },
-            launcher = launcher
-        )
+////            onEdit = { id ->
+////                Timber.i("id : %s", id)
+////                intent.putExtra("pageIndex", 1)
+////                context.startActivity(intent)
+////            },
+//            onDelete = {
+//                showPreViewDialog = false
+//                showDeleteDialog = true
+//            },
+//            launcher = launcher
+//        )
     }
-    var msg by remember { mutableStateOf("목표 삭제 실패...") }
 
     // 삭제 다이얼로그
     if(showDeleteDialog){
@@ -94,12 +93,12 @@ fun ItemTodo(
             onDismiss = { showDeleteDialog = false },
             onCancel = { showDeleteDialog = false },
             onAction = {
-                showDeleteDialog = false
-                if(taskDTO.taskId > 0){
-                    msg = "목표가 삭제되었습니다."
-                    taskRegisterViewModel.removeTaskRegisterById(taskDTO.taskId)
-                }
-                AppUtil.toast(context, msg)
+//                showDeleteDialog = false
+//                if(taskDTO.taskId > 0){
+//                    msg = "목표가 삭제되었습니다."
+//                    taskRegisterViewModel.removeTaskRegisterById(taskDTO.taskId)
+//                }
+//                AppUtil.toast(context, msg)
             },
             title = "목표 삭제하기",
             content = "정말로  등록하신 목표를 삭제 하시겠어요?\n[삭제]를 누르시면 회원님의 목표가 삭제됩니다.",
@@ -114,16 +113,16 @@ fun ItemTodo(
             .height(92.dp)
             .background(mono50)
             .clickable {
-                // dommy...
-                if (isSuccess) {
-                    showPreViewDialog = true
-                } else {
-                    // TODO 이쪽에 콜백으로 바꾸기
-                    intent.putExtra("pageIndex", 2)
-                    intent.putExtra("taskDTO", taskDTO)
-                    intent.putExtra("isComplete", false)
-                    launcher?.launch(intent)
-                }
+//                // dommy...
+//                if (isSuccess) {
+//                    showPreViewDialog = true
+//                } else {
+//                    // TODO 이쪽에 콜백으로 바꾸기
+//                    intent.putExtra("pageIndex", 2)
+//                    intent.putExtra("taskDTO", taskDTO)
+//                    intent.putExtra("isComplete", false)
+//                    launcher?.launch(intent)
+//                }
             }
     ){
         Box(
@@ -155,10 +154,10 @@ fun ItemTodo(
                     tint = green600
                 )
             }
-            // 남은 시간
-            val mTimeFlag = taskDTO.taskLimit?.isNotBlank() == true
-                                && taskDTO.taskComplete?.isBlank() == true
-            if(mTimeFlag){
+
+            // 남은 시간 표시 로직
+            if(taskDTO.taskLimit != null){
+                val timeStr = Time.getTimeLog(taskDTO.taskLimit!!)
                 Row(
                     modifier = Modifier
                         .wrapContentSize()
@@ -177,12 +176,8 @@ fun ItemTodo(
                         tint = purple200
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    val mTaskLimit = taskDTO.taskLimit.toString()
-
-                    val limitString = "" // todo here...
-
                     Text(
-                        text = limitString,
+                        text = timeStr,
                         style = MaterialTheme.typography.subtitle1
                             .copy(
                                 fontSize = 14.sp,
@@ -191,10 +186,10 @@ fun ItemTodo(
                     )
                 }
             }
-            // 로그 시간 파싱
-            val timeString = getTimeString(context, taskDTO)
+
+            // 작성 일자 표시 텍스트...
             Text(
-                text = timeString,
+                text = Time.getFullLog(context, taskDTO.createAt), // 로그 텍스트
                 style = MaterialTheme.typography.subtitle1
                     .copy(
                         fontSize = 14.sp,
@@ -207,45 +202,3 @@ fun ItemTodo(
     }
 }
 
-fun getTimeString(
-    context:Context,
-    taskDTO:TaskDTO
-):String {
-    // 저장된 문자열을 Date 객체로 파싱
-    val savedDate = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(taskDTO.createAt)
-    // 오늘 날짜를 가져옴
-    val today = Calendar.getInstance().time
-    // 오늘과 저장된 날짜가 같은지 여부를 반환
-    val isToday = SimpleDateFormat("yyyy-MM-dd").format(today) == SimpleDateFormat("yyyy-MM-dd").format(savedDate)
-
-    val suffix = context.resources.getString(R.string.suffix_create)
-    val mTaskCreateAt = taskDTO.createAt
-    //Timber.d("time : %s ", mTaskCreateAt)
-    val locale =  Locale.getDefault()
-    // Timber.d("locale : %s", locale)
-    val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)
-
-    val timeString:String
-    if(isToday){
-        val outputFormat = SimpleDateFormat("HH:mm:ss", locale)
-        timeString = try {
-            val date = inputFormat.parse(mTaskCreateAt)
-            val formattedTime = outputFormat.format(date)
-            "$formattedTime $suffix"
-        } catch (e: ParseException) {
-            Timber.e("[MSG] e : %s", e.message)
-            " $suffix"
-        }
-    }else {
-        val outputFormat = SimpleDateFormat("yyyy-MM-dd", locale)
-        timeString = try {
-            val date = inputFormat.parse(mTaskCreateAt)
-            val formattedTime = outputFormat.format(date)
-            "$formattedTime $suffix"
-        } catch (e: ParseException) {
-            Timber.e("[MSG] e : %s", e.message)
-            " $suffix"
-        }
-    }
-    return timeString
-}

@@ -1,7 +1,6 @@
 package com.one.toit.ui.fragment.board
 
 import android.app.Activity
-import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -22,11 +21,10 @@ import com.one.toit.ui.dialog.CustomTimeDialog
 import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.util.AppUtil
+import com.one.toit.util.AppUtil.Time
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
 
@@ -40,7 +38,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     private lateinit var taskInfoViewModel: TaskInfoViewModel
 
     private lateinit var guideArray:Array<String>
-    private var mDeadDate:Date? = null
+    private var mTaskLimit:Date? = null
 
     override fun getDataBindingConfig(): DataBindingConfig {
         // 키보드 엔터 이벤트 핸들링을 위한 리스너
@@ -92,16 +90,17 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
         taskInfoViewModel = getFragmentScopeViewModel(TaskInfoViewModel::class.java, factory)
     }
     override fun initView() {
-        mBinding.limitText = requireContext().getString(R.string.txt_no_limit)
-        guideArray = requireContext().resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
+        val context = requireContext()
+        mBinding.limitText = context.getString(R.string.txt_no_limit)
+        guideArray = context.resources.getStringArray(R.array.arr_limit_guide) // 메뉴 명
         setGuideDesc(mBinding.isLimit == true)
 
         // 등록버튼 스타일 세팅
         val btnName = "등록 하기"
-        val bgColor = ContextCompat.getColor(requireContext(), R.color.purple200)
-        val strokeColor = ContextCompat.getColor(requireContext(), R.color.purple200)
-        val textColor = ContextCompat.getColor(requireContext(), R.color.white)
-        val rippleColor = ContextCompat.getColor(requireContext(), R.color.purple300)
+        val bgColor = ContextCompat.getColor(context, R.color.purple200)
+        val strokeColor = ContextCompat.getColor(context, R.color.purple200)
+        val textColor = ContextCompat.getColor(context, R.color.white)
+        val rippleColor = ContextCompat.getColor(context, R.color.purple300)
 
         mBinding.setVariable(BR.btnName, btnName)
         mBinding.setVariable(BR.bgColor, bgColor)
@@ -136,73 +135,122 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                     val flag = mBinding.isLimit?:false
                     mBinding.setVariable(BR.isLimit, !flag)
                     setGuideDesc(!flag)
+                    if(flag){
+                        mTaskLimit = null;
+                        val context = requireContext()
+                        mBinding.limitText = context.getString(R.string.txt_no_limit)
+                        mBinding.notifyChange()
+                        val message = context.getString(R.string.msg_no_limit)
+                        AppUtil.toast(context, message)
+                    }
+
                 }
                 // 기한 설정
                 R.id.et_limit_input -> {
-                    val timeArr:Array<Int> = AppUtil.Time.getTimeArray()
+                    val context = requireContext()
+                    val timeArr:Array<Int> = Time.getTimeLimit()
                     Timber.i("array : %s", timeArr.contentToString())
-                    val dialog = CustomTimeDialog(
-                        hour = timeArr[0],
-                        min = timeArr[1],
-                        listener = dialogListener,
-                    )
-                    dialog.show(requireActivity().supportFragmentManager, null)
+                    val mFlag = Time.isEnoughTimeDiff(timeArr[0], timeArr[1])
+                    if(mFlag){
+                        val dialog = CustomTimeDialog(
+                            hour = timeArr[0],
+                            min = timeArr[1],
+                            listener = dialogListener,
+                        )
+                        dialog.show(requireActivity().supportFragmentManager, null)
+                    }else {
+                        AppUtil.toast(context,
+                            context.getString(R.string.msg_invalid_limit)
+                        )
+                    }
+
                 }
                 // 등록 버튼!
                 R.id.l_btn_write_todo -> {
-                    // TODO 기한 설정 부분 로직 이상해짐..db 반영 안됨
-                    val titleString = mBinding.etTitleTodo.text.toString()
+                    // 제목이 비었는지 확인하는 플래그 변수
                     val context = requireContext()
-                    val msg:String = if(titleString.isNotBlank()){
+                    val titleCheckMsg = context.getString(R.string.msg_input_title)
+                    val flagTitle = mBinding.etTitleTodo.text?.isBlank() == true
+                    if(flagTitle){ // 타이틀 제목이 비었다면 알림 메세지...
+                        AppUtil.toast(context, titleCheckMsg)
+                    }else { // DB save task...
+                        val message = context.getString(R.string.msg_success_todo)
+
                         lifecycleScope.launch(Dispatchers.IO){
                             val taskRegister = TaskRegister()
                             val taskId = taskRegisterViewModel.addTaskRegister(taskRegister)
                             Timber.i("taskId : %s", taskId)
-                            val taskInfo = getTaskInfo(taskId, titleString)
+                            val taskInfo = createTaskInfo(taskId)
                             val infoId = taskInfoViewModel.addTaskInfo(taskInfo)
                             Timber.i("info : %s", infoId)
                             requireActivity().setResult(Activity.RESULT_OK)
                             requireActivity().finish()
+                            showToast(message)
                         }
-                        context.getString(R.string.msg_success_todo)
-                    }else {
-                        context.getString(R.string.msg_input_title)
                     }
-                    AppUtil.toast(context, msg)
                 }
             }
         }
     }
 
-    private fun getTaskInfo(taskId:Long, titleString:String):TaskInfo{
-        val mMemo = mBinding.etMemoTodo.text.toString().ifBlank { "" }
+    // 확장함수를 통한 코루틴 토스트 메세지 호출
+    private fun BoardWriteFragment.showToast(message: String) {
+        // 토스트 메시지를 노출합니다.
+        lifecycleScope.launch {
+            val context = requireContext();
+            AppUtil.toast(context, message)
+        }
+    }
+
+    /**
+     * 임시로 할일 정보(Task Info) 엔티티를 만드는 메서드
+     */
+    private fun createTaskInfo(fkTaskId:Long): TaskInfo {
+        val titleFlag = mBinding.etTitleTodo.text?.isNotBlank() == true
+        val memoFlag = mBinding.etMemoTodo.text?.isNotBlank() == true
+        var taskTitle: String = if (titleFlag) mBinding.etTitleTodo.text.toString() else ""
+        var taskMemo: String = if (memoFlag) mBinding.etMemoTodo.text.toString() else ""
+        var taskLimit: Date? = mTaskLimit
         return TaskInfo(
-            taskTitle = titleString,
-            taskMemo =  mMemo,
-            fkTaskId = taskId,
-            taskLimit = mDeadDate
+            fkTaskId = fkTaskId,
+            taskTitle = taskTitle,
+            taskMemo = taskMemo,
+            taskLimit = taskLimit,
         )
     }
+
 
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
-            val limitString = if(hour > 0 || min > 0){
-                // time init...
-                val currentDate = Date();
+            val flag = Time.isEnoughTimeDiff(hour, min)
+            val context = requireContext()
+            if(flag){
+                mTaskLimit = Time.getLimitDate(hour, min)
                 val calendar = Calendar.getInstance()
-                calendar.time = currentDate;
-                val lHour = hour + calendar.get(Calendar.HOUR_OF_DAY)
-                val lMinute = min + calendar.get(Calendar.MINUTE)
-                calendar.set(Calendar.HOUR, lHour)
-                calendar.set(Calendar.MINUTE, lMinute)
-                mDeadDate = calendar.time
-                String.format("%02d:%02d", lHour, lMinute)
+                calendar.time = mTaskLimit
+                var mHour = calendar.get(Calendar.HOUR_OF_DAY)
+                var mMinute = calendar.get(Calendar.MINUTE)
+                val isBurstTime = Time.isBurstTime(hour, min)
+                if(isBurstTime){ // 혹시 시간이 오버됐다면,
+                    mHour = 23
+                    mMinute = 59 // 23:59로 강제로 고정
+                    mTaskLimit = Time.getDate(mHour, mMinute) // 마감기한도 변경
+                }
+                val strHour = String.format("%02d", mHour)
+                val strMin = String.format("%02d", mMinute)
+                val timeStr = "$strHour:$strMin"
+                mBinding.setVariable(BR.limitText, timeStr)
+                mBinding.notifyChange()
             }else {
-                requireContext().getString(R.string.txt_no_limit)
+                mTaskLimit = null
+                val strNoLimit = context.getString(R.string.txt_no_limit)
+                mBinding.setVariable(BR.limitText, strNoLimit)
+                mBinding.notifyChange()
+                AppUtil.toast(context, context.getString(R.string.msg_invailid_time_diff))
             }
-            mBinding.limitText = limitString
-            mBinding.notifyChange()
+            Timber.d("hour : $hour , min : $min, flag => $flag")
+
         }
         override fun onCancel() {
         }

@@ -34,10 +34,6 @@
         <variable
             name="textWatcher"
             type="android.text.TextWatcher" />
-        <!-- 데이터 -->
-        <variable
-            name="taskDTO"
-            type="com.one.toit.data.dto.TaskDTO" />
         <!-- 마감기한 문자열 -->
         <variable
             name="limitText"
@@ -100,7 +96,6 @@
                 android:layout_height="wrap_content"
                 android:hint="목표를 입력해보세요(최대 28자)"
                 android:maxLength="28"
-                android:text="@{taskDTO.taskTitle}"
                 android:textSize="14sp"
                 android:textColor="@color/mono600"
                 android:textColorHint="@color/mono400"
@@ -153,7 +148,6 @@
                     android:id="@+id/et_memo_todo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{taskDTO.taskMemo}"
                     android:textSize="14sp"
                     android:textColor="@color/mono600"
                     android:textColorHint="@color/mono400"

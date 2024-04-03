@@ -18,9 +18,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.FloatingActionButtonDefaults
 import androidx.compose.material.Icon
@@ -29,13 +27,11 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
-import androidx.compose.material3.TimeInput
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
+//import com.one.toit.data.dto.TaskDTO
+import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono200
@@ -57,7 +55,7 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
-import com.one.toit.data.viewmodel.TaskViewModel
+import com.one.toit.util.AppUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -78,48 +76,59 @@ fun TodoPage(
     val intent = Intent(context, BoardActivity::class.java)
     var checked by remember { mutableStateOf(false) }
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
-    // val scrollState = rememberScrollState()
 
-    // 리컴포저블을 위한 상태 변수
-    // 페이지 계수 관리를 위한 mutable state
-    var pageIndex by remember { mutableIntStateOf(1) } // 페이지 계수
-    // lazy 컬럼과 함께 관리될 누적 dto list
-    var mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
     val lazyListState = rememberLazyListState()
+    // 일일 taskList
+    val allDailyTaskList = remember { mutableStateOf<List<TaskDTO>>(listOf()) }
+    // 현재 화면이 초기 컴포지션이 일어났는지 체크할 플래그 변수
+    val isInitState = remember { mutableStateOf(false) }
+    Timber.d("초기 상태...? ${isInitState.value}")
 
-    LaunchedEffect(pageIndex, checked) {
-        withContext(Dispatchers.Main) {
-//            val list = taskViewModel.readTaskList()
-//            Timber.d("list : %s", list)
-            val date = Date()
-            val taskList = if(checked){
-                taskViewModel.readNotCompleteTaskListByDate(pageIndex, date)
-            }else {
-                taskViewModel.readTaskListByDate(pageIndex, date)
-            }
-            val parsedTaskDTOList = mutableListOf<TaskDTO>()
-            // 데이터 변화를 감지하기 위해 MutableState를 업데이트
-            Timber.d("taskList : %s", taskList)
-            taskList.map { task ->
-                val dto = TaskDTO(
-                    task.register.taskId,
-                    task.register.createAt.toString(),
-                    task.info.infoId,
-                    task.info.taskTitle,
-                    task.info.taskMemo,
-                    task.info.taskLimit.toString(),
-                    task.info.taskComplete.toString(),
-                    task.info.taskCertification
+    LaunchedEffect(Unit){
+        withContext(Dispatchers.IO) {
+            Timber.e("FIRST INIT CALL...!!!")
+            val mDate = Date()
+            val mDailyList = taskViewModel.readTaskListByDate(mDate)
+            val mDTOList = mutableListOf<TaskDTO>()
+            mDailyList.forEach { taskItem ->
+                val mTaskDTO = TaskDTO(
+                    taskId = taskItem.register.taskId,
+                    createAt = taskItem.register.createAt,
+                    taskTitle = taskItem.info.taskTitle,
+                    taskMemo = taskItem.info.taskMemo,
+                    taskLimit = taskItem.info.taskLimit,
+                    taskComplete = taskItem.info.taskComplete,
+                    taskCertification = taskItem.info.taskCertification
                 )
-                parsedTaskDTOList.add(dto)
+                Timber.i("[item] : $mTaskDTO")
+                mDTOList.add(mTaskDTO)
             }
-            mTaskDTOList = if(pageIndex == 1){
-                Timber.i("첫 로드...")
-                parsedTaskDTOList
-            }else {
-                val tempList = mTaskDTOList
-                tempList.addAll(parsedTaskDTOList)
-                tempList
+            allDailyTaskList.value = mDTOList.toList()
+            isInitState.value = true;
+            Timber.d("상태 초기화 됨... ${isInitState.value}")
+        }
+    }
+    // AppUtil.toast(context, "토스트 메시지...")
+    LaunchedEffect(checked){
+        withContext(Dispatchers.Main) {
+            if(isInitState.value && checked){ // 초기화 되고, 체크가 되었을 경우에만!
+                val mDate = Date()
+                val mDailyList = taskViewModel.readNotCompleteTaskListByDate(mDate)
+                val mDTOList = mutableListOf<TaskDTO>()
+                mDailyList.forEach { taskItem ->
+                    val mTaskDTO = TaskDTO(
+                        taskId = taskItem.register.taskId,
+                        createAt = taskItem.register.createAt,
+                        taskTitle = taskItem.info.taskTitle,
+                        taskMemo = taskItem.info.taskMemo,
+                        taskLimit = taskItem.info.taskLimit,
+                        taskComplete = taskItem.info.taskComplete,
+                        taskCertification = taskItem.info.taskCertification
+                    )
+                    Timber.i("[item] : $mTaskDTO")
+                    mDTOList.add(mTaskDTO)
+                }
+                allDailyTaskList.value = mDTOList.toList()
             }
 
         }
@@ -159,8 +168,6 @@ fun TodoPage(
                     Switch(
                         checked = checked,
                         onCheckedChange = {
-                            mTaskDTOList = mutableListOf()
-                            pageIndex = 1
                             checked = it
                         },
                         modifier = Modifier
@@ -175,36 +182,36 @@ fun TodoPage(
                     )
                 }
             }
-            // content
-            // observe list scrolling
-            val reachedBottom: Boolean by remember {
-                derivedStateOf {
-                    val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
-                    lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
-                }
-            }
+//            // content
+//            // observe list scrolling
+//            val reachedBottom: Boolean by remember {
+//                derivedStateOf {
+//                    val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+//                    lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
+//                }
+//            }
+//
+//            // load more if scrolled to bottom
+//            LaunchedEffect(reachedBottom) {
+//                if (reachedBottom) {
+//                    pageIndex = (pageIndex+1) % Int.MAX_VALUE
+//                }
+//            }
 
-            // load more if scrolled to bottom
-            LaunchedEffect(reachedBottom) {
-                if (reachedBottom) {
-                    pageIndex = (pageIndex+1) % Int.MAX_VALUE
-                }
-            }
-
-            if(mTaskDTOList.isNotEmpty()){
+            if(allDailyTaskList.value.isEmpty()){
+                ItemNoContent()
+            }else {
                 LazyColumn(state = lazyListState) {
                     item {
                         // header?
                     }
-                    items(mTaskDTOList) { item ->
+                    items(allDailyTaskList.value) { item ->
                         // Main items content
                         Spacer(modifier = Modifier.height(4.dp))
                         ItemTodo(taskDTO = item, launcher = launcher)
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-            }else {
-                ItemNoContent()
             }
         }
         // 플로팅 버튼
