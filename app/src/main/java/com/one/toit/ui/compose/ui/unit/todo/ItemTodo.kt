@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
@@ -69,22 +70,22 @@ fun ItemTodo(
     var showDeleteDialog by remember { mutableStateOf(false) }
     // 다이얼로그 팝업
     if (showPreViewDialog) {
-//        TodoPreviewDialog(
-//            taskDTO = taskDTO,
-//            onDismiss = {
-//                showPreViewDialog = false
+        TodoPreviewDialog(
+            taskDTO = taskDTO,
+            onDismiss = {
+                showPreViewDialog = false
+            },
+//            onEdit = { id ->
+//                Timber.i("id : %s", id)
+//                intent.putExtra("pageIndex", 1)
+//                context.startActivity(intent)
 //            },
-////            onEdit = { id ->
-////                Timber.i("id : %s", id)
-////                intent.putExtra("pageIndex", 1)
-////                context.startActivity(intent)
-////            },
-//            onDelete = {
-//                showPreViewDialog = false
-//                showDeleteDialog = true
-//            },
-//            launcher = launcher
-//        )
+            onDelete = {
+                showPreViewDialog = false
+                showDeleteDialog = true
+            },
+            launcher = launcher
+        )
     }
 
     // 삭제 다이얼로그
@@ -93,16 +94,16 @@ fun ItemTodo(
             onDismiss = { showDeleteDialog = false },
             onCancel = { showDeleteDialog = false },
             onAction = {
-//                showDeleteDialog = false
-//                if(taskDTO.taskId > 0){
-//                    msg = "목표가 삭제되었습니다."
-//                    taskRegisterViewModel.removeTaskRegisterById(taskDTO.taskId)
-//                }
-//                AppUtil.toast(context, msg)
+                showDeleteDialog = false
+                if(taskDTO.taskId > 0){
+                    val msg = context.getString(R.string.msg_delete_todo)
+                    taskRegisterViewModel.removeTaskRegisterById(taskDTO.taskId)
+                    AppUtil.toast(context, msg)
+                }
             },
-            title = "목표 삭제하기",
-            content = "정말로  등록하신 목표를 삭제 하시겠어요?\n[삭제]를 누르시면 회원님의 목표가 삭제됩니다.",
-            textAction = "삭제"
+            title = stringResource(R.string.title_remove_todo),
+            content = stringResource(R.string.txt_guide_remove_todo),
+            textAction = stringResource(R.string.txt_delete)
         )
     }
     Card(
@@ -114,15 +115,15 @@ fun ItemTodo(
             .background(mono50)
             .clickable {
 //                // dommy...
-//                if (isSuccess) {
-//                    showPreViewDialog = true
-//                } else {
+                if (isSuccess) {
+                    showPreViewDialog = true
+                } else {
 //                    // TODO 이쪽에 콜백으로 바꾸기
-//                    intent.putExtra("pageIndex", 2)
-//                    intent.putExtra("taskDTO", taskDTO)
-//                    intent.putExtra("isComplete", false)
-//                    launcher?.launch(intent)
-//                }
+                    intent.putExtra("pageIndex", 2)
+                    intent.putExtra("taskDTO", taskDTO)
+                    intent.putExtra("isComplete", false)
+                    launcher?.launch(intent)
+                }
             }
     ){
         Box(
@@ -189,7 +190,7 @@ fun ItemTodo(
 
             // 작성 일자 표시 텍스트...
             Text(
-                text = Time.getFullLog(context, taskDTO.createAt), // 로그 텍스트
+                text = Time.getTimeLog(context, taskDTO.createAt), // 로그 텍스트
                 style = MaterialTheme.typography.subtitle1
                     .copy(
                         fontSize = 14.sp,

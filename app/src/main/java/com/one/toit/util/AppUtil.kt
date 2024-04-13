@@ -177,6 +177,18 @@ class AppUtil {
             calendar.set(Calendar.MINUTE, mMinute)
             return calendar.time
         }
+        // 저장된 date 를 기반으로 제한시간 문자열 리턴하는 메서드
+        fun getLimitString(mDate:Date):String {
+            val calendar = Calendar.getInstance()
+            calendar.time = mDate
+            val mHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val mMinute = calendar.get(Calendar.MINUTE)
+            val sb = StringBuilder()
+            sb.append(String.format("%02d", mHour)) // Hour
+                .append(":").append(String.format("%02d", mMinute)) // min
+            return sb.toString()
+        }
+
         // Date 값을 기준으로 시간을 추출하는 메서드
         fun getFullLog(context:Context, mDate:Date):String{
             val suffix = context.getString(R.string.suffix_create)
@@ -203,6 +215,23 @@ class AppUtil {
                 .append(suffix)
             return sb.toString()
         }
+
+        // 시간 로그
+        fun getTimeLog(context:Context, mDate:Date):String{
+            val suffx = context.resources.getString(R.string.suffix_create);
+            val calendar = Calendar.getInstance();
+            calendar.time = mDate
+            val mHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val mMinute = calendar.get(Calendar.MINUTE)
+            val mSecond = calendar.get(Calendar.SECOND)
+            val sb = StringBuilder()
+            sb.append(String.format("%02d", mHour)) // Hour
+                .append(":").append(String.format("%02d", mMinute))
+                .append(":").append(String.format("%02d", mSecond))
+                .append(" ").append(suffx);
+            return sb.toString()
+        }
+
         // Date 값을 기준으로 시간 문자열을 추출하는 메서드
         fun getTimeLog(mDate: Date?):String{
             val calendar = Calendar.getInstance()

@@ -116,6 +116,19 @@
     <string name="msg_invailid_time_diff">유효한 시간을 선택해 주세요.</string>
     <string name="msg_invalid_limit">남은 시간이 10분 미만이므로 마감 기한을 설정할 수 없습니다..</string>
     <string name="msg_no_limit">마감 기한이 초기화 되었습니다.</string>
+    <string name="msg_delete_todo">목표가 삭제되었습니다.</string>
+    <string name="title_remove_todo">목표 삭제하기</string>
+    <string name="txt_guide_remove_todo">정말로  등록하신 목표를 삭제 하시겠어요?\n[삭제]를 누르시면 회원님의 목표가 삭제됩니다.</string>
+    <string name="txt_delete">삭제</string>
+    <string name="title_memo">메모</string>
+    <string name="title_memo_eng">memo</string>
+    <string name="title_remain_time">남은 시간</string>
+    <string name="title_reamin_time_eng">remain time</string>
+    <string name="txt_complete">완료</string>
+    <string name="msg_request_camera_auth">카메라를 열 수 없습니다. [권한]을 허용해주세요.</string>
+    <string name="msg_todo_complete">목표 달성! 오늘의 할 일을 달성한 것을 축하합니다😃</string>
+    <string name="title_complete_todo">목표 완료 하기</string>
+    <string name="txt_guide_complete_todo">정말로 등록하신 목표를 완료 하시겠어요?\n[완료]를 누르시면 회원님의 목표가 완료 처리됩니다.\n완료 후에는 데이터 수정에 제약이 발생해요!\n잊으신 부분은 없는 지 다시 한번 확인해주세요.😁</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

@@ -1,5 +1,6 @@
 package com.one.toit.ui.compose.ui.unit.todo
 
+//import com.one.toit.data.dto.TaskDTO
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.one.toit.R
-//import com.one.toit.data.dto.TaskDTO
+import com.one.toit.data.dto.TaskDTO
+import com.one.toit.util.AppUtil
+import com.one.toit.util.AppUtil.Time
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono300
@@ -51,11 +53,10 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
-import timber.log.Timber
 
 @Composable
 fun TodoPreviewDialog(
-//    taskDTO: TaskDTO,
+    taskDTO: TaskDTO,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
     launcher: ActivityResultLauncher<Intent>? = null
@@ -63,9 +64,15 @@ fun TodoPreviewDialog(
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
     val completeSuffix = stringResource(R.string.suffix_complete)
-//    val completeDateString by remember { mutableStateOf(
-//        (taskDTO.taskComplete ?: "") + completeSuffix)
-//    }
+    val completeDateString = remember {
+        mutableStateOf(
+            if(taskDTO.taskComplete == null){
+                ""
+            }else {
+               Time.getFullLog(context, taskDTO.taskComplete!!)
+            }
+        )
+    }
     val scrollState = rememberScrollState()
 //    Timber.i("fileName : %s", taskDTO.taskCertification)
 
@@ -93,20 +100,20 @@ fun TodoPreviewDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-//                Icon(
-//                    imageVector = Icons.Rounded.Edit,
-//                    contentDescription = "iconEdit",
-//                    modifier = Modifier
-//                        .size(18.dp)
-//                        .clickable {
-//                            // TODO 이쪽에 콜백으로 바꿔서, 리컴포지션 일어나게 하기
-//                            intent.putExtra("pageIndex", 1)
-//                            intent.putExtra("taskDTO", taskDTO)
-//                            intent.putExtra("isComplete", true)
-//                            launcher?.launch(intent)
-//                        },
-//                    tint = white
-//                )
+                Icon(
+                    imageVector = Icons.Rounded.Edit,
+                    contentDescription = "iconEdit",
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clickable {
+                            // TODO 이쪽에 콜백으로 바꿔서, 리컴포지션 일어나게 하기
+                            intent.putExtra("pageIndex", 1)
+                            intent.putExtra("taskDTO", taskDTO)
+                            intent.putExtra("isComplete", true)
+                            launcher?.launch(intent)
+                        },
+                    tint = white
+                )
                 Spacer(modifier = Modifier.width(16.dp))
                 Icon(
                     imageVector = Icons.Rounded.Delete,
@@ -152,15 +159,15 @@ fun TodoPreviewDialog(
                             .background(color = mono300)
                     )
 
-//                    Text(
-//                        text = taskDTO.taskTitle,
-//                        style = MaterialTheme.typography.subtitle1.copy(
-//                            fontSize = 14.sp,
-//                            color = black
-//                        ),
-//                        modifier = Modifier
-//                            .wrapContentSize()
-//                    )
+                    Text(
+                        text = taskDTO.taskTitle,
+                        style = MaterialTheme.typography.subtitle1.copy(
+                            fontSize = 14.sp,
+                            color = black
+                        ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
                 }
                 // 메모
                 Row(
@@ -189,49 +196,50 @@ fun TodoPreviewDialog(
                             .wrapContentSize()
                     )
                 }
-//                // 메모 내용
-//                Text(
-//                    text = taskDTO.taskMemo,
-//                    style = MaterialTheme.typography.subtitle1.copy(
-//                        fontSize = 14.sp,
-//                        color = mono700,
-//                        textAlign = TextAlign.Start
-//                    ),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                        .heightIn(max = 172.dp)
-//                        .verticalScroll(scrollState)
-//                )
+                // 메모 내용
+                Text(
+                    text = taskDTO.taskMemo,
+                    style = MaterialTheme.typography.subtitle1.copy(
+                        fontSize = 14.sp,
+                        color = mono700,
+                        textAlign = TextAlign.Start
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .heightIn(max = 172.dp)
+                        .verticalScroll(scrollState)
+                )
 //                // 이미지
-//                if(taskDTO.taskCertification?.isNotBlank() == true){
-//                    GlideImage(
-//                        imageModel = taskDTO.taskCertification,
-//                        // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
-//                        contentScale = ContentScale.Crop,
-//                        circularReveal = CircularReveal(duration = 0),
-//                        // 이미지 로딩 전 표시할 place holder 이미지
-//                        placeHolder = painterResource(id = R.drawable.img_sample),
-//                        // 에러 발생 시 표시할 이미지
-//                        error = painterResource(id = R.drawable.img_sample),
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(216.dp)
-//                    )
-//                }
-//                // 날짜
-//                Text(
-//                    // 파싱 함수 추가
-//                    text = completeDateString,
-//                    style = MaterialTheme.typography.subtitle1.copy(
-//                        fontSize = 12.sp,
-//                        color = mono400,
-//                        textAlign = TextAlign.End
-//                    ),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
+                if(taskDTO.taskCertification?.isNotBlank() == true){
+                    GlideImage(
+                        imageModel = taskDTO.taskCertification,
+                        // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
+                        contentScale = ContentScale.Crop,
+                        circularReveal = CircularReveal(duration = 0),
+                        // 이미지 로딩 전 표시할 place holder 이미지
+                        placeHolder = painterResource(id = R.drawable.img_sample),
+                        // 에러 발생 시 표시할 이미지
+                        error = painterResource(id = R.drawable.img_sample),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(216.dp)
+                    )
+                }
+
+                // 날짜
+                Text(
+                    // 파싱 함수 추가
+                    text = completeDateString.value,
+                    style = MaterialTheme.typography.subtitle1.copy(
+                        fontSize = 12.sp,
+                        color = mono400,
+                        textAlign = TextAlign.End
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
             }
         }
     }

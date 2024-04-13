@@ -154,7 +154,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
 //            mBinding.setVariable(BR.deadLineString, limitText)
 //            mBinding.setVariable(BR.isLimit, mHasLimit)
             mBinding.setVariable(BR.isComplete, false)
-            mBinding.setVariable(BR.deadLineString, false)
+//            mBinding.setVariable(BR.deadLineString, false)
             mBinding.setVariable(BR.isLimit, false)
 
         }

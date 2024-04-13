@@ -9,6 +9,7 @@ import com.one.toit.R
 import com.one.toit.base.bind.DataBindingConfig
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseActivity
+import com.one.toit.data.dto.TaskDTO
 //import com.one.toit.data.dto.TaskDTO
 import com.one.toit.databinding.ActivityBoardBinding
 import com.one.toit.ui.fragment.board.BoardModifyFragment
@@ -34,17 +35,17 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         // intent로부터 인자를 받아 세팅
         val pageIndex = intent?.extras?.getInt("pageIndex")?:0;
         val actionName = getActionName(pageIndex)
-//        @Suppress("DEPRECATION")
-//        val mTaskDTO = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            intent?.extras?.getParcelable("taskDTO", TaskDTO::class.java)
-//        } else {
-//            intent?.extras?.getParcelable("taskDTO")
-//        }
+        @Suppress("DEPRECATION")
+        val mTaskDTO = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent?.extras?.getParcelable("taskDTO", TaskDTO::class.java)
+        } else {
+            intent?.extras?.getParcelable("taskDTO")
+        }
 //        Timber.i("taskDTO... %s", mTaskDTO)
         val bundle = Bundle()
-//        if(mTaskDTO!=null){
-//            bundle.putParcelable("taskDTO", mTaskDTO)
-//        }
+        if(mTaskDTO!=null){
+            bundle.putParcelable("taskDTO", mTaskDTO)
+        }
         // 할일 완료 여부
         val isComplete = intent?.extras?.getBoolean("isComplete")?:false
         bundle.putBoolean("isComplete", isComplete)

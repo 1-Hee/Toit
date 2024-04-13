@@ -3,7 +3,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 fun getApiKey(propertyKey: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+    /*
+        if gradle AGP version under 8.3.0 , can use these method,
+
+            return gradleLocalProperties(rootDir).getProperty(propertyKey)
+
+        but upper than 8.3.0 you should change codes like this...
+     */
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 plugins {

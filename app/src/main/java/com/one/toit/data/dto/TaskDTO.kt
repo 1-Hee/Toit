@@ -5,6 +5,7 @@ import android.os.Parcelable
 import java.util.Date
 data class TaskDTO(
     val taskId: Long = -1,
+    val taskInfoId:Long = -1,
     val createAt: Date = Date(),
     var taskTitle: String = "",
     var taskMemo: String = "",
@@ -13,6 +14,7 @@ data class TaskDTO(
     var taskCertification: String? = null
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readLong(),
         parcel.readLong(),
         Date(parcel.readLong()),
         parcel.readString() ?: "",
@@ -24,6 +26,7 @@ data class TaskDTO(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(taskId)
+        parcel.writeLong(taskInfoId)
         parcel.writeLong(createAt.time)
         parcel.writeString(taskTitle)
         parcel.writeString(taskMemo)

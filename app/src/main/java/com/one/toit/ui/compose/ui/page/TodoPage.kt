@@ -93,6 +93,7 @@ fun TodoPage(
             mDailyList.forEach { taskItem ->
                 val mTaskDTO = TaskDTO(
                     taskId = taskItem.register.taskId,
+                    taskInfoId = taskItem.info.infoId,
                     createAt = taskItem.register.createAt,
                     taskTitle = taskItem.info.taskTitle,
                     taskMemo = taskItem.info.taskMemo,
@@ -118,6 +119,7 @@ fun TodoPage(
                 mDailyList.forEach { taskItem ->
                     val mTaskDTO = TaskDTO(
                         taskId = taskItem.register.taskId,
+                        taskInfoId = taskItem.info.infoId,
                         createAt = taskItem.register.createAt,
                         taskTitle = taskItem.info.taskTitle,
                         taskMemo = taskItem.info.taskMemo,

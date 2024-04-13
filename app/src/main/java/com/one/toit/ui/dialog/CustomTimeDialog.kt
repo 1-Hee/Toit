@@ -37,18 +37,25 @@ class CustomTimeDialog(
 
         // 값 감지 및 유효성 체크용 리스너
         mBinding.npHour.setOnValueChangedListener { picker, oldVal, newVal ->
-            // 값이 변경될 때 호출되는 콜백
-            // newVal에는 새로운 값이 들어 있음
+            val mMinute = mBinding.npMinute.value // 현재 선택된 분
+            val isBurstTime = Time.isBurstTime(newVal, mMinute) // 시, 분으로 유효성을 점검함
+            resetToLegalTimes(isBurstTime) //  유효성을 검사!
         }
 
         mBinding.npMinute.setOnValueChangedListener { picker, oldVal, newVal ->
-            val isBurstTime = Time.isBurstTime(mBinding.npHour.value, newVal)
-            if(isBurstTime) {
-                mBinding.npHour.value = 0;
-                mBinding.npMinute.value = 10
-                val context = requireContext();
-                AppUtil.toast(context, context.getString(R.string.msg_invalid_time))
-            }
+            val mHour = mBinding.npHour.value // 현재 선택된 시간
+            val isBurstTime = Time.isBurstTime(mHour, newVal) // 시, 분으로 유효성을 점검함
+            resetToLegalTimes(isBurstTime) //  유효성을 검사!
+         }
+    }
+
+    // 유효성 체크 후 강제로 값을 변경하는 메서드
+    private fun resetToLegalTimes(isBurstTime : Boolean){
+        if(isBurstTime) {
+            mBinding.npHour.value = 0;
+            mBinding.npMinute.value = 10
+            val context = requireContext();
+            AppUtil.toast(context, context.getString(R.string.msg_invalid_time))
         }
     }
 
