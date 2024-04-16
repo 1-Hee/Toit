@@ -129,6 +129,13 @@
     <string name="msg_todo_complete">목표 달성! 오늘의 할 일을 달성한 것을 축하합니다😃</string>
     <string name="title_complete_todo">목표 완료 하기</string>
     <string name="txt_guide_complete_todo">정말로 등록하신 목표를 완료 하시겠어요?\n[완료]를 누르시면 회원님의 목표가 완료 처리됩니다.\n완료 후에는 데이터 수정에 제약이 발생해요!\n잊으신 부분은 없는 지 다시 한번 확인해주세요.😁</string>
+    <string name="hint_todo">목표를 입력해보세요(최대 28자)</string>
+    <string name="hint_todo_memo">메모를 입력해보세요</string>
+    <string name="txt_title_todo">TODO</string>
+    <string name="txt_title_memo">메모</string>
+    <string name="guide_todo_memo">memo</string>
+    <string name="txt_set_limit">기한 설정</string>
+    <string name="txt_dead_line">마감 기한</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

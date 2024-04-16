@@ -216,6 +216,34 @@ class AppUtil {
             return sb.toString()
         }
 
+        // Date 값을 기준으로 시간을 추출하는 메서드
+        fun getFullString(mDate:Date?):String{
+            val sb = StringBuilder()
+            if(mDate == null){
+                return sb.toString()
+            }else {
+                val calendar = Calendar.getInstance()
+                calendar.time = mDate
+                val mYear = calendar.get(Calendar.YEAR)
+                val mMonth = calendar.get(Calendar.MONTH)+1
+                val mDay = calendar.get(Calendar.DAY_OF_MONTH)
+                val mHour = calendar.get(Calendar.HOUR_OF_DAY)
+                val mMinute = calendar.get(Calendar.MINUTE)
+                val mSecond = calendar.get(Calendar.SECOND)
+                sb.append(String.format("%04d", mYear)) // Year
+                    .append("-")
+                    .append(String.format("%02d", mMonth)) // Month
+                    .append("-")
+                    .append(String.format("%02d", mDay)) // Day
+                    .append(" ")
+                    .append(String.format("%02d", mHour)) // hour
+                    .append(":")
+                    .append(String.format("%02d", mMinute)) // minute
+                    .append(":")
+                    .append(String.format("%02d", mSecond))
+                return sb.toString()
+            }
+        }
         // 시간 로그
         fun getTimeLog(context:Context, mDate:Date):String{
             val suffx = context.resources.getString(R.string.suffix_create);
