@@ -60,6 +60,10 @@ import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.PackedPieChart
 import com.one.toit.ui.compose.ui.unit.graph.PackedPieChartEntry
 import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.util.Date
 import kotlin.math.ceil
 import kotlin.math.round
 import kotlin.random.Random
@@ -70,6 +74,18 @@ fun WeeklyPage(
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO){
+            val mDate = Date()
+            val mList = taskViewModel.getWeeklyTaskCountList(mDate);
+            Timber.i("주간 리스트!!! >>>> $mList")
+            val mDailyList = taskViewModel.readTaskListByDate(mDate)
+            Timber.i("DB 리스트!!! >> $mDailyList")
+
+        }
+    }
+
     // dummy
     val test = listOf(
         "9/1","9/2","9/3","9/4","9/5",

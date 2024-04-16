@@ -37,11 +37,13 @@ import androidx.compose.ui.unit.sp
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.mono900
+import com.one.toit.ui.compose.style.purple400
 
 @Composable
 fun PerforatedPieChart(
@@ -53,7 +55,6 @@ fun PerforatedPieChart(
     success:Int
 ) {
     val colors = mutableListOf<Color>()
-
     /*
     PerformChartEntry
      */
@@ -63,7 +64,6 @@ fun PerforatedPieChart(
         colors.add(entry.color)
     }
     val floatValue = mutableListOf<Float>()
-
     // To set the value of each Arc according to
     // the value given in the data, we have used a simple formula.
     // For a detailed explanation check out the Medium Article.
@@ -129,9 +129,9 @@ fun PerforatedPieChart(
                         lastValue += value
                     }
 
-                }else {
+                } else {
                     drawArc(
-                        color = mono50,
+                        color = mono300,
                         0f,
                         360f,
                         useCenter = false,
@@ -259,6 +259,5 @@ fun DetailsPieChartItem(
                 )
             }
         }
-
     }
 }

@@ -85,4 +85,11 @@ class TaskViewModel(
         return repository.getCompleteTodayTaskCount(targetDate)
     }
 
+    /**
+     * 주간 통계 관련!
+     */
+    suspend fun getWeeklyTaskCountList(mDate:Date):List<Int> {
+        return repository.getWeeklyTaskCountList(mDate)
+    }
+
 }

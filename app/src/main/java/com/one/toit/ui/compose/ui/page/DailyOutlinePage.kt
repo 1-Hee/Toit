@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
+import com.one.toit.data.dto.TaskDTO
 //import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
@@ -53,36 +54,42 @@ fun DailyOutlinePage(
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
-    val currentDate = Date()
     val context = LocalContext.current
-    // MutableState를 사용하여 taskDTOList를 감싸기
-    // val taskDTOListState = remember { mutableStateOf<List<TaskDTO>>(emptyList()) }
+    val taskDTOList = remember { // db  로부터 불러온 오늘 할일 목록, only 해야할 일만
+        mutableStateOf(listOf<TaskDTO>())
+    }
+    val isInitState = remember { mutableStateOf(false) }
     // 오늘 taskValue 값!
     var totalCnt by remember { mutableIntStateOf(0) }
     var completeCnt by remember { mutableIntStateOf(0) }
-//    LaunchedEffect(Unit) {
-//        withContext(Dispatchers.Main) {
-//            val taskList = taskViewModel.readTaskListByDate(currentDate)
-//            Timber.i("[할일 목록] : %s", taskList)
-//            // 데이터 변화를 감지하기 위해 MutableState를 업데이트
-//            taskDTOListState.value = taskList.map { task ->
-//                TaskDTO(
-//                    task.register.taskId,
-//                    task.register.createAt.toString(),
-//                    task.info.infoId,
-//                    task.info.taskTitle,
-//                    task.info.taskMemo,
-////                    task.info.taskLimit,
-////                    task.info.taskComplete,
-//                    task.info.taskCertification
-//                )
-//            }
-//            val date = Date()
-//            totalCnt = taskViewModel.getAllTodayTaskCount(date)
-//            completeCnt = taskViewModel.getCompleteTodayTaskCount(date)
-//            Timber.i("total : %s | complete : %s", totalCnt, completeCnt)
-//        }
-//    }
+    LaunchedEffect(Unit){
+        withContext(Dispatchers.IO) {
+            Timber.e("FIRST INIT CALL...!!!")
+            val mDate = Date()
+            val mDailyList = taskViewModel.readNotCompleteTaskListByDate(mDate)
+            val mDTOList = mutableListOf<TaskDTO>()
+            mDailyList.forEach { taskItem ->
+                val mTaskDTO = TaskDTO(
+                    taskId = taskItem.register.taskId,
+                    taskInfoId = taskItem.info.infoId,
+                    createAt = taskItem.register.createAt,
+                    taskTitle = taskItem.info.taskTitle,
+                    taskMemo = taskItem.info.taskMemo,
+                    taskLimit = taskItem.info.taskLimit,
+                    taskComplete = taskItem.info.taskComplete,
+                    taskCertification = taskItem.info.taskCertification
+                )
+                Timber.i("[item] : $mTaskDTO")
+                mDTOList.add(mTaskDTO)
+            }
+            taskDTOList.value = mDTOList.toList()
+            // total cnt !
+            totalCnt = taskViewModel.getAllTodayTaskCount(mDate);
+            completeCnt = taskViewModel.getCompleteTodayTaskCount(mDate);
+            isInitState.value = true;
+            Timber.d("상태 초기화 됨... ${isInitState.value}")
+        }
+    }
     // taskDTOListState를 사용하여 UI 업데이트
 //    val taskDTOList = taskDTOListState.value
     // 현재 높이를 저장하기 위한 상태 변수
@@ -96,6 +103,10 @@ fun DailyOutlinePage(
     }
     val outerScrollState = rememberScrollState()
     val innerScrollState = rememberScrollState()
+
+    /**
+     * 시간대에 따른 추이 계싼해서 렌더링하는 메서드
+     */
     // dummy
     val test = mutableListOf<String>()
     val date = Date()
@@ -163,33 +174,33 @@ fun DailyOutlinePage(
         Spacer(modifier = Modifier.height(12.dp))
         // content
         // 등록한 List가 있을 경우
-//        if(taskDTOList.isNotEmpty()){
-//            Text(
-//                text = stringResource(id = R.string.header_todo_list),
-//                style = MaterialTheme.typography.subtitle1
-//                    .copy(
-//                        fontSize = 16.sp,
-//                        color = black
-//                    ),
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//            Spacer(modifier = Modifier.height(24.dp))
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height((deviceHeight * 0.7).dp)
-//                    .verticalScroll(innerScrollState)
-//                ,
-//                verticalArrangement = Arrangement.spacedBy(12.dp)
-//            ) {
-//                Spacer(modifier = Modifier.height(4.dp))
-//                repeat(taskDTOList.size){
-//                    ItemTodo(taskDTO = taskDTOList[it], launcher = launcher)
-//                }
-//                Spacer(modifier = Modifier.height(16.dp))
-//            }
-//        }
+        if(taskDTOList.value.isNotEmpty()){
+            Text(
+                text = stringResource(id = R.string.header_todo_list),
+                style = MaterialTheme.typography.subtitle1
+                    .copy(
+                        fontSize = 16.sp,
+                        color = black
+                    ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((deviceHeight * 0.7).dp)
+                    .verticalScroll(innerScrollState)
+                ,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Spacer(modifier = Modifier.height(4.dp))
+                repeat(taskDTOList.value.size){
+                    ItemTodo(taskDTO = taskDTOList.value[it], launcher = launcher)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
     }
 }

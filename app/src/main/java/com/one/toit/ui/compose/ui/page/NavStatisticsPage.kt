@@ -2,6 +2,7 @@ package com.one.toit.ui.compose.ui.page
 
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
@@ -30,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -43,10 +49,13 @@ import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.activity.StatisticsActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
+import com.one.toit.ui.compose.style.mono300
+import com.one.toit.ui.compose.style.none
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
+import com.patrykandpatrick.vico.compose.component.shapeComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -91,10 +100,6 @@ fun NavStatisticsPage(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            // Preview with sample data
-            // 변수 1 : 전체 개수, 성공 개수 엔트리
-            // 변수 2 : 일일 목표 개수
-            // 변수 3 : 달성 목표 개수
             // 차트
             val dataList = listOf(
                 ChartEntry(
@@ -114,41 +119,44 @@ fun NavStatisticsPage(
                 total = totalCnt,
                 success = completeCnt
             )
-            // 격언
-            val sentence = stringResource(id = R.string.sample_guide)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 48.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            Spacer(modifier = Modifier.height(24.dp))
+            if(totalCnt > 0){
+                // 격언
+                val sentence = stringResource(id = R.string.sample_guide)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = "\" $sentence \"",
+                        style = MaterialTheme.typography.caption.copy(
+                            fontSize = 16.sp,
+                            color = black,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            // 버튼
+            OutlinedButton(
+                onClick = { launcher?.launch(intent) },
+                border = BorderStroke(1.dp, none),
+                shape = CircleShape,
+                // or shape = CircleShape
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = purple200,
+                    contentColor = white,
+                    disabledContentColor = mono300
+                )
             ){
                 Text(
-                    text = "\" $sentence \"",
-                    style = MaterialTheme.typography.caption.copy(
-                        fontSize = 16.sp,
-                        color = black,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    modifier = Modifier
-                        .wrapContentSize()
-                )
-            }
-            // 버튼
-            Button(onClick = {
-                launcher?.launch(intent)
-            },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = purple200,
-                    contentColor = contentColorFor(purple200),
-                    disabledBackgroundColor = purple400,
-                    disabledContentColor = mono100
-                ),
-                elevation = null
-            ) {
-                Text(
-                    text = "자세한 통계 보기",
+                    text = stringResource(R.string.txt_see_detail_statistics),
                     style = MaterialTheme.typography.caption.copy(
                         fontSize = 16.sp,
                         color = white,
@@ -156,8 +164,11 @@ fun NavStatisticsPage(
                     ),
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(horizontal = 4.dp)
-                )
+                        .padding(
+                            vertical = 4.dp,
+                            horizontal = 2.dp
+                        ),
+                    )
             }
         }
     }

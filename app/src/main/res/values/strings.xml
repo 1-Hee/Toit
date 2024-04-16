@@ -103,7 +103,7 @@
     <string name="txt_statistics_date">%1$s년 %2$s월 Toit 통계</string>
     <string name="txt_h_monthly_report">님의 월간 리포트</string>
     <string name="txt_guide_toit_point">*회원님의 앱 사용 기록을 바탕으로 추산한 점수입니다.</string>
-    <string name="txt_empty_task">등록된 목표 없음</string>
+    <string name="txt_empty_task">목표 없음</string>
     <string name="txt_desc_total_todo">%1$s 님이 등록 하신 모든 목표의 총합 입니다.</string>
     <string name="txt_desc_avg_todo">%1$s 님이 하루에 등록한 목표의 평균 값입니다.</string>
     <string name="txt_desc_cumulative_todo">%1$s월 기준, 한 달간 누적된 총 목표의 수 입니다.</string>
@@ -136,6 +136,7 @@
     <string name="guide_todo_memo">memo</string>
     <string name="txt_set_limit">기한 설정</string>
     <string name="txt_dead_line">마감 기한</string>
+    <string name="txt_see_detail_statistics">자세한 통계 보기</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

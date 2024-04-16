@@ -107,6 +107,20 @@ interface TaskDao {
             "AND DATE(a.create_at) = DATE(:targetDate)")
     fun getCompleteTodayTaskCount(targetDate: Date):Int
 
+    /**
+     * 주간 통계 관련!
+     */
+
+    // for 주간 막대 그래프 && 주간 꺾은선 그래프
+    @Query("SELECT COALESCE(COUNT(task_id), -1) " +
+            "FROM table_task_registration a " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE DATE(a.create_at) <= DATE(:mDate) " +
+            "AND DATE(a.create_at) >= DATE(:mDate, '-7 days') " +
+            "GROUP BY DATE(a.create_at)"
+    )
+    fun getWeeklyTaskCountList(mDate:Date):List<Int>
 
 
 }
