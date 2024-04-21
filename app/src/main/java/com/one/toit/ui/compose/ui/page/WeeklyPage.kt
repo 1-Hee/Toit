@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,35 +39,27 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
+import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
-import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono200
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono400
-import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
-import com.one.toit.ui.compose.style.navy400
-import com.one.toit.ui.compose.style.orange300
 import com.one.toit.ui.compose.style.purple200
-import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.purple400
-import com.one.toit.ui.compose.style.purple50
-import com.one.toit.ui.compose.style.red300
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.graph.BarGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.PackedPieChart
 import com.one.toit.ui.compose.ui.unit.graph.PackedPieChartEntry
-import com.one.toit.ui.compose.ui.unit.graph.PerforatedPieChart
+import com.one.toit.util.AppUtil.Statistics
+import com.one.toit.util.AppUtil.Time
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Date
-import kotlin.math.ceil
-import kotlin.math.round
-import kotlin.random.Random
+import kotlin.math.max
 
 @Composable
 fun WeeklyPage(
@@ -75,35 +68,24 @@ fun WeeklyPage(
     launcher: ActivityResultLauncher<Intent>? = null
 ){
 
+    val mTaskCountList = remember { mutableStateOf<List<TaskCounter>>(listOf()) } // 주간 통계 데이터
+    val mMaxValue = remember { mutableIntStateOf(128) }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO){
             val mDate = Date()
-            val mList = taskViewModel.getWeeklyTaskCountList(mDate);
-            Timber.i("주간 리스트!!! >>>> $mList")
-            val mDailyList = taskViewModel.readTaskListByDate(mDate)
-            Timber.i("DB 리스트!!! >> $mDailyList")
-
+            val mList = taskViewModel.getWeeklyCounterList(mDate);
+            mTaskCountList.value  = mList
         }
     }
-
-    // dummy
-    val test = listOf(
-        "9/1","9/2","9/3","9/4","9/5",
-        "9/6","9/7",
-    )
-    val colorList = listOf(
-        black, red300, orange300, navy400, purple300
-    )
-    val testData by remember { mutableStateOf(mutableMapOf<String, ChartEntry>()) }
-    val testList = mutableListOf<Float>()
-    test.forEach { date ->
-        /*
-         val randomNumberInRange = Random.nextInt(1, 100)
-         */
-        val randIdx = Random.nextInt(0, 4)
-        val volume = Random.nextInt(32,  128)
-        testList.add(volume.toFloat())
-        testData[date] = ChartEntry(volume, colorList[randIdx])
+    val weeklyData by remember { mutableStateOf(mutableMapOf<String, ChartEntry>()) }
+    mTaskCountList.value.forEach { item ->
+        val volume = item.completeTask;
+        val mChartEntry = ChartEntry(volume, purple200)
+        val mDate = Time.getSimpleDateLog(item.date)
+        weeklyData[mDate] = mChartEntry;
+        if(item.completeTask > mMaxValue.value){
+            mMaxValue.value = item.completeTask
+        }
     }
 
     /// scroll state
@@ -154,17 +136,16 @@ fun WeeklyPage(
             )
         }
         if(!isCheck){
-            LaunchedEffect(testData){}
             BarGraphChart(
-                data = testData,
+                data = weeklyData,
                 durationMillis = 700,
-                maxValue = 172,
+                maxValue = mMaxValue.value
             )
         }else {
             LineGraphChart(
-                data = testData,
+                data = weeklyData,
                 durationMillis = 700,
-                maxValue = 172
+                maxValue = mMaxValue.value
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -184,8 +165,7 @@ fun WeeklyPage(
         // 주간 목표 달성율
         val titleWeekRatio = stringResource(R.string.title_weekly_ratio)
         val txtGuideWeeklyRatio = stringResource(R.string.txt_guide_weekly_ratio)
-        // 그래프
-        val weekAvgRatio = 0.854f // TODO 실제 계산한 값으로..
+        val weekAvgRatio = Statistics.getWeeklyRatio(mTaskCountList.value)// 주간 값으로 계산!
         PackedPieWeekUnit(
             titleString = titleWeekRatio,
             guideText = txtGuideWeeklyRatio,
@@ -195,7 +175,7 @@ fun WeeklyPage(
         val titleAvgDailyRatio = stringResource(R.string.title_average_daily_ratio)
         val txtGuideAvgDailyRatio = stringResource(R.string.txt_guide_average_daily_ratio)
         // 그래프
-        val weekAvgDailyRatio = 0.754f // TODO 실제 계산한 값으로..
+        val weekAvgDailyRatio = Statistics.getWeeklyDailyAvg(mTaskCountList.value)
         PackedPieWeekUnit(
             titleString = titleAvgDailyRatio,
             guideText = txtGuideAvgDailyRatio,

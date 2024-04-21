@@ -1,9 +1,11 @@
 package com.one.toit.data.repository
 
 import com.one.toit.data.dao.TaskDao
+import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.model.Task
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.Date
 
 class TaskRepository(
@@ -31,14 +33,14 @@ class TaskRepository(
         return@withContext taskDao.getAllTaskCnt()
     }
 
-    suspend fun readNotCompleteTaskList():List<Task>
+    suspend fun readRemainTaskList():List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readNotCompleteTaskList()
+        return@withContext taskDao.readRemainTaskList()
     }
     // 페이징 추가
-    suspend fun readNotCompleteTaskList(page:Int):List<Task>
+    suspend fun readRemainTaskList(page:Int):List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readNotCompleteTaskList(page)
+        return@withContext taskDao.readRemainTaskList(page)
     }
 
     suspend fun readTaskListByDate(targetDate: Date): List<Task>
@@ -55,39 +57,61 @@ class TaskRepository(
         = withContext(Dispatchers.IO){
         return@withContext taskDao.getTaskCntByDate(targetDate)
     }
-    suspend fun readNotCompleteTaskListByDate(targetDate: Date): List<Task>
+    suspend fun readRemainTaskListByDate(targetDate: Date): List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readNotCompleteTaskListByDate(targetDate)
+        return@withContext taskDao.readRemainTaskListByDate(targetDate)
     }
 
     // 페이징 추가
-    suspend fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task>
+    suspend fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readNotCompleteTaskListByDate(page, targetDate)
+        return@withContext taskDao.readRemainTaskListByDate(page, targetDate)
     }
-    suspend fun getNotCompleteTaskCntByDate(targetDate: Date): Int
+    suspend fun readRemainTaskCntByDate(targetDate: Date): Int
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.getNotCompleteTaskCntByDate(targetDate)
+        return@withContext taskDao.readRemainTaskCntByDate(targetDate)
     }
 
     // 통계 관련
     // 일일 전체 Task 개수
-    suspend fun getAllTodayTaskCount(targetDate: Date):Int
+    suspend fun getTotalTaskCnt(targetDate: Date):Int
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.getAllTodayTaskCount(targetDate)
+        return@withContext taskDao.getTotalTaskCnt(targetDate)
     }
 
     // 완료한 전체 Task 개수
-    suspend fun getCompleteTodayTaskCount(targetDate: Date):Int
+    suspend fun getCompleteTaskCnt(targetDate: Date):Int
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.getCompleteTodayTaskCount(targetDate)
+        return@withContext taskDao.getCompleteTaskCnt(targetDate)
     }
 
     /**
      * 주간 통계 관련!
      */
-    suspend fun getWeeklyTaskCountList(mDate:Date):List<Int>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.getWeeklyTaskCountList(mDate);
+
+    suspend fun getWeeklyCounterList(mDate:Date):List<TaskCounter>
+        = withContext(Dispatchers.IO) {
+        // taskDao
+        var cnt = 0;
+        val calendar:Calendar = Calendar.getInstance()
+        calendar.time = mDate;
+        val mTaskCounterList = mutableListOf<TaskCounter>();
+        while(cnt < 7){
+            val qDate = calendar.time
+            // 일일 task 개수
+            val dTotalCnt = taskDao.getTotalTaskCnt(qDate)
+            // 일일 task 완료 개수
+            val dCompleteCnt = taskDao.getCompleteTaskCnt(qDate)
+            // dto
+            val mTaskCount = TaskCounter(
+                totalTask = dTotalCnt,
+                completeTask = dCompleteCnt,
+                date = qDate
+            )
+            mTaskCounterList.add(mTaskCount)
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            cnt++;
+        }
+        return@withContext mTaskCounterList;
     }
 }

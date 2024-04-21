@@ -1,6 +1,5 @@
 package com.one.toit.ui.compose.ui.unit.todo
 
-//import com.one.toit.data.dto.TaskDTO
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
@@ -35,15 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
-import com.one.toit.util.AppUtil
-import com.one.toit.util.AppUtil.Time
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono300
@@ -51,6 +47,7 @@ import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
+import com.one.toit.util.AppUtil.Time
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -63,7 +60,6 @@ fun TodoPreviewDialog(
 ) {
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
-    val completeSuffix = stringResource(R.string.suffix_complete)
     val completeDateString = remember {
         mutableStateOf(
             if(taskDTO.taskComplete == null){
@@ -74,7 +70,6 @@ fun TodoPreviewDialog(
         )
     }
     val scrollState = rememberScrollState()
-//    Timber.i("fileName : %s", taskDTO.taskCertification)
 
     Dialog(
         onDismissRequest = onDismiss

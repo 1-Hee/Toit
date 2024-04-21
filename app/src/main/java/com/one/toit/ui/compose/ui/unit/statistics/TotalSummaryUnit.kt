@@ -1,7 +1,6 @@
 package com.one.toit.ui.compose.ui.unit.statistics
 
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,19 +24,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,7 +43,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -60,21 +50,9 @@ import androidx.compose.ui.unit.sp
 import com.one.toit.R
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
-import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.mono600
-import com.one.toit.ui.compose.style.mono700
-import com.one.toit.ui.compose.style.navy300
-import com.one.toit.ui.compose.style.orange200
 import com.one.toit.ui.compose.style.orange300
-import com.one.toit.ui.compose.style.orange400
-import com.one.toit.ui.compose.style.orange50
-import com.one.toit.ui.compose.style.purple100
-import com.one.toit.ui.compose.style.purple200
-import com.one.toit.ui.compose.style.purple300
-import com.one.toit.ui.compose.style.purple400
-import com.one.toit.ui.compose.style.purple50
-import com.one.toit.ui.compose.style.red100
 import com.one.toit.ui.compose.style.red300
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.ToitPointCard

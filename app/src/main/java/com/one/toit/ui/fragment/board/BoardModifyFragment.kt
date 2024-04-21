@@ -16,22 +16,16 @@ import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.listener.ViewClickListener
 import com.one.toit.base.ui.BaseFragment
 import com.one.toit.data.dto.TaskDTO
-//import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.model.TaskInfo
+import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.databinding.FragmentBoardModifyBinding
 import com.one.toit.ui.dialog.CustomTimeDialog
-import com.one.toit.data.viewmodel.TaskInfoViewModel
 import com.one.toit.util.AppUtil
 import com.one.toit.util.AppUtil.Time
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 
 class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
@@ -46,7 +40,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     override fun getDataBindingConfig(): DataBindingConfig {
         mBundle = Bundle() // bundle init
         // 키보드 엔터 이벤트 핸들링을 위한 리스너
-        val onKeyListener: View.OnKeyListener = View.OnKeyListener { view, keyCode, keyEvent ->
+        val onKeyListener: View.OnKeyListener = View.OnKeyListener { _, keyCode, keyEvent ->
             if(keyCode == KeyEvent.KEYCODE_ENTER
                 && keyEvent.action == KeyEvent.ACTION_DOWN){
                 // hide keypad
@@ -60,7 +54,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
         }
         // 가상 키패드 엔터 이벤트 핸들링을 위한 리스너
         val textListener: TextView.OnEditorActionListener = TextView.OnEditorActionListener {
-                textView, keyCode, keyEvent ->
+                _, keyCode, _ ->
             if(keyCode == 5 || keyCode == 6){
                 // hide keypad
                 AppUtil.UIManager.hideKeyPad(requireActivity())
@@ -107,7 +101,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     private fun parseArguments(){
         // bundle data parsing!
         arguments?.let { bundle ->
-            val context = requireContext();
+            val context = requireContext()
             mBundle = bundle
             Timber.i("[MODIFY FRAGMENT] %s", bundle)
             @Suppress("DEPRECATION")
@@ -118,14 +112,14 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             }
             Timber.d("MODIFY dto >> $mTaskDTO")
             mBinding.setVariable(BR.taskDTO, mTaskDTO)
-            val mHasLimit = mTaskDTO?.taskLimit != null;
-            mBinding.setVariable(BR.hasLimit, mHasLimit);
+            val mHasLimit = mTaskDTO?.taskLimit != null
+            mBinding.setVariable(BR.hasLimit, mHasLimit)
             val mLimitText = if(mHasLimit){
                 Time.getTimeLog(mTaskDTO?.taskLimit)
             }else {
                 context.resources.getString(R.string.txt_no_limit)
             }
-            mBinding.setVariable(BR.limitText, mLimitText);
+            mBinding.setVariable(BR.limitText, mLimitText)
 
             // 완료 여부 판정
             val isComplete = mTaskDTO?.taskComplete != null
@@ -133,9 +127,9 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                 val timeLog = Time.getFullString(mTaskDTO?.taskComplete)
                 val suffixStr = context.resources.getString(R.string.suffix_complete)
                 mBinding.setVariable(BR.limitDesc, "$timeLog $suffixStr")
-                mBinding.setVariable(BR.isComplete, true);
+                mBinding.setVariable(BR.isComplete, true)
             }else {
-                mBinding.setVariable(BR.isComplete, false);
+                mBinding.setVariable(BR.isComplete, false)
                 setGuideDesc(mHasLimit)
             }
             mBinding.notifyChange()
@@ -155,7 +149,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                 R.id.iv_back -> {
                     val activity = requireActivity()
                     activity.setResult(Activity.RESULT_CANCELED)
-                    activity.onBackPressedDispatcher.onBackPressed();
+                    activity.onBackPressedDispatcher.onBackPressed()
                 }
                 // 수정 버튼
                 R.id.tv_action -> {
@@ -169,7 +163,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                             taskInfoViewModel.modifyTaskInfo(mInfo)
                             activity.setResult(Activity.RESULT_OK)
                             activity.finish()
-                            showToast(msg);
+                            showToast(msg)
                         }
                     }
                 }
@@ -184,7 +178,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                     mBinding.setVariable(BR.hasLimit, !flag)
                     setGuideDesc(!flag)
                     if(flag){
-                        mTaskLimit = null;
+                        mTaskLimit = null
                         val context = requireContext()
                         mBinding.limitText = context.getString(R.string.txt_no_limit)
                         mBinding.notifyChange()
@@ -219,7 +213,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     private fun BoardModifyFragment.showToast(message: String) {
         // 토스트 메시지를 노출합니다.
         lifecycleScope.launch {
-            val context = requireContext();
+            val context = requireContext()
             AppUtil.toast(context, message)
         }
     }
@@ -230,9 +224,9 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
     private fun createTaskInfo(mTaskDTO: TaskDTO): TaskInfo {
         val titleFlag = mBinding.etTitleTodo.text?.isNotBlank() == true
         val memoFlag = mBinding.etMemoTodo.text?.isNotBlank() == true
-        var taskTitle: String = if (titleFlag) mBinding.etTitleTodo.text.toString() else ""
-        var taskMemo: String = if (memoFlag) mBinding.etMemoTodo.text.toString() else ""
-        var taskLimit: Date? = mTaskLimit
+        val taskTitle: String = if (titleFlag) mBinding.etTitleTodo.text.toString() else ""
+        val taskMemo: String = if (memoFlag) mBinding.etMemoTodo.text.toString() else ""
+        val taskLimit: Date? = mTaskLimit
         return TaskInfo(
             infoId = mTaskDTO.taskInfoId,
             fkTaskId = mTaskDTO.taskId,

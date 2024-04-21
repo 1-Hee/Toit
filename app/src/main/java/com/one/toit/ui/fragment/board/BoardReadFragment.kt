@@ -133,19 +133,19 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // bundle로 받아온 값 파싱하는 메서드
     private fun initBundleTaskDTO(context: Context, taskDTO: TaskDTO){
         val actionStr = context.resources.getString(R.string.txt_complete)
-        val isCertified = taskDTO.taskComplete != null; // 할일 완료 여부
-        val hasLimit = taskDTO.taskLimit != null; // 제한 시간이 있는지 여부
+        val isCertified = taskDTO.taskComplete != null // 할일 완료 여부
+        val hasLimit = taskDTO.taskLimit != null // 제한 시간이 있는지 여부
         val limitText = if(hasLimit){
-            Time.getLimitString(taskDTO.taskLimit!!);
+            Time.getLimitString(taskDTO.taskLimit!!)
         }else {
             context.getString(R.string.txt_no_limit)
         }
-        mBinding.setVariable(BR.title, taskDTO.taskTitle);
-        mBinding.setVariable(BR.actionName, actionStr);
-        mBinding.setVariable(BR.isCertified, isCertified);
-        mBinding.setVariable(BR.hasLimit, hasLimit);
-        mBinding.setVariable(BR.limitText, limitText);
-        mBinding.notifyChange();
+        mBinding.setVariable(BR.title, taskDTO.taskTitle)
+        mBinding.setVariable(BR.actionName, actionStr)
+        mBinding.setVariable(BR.isCertified, isCertified)
+        mBinding.setVariable(BR.hasLimit, hasLimit)
+        mBinding.setVariable(BR.limitText, limitText)
+        mBinding.notifyChange()
     }
 
     // 카메라로부터 받아온 이미지 비트맵을 uri로 저장하는 메서드
@@ -163,11 +163,11 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
             acceptedBitmap = bitmap
             if (acceptedBitmap != null) {
                 // 이미지 뷰에 바인딩
-                val resolver = requireActivity().contentResolver
                 mBinding.ivCapture.setImageBitmap(bitmap)
                 mBinding.isCertified = true
                 mBinding.notifyChange()
                 // 파일명 세팅...
+                // TODO 파일명 세팅 리터칭하기
                 val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
                 mFileName = "${requireContext().packageName}_${timeStamp}.jpg"
             }
@@ -339,7 +339,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                             val msg = context.resources.getString(R.string.msg_delete_todo)
                             lifecycleScope.launch(Dispatchers.Main) {
                                 taskRegisterViewModel.removeTaskRegisterById(mTaskId)
-                                showToast(msg);
+                                showToast(msg)
                                 requireActivity().setResult(Activity.RESULT_OK)
                                 requireActivity().finish()
 
@@ -355,7 +355,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     private fun BoardReadFragment.showToast(message: String) {
         // 토스트 메시지를 노출합니다.
         lifecycleScope.launch {
-            val context = requireContext();
+            val context = requireContext()
             AppUtil.toast(context, message)
         }
     }

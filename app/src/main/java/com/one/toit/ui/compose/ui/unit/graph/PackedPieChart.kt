@@ -18,12 +18,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono900
+import com.one.toit.ui.compose.style.red300
 import com.one.toit.ui.compose.style.white
 
 data class PackedPieChartEntry(
@@ -83,9 +85,9 @@ fun PackedPieChart(
         }
         if(text != null){
             val textSize = 18.sp
-            val adjustment = (textSize.value*2.5f)
+            val adjustment = (textSize.value*4f)
             val mWidth = ((this.size.width/2f) - adjustment)
-            val mHeight = ((this.size.height/2f) - adjustment) * animatedProgress.value
+            val mHeight = ((this.size.height/2f) - adjustment) * (animatedProgress.value)
             val offset = Offset(mWidth, mHeight)
             drawText(
                 textMeasurer = textMeasurer,
@@ -93,7 +95,8 @@ fun PackedPieChart(
                 topLeft = offset,
                 style = TextStyle.Default.copy(
                     color = white,
-                    fontSize = textSize
+                    fontSize = textSize,
+                    fontWeight = FontWeight.Bold
                 )
             )
         }

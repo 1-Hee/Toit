@@ -74,7 +74,7 @@ fun BarGraphChart(
 
                 Canvas(modifier = Modifier
                     .wrapContentWidth()
-                    .height(entry.volume.dp)
+                    .height((entry.volume*5).dp)
                 ) {
                     val height = size.height
                     val startingPoint = Offset(size.width, height)

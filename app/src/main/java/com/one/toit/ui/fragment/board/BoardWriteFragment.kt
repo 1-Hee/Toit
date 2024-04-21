@@ -42,7 +42,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
 
     override fun getDataBindingConfig(): DataBindingConfig {
         // 키보드 엔터 이벤트 핸들링을 위한 리스너
-        val onKeyListener: View.OnKeyListener = View.OnKeyListener { view, keyCode, keyEvent ->
+        val onKeyListener: View.OnKeyListener = View.OnKeyListener { _, keyCode, keyEvent ->
             if(keyCode == KeyEvent.KEYCODE_ENTER
                 && keyEvent.action == KeyEvent.ACTION_DOWN){
                 // hide keypad
@@ -56,7 +56,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
         }
         // 가상 키패드 엔터 이벤트 핸들링을 위한 리스너
         val textListener: TextView.OnEditorActionListener = TextView.OnEditorActionListener {
-                textView, keyCode, keyEvent ->
+                _, keyCode, _ ->
             if(keyCode == 5 || keyCode == 6){
                 // hide keypad
                 AppUtil.UIManager.hideKeyPad(requireActivity())
@@ -136,7 +136,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                     mBinding.setVariable(BR.isLimit, !flag)
                     setGuideDesc(!flag)
                     if(flag){
-                        mTaskLimit = null;
+                        mTaskLimit = null
                         val context = requireContext()
                         mBinding.limitText = context.getString(R.string.txt_no_limit)
                         mBinding.notifyChange()
@@ -197,7 +197,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     private fun BoardWriteFragment.showToast(message: String) {
         // 토스트 메시지를 노출합니다.
         lifecycleScope.launch {
-            val context = requireContext();
+            val context = requireContext()
             AppUtil.toast(context, message)
         }
     }
@@ -208,9 +208,9 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     private fun createTaskInfo(fkTaskId:Long): TaskInfo {
         val titleFlag = mBinding.etTitleTodo.text?.isNotBlank() == true
         val memoFlag = mBinding.etMemoTodo.text?.isNotBlank() == true
-        var taskTitle: String = if (titleFlag) mBinding.etTitleTodo.text.toString() else ""
-        var taskMemo: String = if (memoFlag) mBinding.etMemoTodo.text.toString() else ""
-        var taskLimit: Date? = mTaskLimit
+        val taskTitle: String = if (titleFlag) mBinding.etTitleTodo.text.toString() else ""
+        val taskMemo: String = if (memoFlag) mBinding.etMemoTodo.text.toString() else ""
+        val taskLimit: Date? = mTaskLimit
         return TaskInfo(
             fkTaskId = fkTaskId,
             taskTitle = taskTitle,

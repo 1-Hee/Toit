@@ -22,9 +22,12 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.data.dto.ChartEntry
+import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono600
+import com.one.toit.ui.compose.style.mono900
 import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.red300
+import com.one.toit.ui.compose.style.white
 
 // TODO List로 바꾸기!
 @Composable
@@ -33,8 +36,8 @@ fun LineGraphChart(
     durationMillis:Int = 1000,
     maxValue: Int = 128,
     graphColor: Color = purple300,
-    dotColor:Color = red300,
-    textColor:Color = mono600
+    dotColor:Color = mono100,
+    textColor:Color = mono900
 ) {
 
     val keyList = mutableListOf<String>()

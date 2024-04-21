@@ -114,7 +114,7 @@ fun TodoPage(
         withContext(Dispatchers.Main) {
             if(isInitState.value && checked){ // 초기화 되고, 체크가 되었을 경우에만!
                 val mDate = Date()
-                val mDailyList = taskViewModel.readNotCompleteTaskListByDate(mDate)
+                val mDailyList = taskViewModel.readRemainTaskListByDate(mDate)
                 val mDTOList = mutableListOf<TaskDTO>()
                 mDailyList.forEach { taskItem ->
                     val mTaskDTO = TaskDTO(

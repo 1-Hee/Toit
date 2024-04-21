@@ -37,13 +37,13 @@ interface TaskDao {
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
-    fun readNotCompleteTaskList(): List<Task>
+    fun readRemainTaskList(): List<Task>
 
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = '' " +
             "LIMIT 20 OFFSET(:page-1)*20")
-    fun readNotCompleteTaskList(page:Int): List<Task> // 페이징 추가한 메서드
+    fun readRemainTaskList(page:Int): List<Task> // 페이징 추가한 메서드
 
     /**
      *  일일 조회
@@ -73,7 +73,8 @@ interface TaskDao {
             "ON task_id = fk_task_id " +
             "WHERE COALESCE(task_complete, '') = '' " +
             "AND DATE(a.create_at) = DATE(:targetDate)")
-    fun readNotCompleteTaskListByDate(targetDate: Date): List<Task>
+    fun readRemainTaskListByDate(targetDate: Date): List<Task>
+    // readRemainTaskList(page:Int)
 
     @Query("SELECT * FROM table_task_registration a " +
             "INNER JOIN table_task_information " +
@@ -81,7 +82,7 @@ interface TaskDao {
             "WHERE COALESCE(task_complete, '') = '' " +
             "AND DATE(a.create_at) = DATE(:targetDate)" +
             "LIMIT 20 OFFSET(:page-1)*20")
-    fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task> // 페이징 추가
+    fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task> // 페이징 추가
 
     // 카운트 계수
     @Query("SELECT COUNT(ti.info_id) FROM table_task_registration tr " +
@@ -89,7 +90,8 @@ interface TaskDao {
             "ON task_id = fk_task_id " +
             "WHERE COALESCE(task_complete, '') = '' " +
             "AND DATE(tr.create_at) = DATE(:targetDate) ")
-    fun getNotCompleteTaskCntByDate(targetDate: Date): Int
+    fun readRemainTaskCntByDate(targetDate: Date): Int
+    // getRemainTaskCnt//
 
     // 통계 관련...
     // 일일 전체 Task 개수
@@ -97,7 +99,8 @@ interface TaskDao {
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
             "WHERE DATE(a.create_at) = DATE(:targetDate) ")
-    fun getAllTodayTaskCount(targetDate: Date):Int
+    fun getTotalTaskCnt(targetDate: Date):Int
+
 
     // 완료한 전체 Task 개수
     @Query("SELECT COUNT(task_id) FROM table_task_registration a " +
@@ -105,22 +108,12 @@ interface TaskDao {
             "ON task_id = fk_task_id " +
             "WHERE COALESCE(task_complete, '') != '' " +
             "AND DATE(a.create_at) = DATE(:targetDate)")
-    fun getCompleteTodayTaskCount(targetDate: Date):Int
+    fun getCompleteTaskCnt(targetDate: Date):Int
+    // getCompleteTaskCnt
 
     /**
      * 주간 통계 관련!
      */
-
-    // for 주간 막대 그래프 && 주간 꺾은선 그래프
-    @Query("SELECT COALESCE(COUNT(task_id), -1) " +
-            "FROM table_task_registration a " +
-            "INNER JOIN table_task_information " +
-            "ON task_id = fk_task_id " +
-            "WHERE DATE(a.create_at) <= DATE(:mDate) " +
-            "AND DATE(a.create_at) >= DATE(:mDate, '-7 days') " +
-            "GROUP BY DATE(a.create_at)"
-    )
-    fun getWeeklyTaskCountList(mDate:Date):List<Int>
 
 
 }

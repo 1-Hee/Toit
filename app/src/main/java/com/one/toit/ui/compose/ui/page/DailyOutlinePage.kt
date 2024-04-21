@@ -66,7 +66,7 @@ fun DailyOutlinePage(
         withContext(Dispatchers.IO) {
             Timber.e("FIRST INIT CALL...!!!")
             val mDate = Date()
-            val mDailyList = taskViewModel.readNotCompleteTaskListByDate(mDate)
+            val mDailyList = taskViewModel.readRemainTaskListByDate(mDate)
             val mDTOList = mutableListOf<TaskDTO>()
             mDailyList.forEach { taskItem ->
                 val mTaskDTO = TaskDTO(
@@ -84,8 +84,8 @@ fun DailyOutlinePage(
             }
             taskDTOList.value = mDTOList.toList()
             // total cnt !
-            totalCnt = taskViewModel.getAllTodayTaskCount(mDate);
-            completeCnt = taskViewModel.getCompleteTodayTaskCount(mDate);
+            totalCnt = taskViewModel.getTotalTaskCnt(mDate);
+            completeCnt = taskViewModel.getCompleteTaskCnt(mDate);
             isInitState.value = true;
             Timber.d("상태 초기화 됨... ${isInitState.value}")
         }

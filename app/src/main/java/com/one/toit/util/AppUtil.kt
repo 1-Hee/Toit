@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatEditText
 import com.one.toit.R
 import com.one.toit.data.dto.MediaDTO
+import com.one.toit.data.dto.TaskCounter
 import timber.log.Timber
 import java.lang.StringBuilder
 import java.text.ParseException
@@ -262,6 +263,7 @@ class AppUtil {
 
         // Date 값을 기준으로 시간 문자열을 추출하는 메서드
         fun getTimeLog(mDate: Date?):String{
+            if(mDate == null) return "empty"
             val calendar = Calendar.getInstance()
             calendar.time = mDate
             val mHour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -271,6 +273,52 @@ class AppUtil {
                 .append(":")
                 .append(String.format("%02d", mMinute)) // minute
             return sb.toString()
+        }
+
+        // 일일 9/1 이런 문자열 얻기 위한 메서드
+        fun getSimpleDateLog(mDate: Date?):String{
+            if(mDate == null) return ""
+            else {
+                val calendar = Calendar.getInstance()
+                calendar.time = mDate
+                val mMonth = calendar.get(Calendar.MONTH) + 1
+                val mDay = calendar.get(Calendar.DAY_OF_MONTH)
+                return "$mMonth/$mDay"
+            }
+        }
+    }
+
+    // 통계 관런 계산에 사용할 유틸리티
+    object Statistics{
+        // 주간 목표 달성율 계산 메서드
+        fun getWeeklyRatio(mCounterList:List<TaskCounter>):Float{
+            if(mCounterList.size < 7) return 0f;
+            else {
+                var mAllCnt:Float = 0f;
+                var mAllCompleteCnt:Float = 0f;
+                mCounterList.forEach { item ->
+                    mAllCnt += item.totalTask
+                    mAllCompleteCnt += item.completeTask
+                }
+                return if(mAllCnt <=0) 0f else mAllCompleteCnt/mAllCnt
+            }
+        }
+        // 일일 평균 목표 달성율 계산 메서드
+        fun getWeeklyDailyAvg(mCounterList:List<TaskCounter>):Float{
+            if(mCounterList.size < 7) return 0f;
+            else {
+                var mTotalRatio = 0f;
+                var size = mCounterList.size ;
+                for(item in mCounterList){
+                    if(item.totalTask <= 0) {
+                        size--;
+                        continue
+                    };
+                    val mDailyRatio:Float = ((item.completeTask.toFloat())/(item.totalTask.toFloat()))
+                    mTotalRatio += mDailyRatio
+                }
+                return if(size <= 0) 0f else mTotalRatio / size
+            }
         }
     }
 }

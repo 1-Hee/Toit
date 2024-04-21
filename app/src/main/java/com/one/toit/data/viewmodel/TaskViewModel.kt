@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.one.toit.data.TaskDataBase
+import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.model.Task
 import com.one.toit.data.repository.TaskInfoRepository
 import com.one.toit.data.repository.TaskRepository
@@ -40,13 +41,14 @@ class TaskViewModel(
         return repository.getAllTaskCnt()
     }
 
-    suspend fun readNotCompleteTaskList():List<Task>{
-        return repository.readNotCompleteTaskList()
+    suspend fun readRemainTaskList():List<Task>{
+        return repository.readRemainTaskList()
     }
     // 페이징 추가
-    suspend fun readNotCompleteTaskList(page:Int):List<Task>{
-        return repository.readNotCompleteTaskList(page)
+    suspend fun readRemainTaskList(page:Int):List<Task>{
+        return repository.readRemainTaskList(page)
     }
+    // readNotCompleteTaskList
 
     suspend fun readTaskListByDate(targetDate: Date): List<Task>{
         return repository.readTaskListByDate(targetDate)
@@ -61,35 +63,36 @@ class TaskViewModel(
         return repository.readTaskListByDate(page, targetDate)
     }
 
-    suspend fun readNotCompleteTaskListByDate(targetDate: Date): List<Task>{
-        return repository.readNotCompleteTaskListByDate(targetDate)
+    suspend fun readRemainTaskListByDate(targetDate: Date): List<Task>{
+        return repository.readRemainTaskListByDate(targetDate)
     }
     // 페이징 추가
-    suspend fun readNotCompleteTaskListByDate(page:Int, targetDate: Date): List<Task>{
-        return repository.readNotCompleteTaskListByDate(page, targetDate)
+    suspend fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task>{
+        return repository.readRemainTaskListByDate(page, targetDate)
     }
 
     // 카운트 함수
-    suspend fun getNotCompleteTaskCntByDate(targetDate: Date): Int{
-        return repository.getNotCompleteTaskCntByDate(targetDate)
+    suspend fun readRemainTaskCntByDate(targetDate: Date): Int{
+        return repository.readRemainTaskCntByDate(targetDate)
     }
 
     // 통계 관련
     // 일일 전체 Task 개수
-    suspend fun getAllTodayTaskCount(targetDate: Date):Int{
-        return repository.getAllTodayTaskCount(targetDate)
+    suspend fun getTotalTaskCnt(targetDate: Date):Int{
+        return repository.getTotalTaskCnt(targetDate)
     }
 
     // 완료한 전체 Task 개수
-    suspend fun getCompleteTodayTaskCount(targetDate: Date):Int {
-        return repository.getCompleteTodayTaskCount(targetDate)
+    suspend fun getCompleteTaskCnt(targetDate: Date):Int {
+        return repository.getCompleteTaskCnt(targetDate)
     }
 
     /**
      * 주간 통계 관련!
      */
-    suspend fun getWeeklyTaskCountList(mDate:Date):List<Int> {
-        return repository.getWeeklyTaskCountList(mDate)
+    suspend fun getWeeklyCounterList(mDate:Date):List<TaskCounter> {
+        return repository.getWeeklyCounterList(mDate)
+                            .sortedBy { it.date }
     }
 
 }

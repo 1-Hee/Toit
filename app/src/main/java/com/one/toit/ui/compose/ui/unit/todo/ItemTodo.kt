@@ -1,7 +1,7 @@
 package com.one.toit.ui.compose.ui.unit.todo
 
+//import com.one.toit.data.dto.TaskDTO
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
-//import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
@@ -49,12 +47,6 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.ui.unit.WarningDialog
 import com.one.toit.util.AppUtil
 import com.one.toit.util.AppUtil.Time
-import timber.log.Timber
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun ItemTodo(
@@ -75,11 +67,6 @@ fun ItemTodo(
             onDismiss = {
                 showPreViewDialog = false
             },
-//            onEdit = { id ->
-//                Timber.i("id : %s", id)
-//                intent.putExtra("pageIndex", 1)
-//                context.startActivity(intent)
-//            },
             onDelete = {
                 showPreViewDialog = false
                 showDeleteDialog = true
@@ -118,7 +105,6 @@ fun ItemTodo(
                 if (isSuccess) {
                     showPreViewDialog = true
                 } else {
-//                    // TODO 이쪽에 콜백으로 바꾸기
                     intent.putExtra("pageIndex", 2)
                     intent.putExtra("taskDTO", taskDTO)
                     intent.putExtra("isComplete", false)
