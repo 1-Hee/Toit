@@ -136,7 +136,7 @@ fun AllStatisticsPage(
             // Content of each tab
             when (selectedTabIndex) {
                 0 -> {
-                    TotalSummaryUnit()
+                    TotalSummaryUnit(taskViewModel)
                 }
                 1 -> {
                     AllToitListUnit(context, taskViewModel, launcher)

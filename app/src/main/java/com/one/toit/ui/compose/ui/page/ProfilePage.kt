@@ -116,7 +116,7 @@ fun ProfilePage(
     LaunchedEffect(updateState) {
         withContext(Dispatchers.Main) {
             val date = Date()
-            totalCnt = taskViewModel.getTotalTaskCnt(date)
+            totalCnt = taskViewModel.getTaskCntByDate(date)
             completeCnt = taskViewModel.getCompleteTaskCnt(date)
             Timber.i("total : %s / complete : %s", totalCnt, completeCnt)
             updateState = true

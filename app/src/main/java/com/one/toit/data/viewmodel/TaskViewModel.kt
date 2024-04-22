@@ -37,10 +37,6 @@ class TaskViewModel(
         return repository.readTaskListByQuery(page, query)
     }
 
-    suspend fun getAllTaskCnt(): Int{
-        return repository.getAllTaskCnt()
-    }
-
     suspend fun readRemainTaskList():List<Task>{
         return repository.readRemainTaskList()
     }
@@ -53,11 +49,6 @@ class TaskViewModel(
     suspend fun readTaskListByDate(targetDate: Date): List<Task>{
         return repository.readTaskListByDate(targetDate)
     }
-    // 카운트 함수
-    suspend fun getTaskCntByDate(targetDate: Date): Int {
-        return repository.getTaskCntByDate(targetDate)
-    }
-
     // 페이징 추가
     suspend fun readTaskListByDate(page:Int, targetDate: Date): List<Task>{
         return repository.readTaskListByDate(page, targetDate)
@@ -71,15 +62,28 @@ class TaskViewModel(
         return repository.readRemainTaskListByDate(page, targetDate)
     }
 
-    // 카운트 함수
-    suspend fun readRemainTaskCntByDate(targetDate: Date): Int{
-        return repository.readRemainTaskCntByDate(targetDate)
-    }
+    /**
+     * getTotalTaskCnt
+     * getCompleteTaskCnt
+     */
 
     // 통계 관련
     // 일일 전체 Task 개수
-    suspend fun getTotalTaskCnt(targetDate: Date):Int{
-        return repository.getTotalTaskCnt(targetDate)
+    //  getTotalTaskCnt
+
+
+    /**
+     * 주간 통계 관련!
+     */
+
+    // 일일 task 개수
+    suspend fun getTaskCntByDate(targetDate: Date): Int {
+        return repository.getTaskCntByDate(targetDate)
+    }
+
+    // 일일 남은 task 개수
+    suspend fun getRemainTaskCntByDate(targetDate: Date): Int{
+        return repository.getRemainTaskCntByDate(targetDate)
     }
 
     // 완료한 전체 Task 개수
@@ -87,12 +91,36 @@ class TaskViewModel(
         return repository.getCompleteTaskCnt(targetDate)
     }
 
-    /**
-     * 주간 통계 관련!
-     */
     suspend fun getWeeklyCounterList(mDate:Date):List<TaskCounter> {
         return repository.getWeeklyCounterList(mDate)
                             .sortedBy { it.date }
     }
 
+    /**
+     *  전체 통계 관련
+     */
+    // 전체 목표 수
+    suspend fun getAllTaskCnt(): Long{
+        return repository.getAllTaskCnt()
+    }
+    // 평균 목표 수
+    suspend fun getAvgTaskCnt(): Float {
+        return repository.getAvgTaskCnt()
+    }
+    // 월간 목표 수
+    suspend fun getMonthTaskCnt(mDate: Date): Long {
+        return repository.getMonthTaskCnt(mDate)
+    }
+    // 최장 기록
+    suspend fun getMaxTaskTime(): Long {
+        return repository.getMaxTaskTime()
+    }
+    // 최단 기록
+    suspend fun getMinTaskTime(): Long {
+        return repository.getMinTaskTime()
+    }
+    // 평균 기록
+    suspend fun getAvgTaskTime(): Float {
+        return repository.getAvgTaskTime()
+    }
 }

@@ -84,7 +84,7 @@ fun DailyOutlinePage(
             }
             taskDTOList.value = mDTOList.toList()
             // total cnt !
-            totalCnt = taskViewModel.getTotalTaskCnt(mDate);
+            totalCnt = taskViewModel.getTaskCntByDate(mDate);
             completeCnt = taskViewModel.getCompleteTaskCnt(mDate);
             isInitState.value = true;
             Timber.d("상태 초기화 됨... ${isInitState.value}")

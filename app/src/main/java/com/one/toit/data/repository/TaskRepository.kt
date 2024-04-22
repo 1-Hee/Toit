@@ -27,12 +27,6 @@ class TaskRepository(
         return@withContext taskDao.readTaskListByQuery(page, query)
     }
 
-    // 카운트 함수
-    suspend fun getAllTaskCnt(): Int
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.getAllTaskCnt()
-    }
-
     suspend fun readRemainTaskList():List<Task>
         = withContext(Dispatchers.IO){
         return@withContext taskDao.readRemainTaskList()
@@ -53,10 +47,6 @@ class TaskRepository(
         return@withContext taskDao.readTaskListByDate(page, targetDate)
     }
 
-    suspend fun getTaskCntByDate(targetDate: Date): Int
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.getTaskCntByDate(targetDate)
-    }
     suspend fun readRemainTaskListByDate(targetDate: Date): List<Task>
         = withContext(Dispatchers.IO){
         return@withContext taskDao.readRemainTaskListByDate(targetDate)
@@ -67,27 +57,28 @@ class TaskRepository(
         = withContext(Dispatchers.IO){
         return@withContext taskDao.readRemainTaskListByDate(page, targetDate)
     }
-    suspend fun readRemainTaskCntByDate(targetDate: Date): Int
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readRemainTaskCntByDate(targetDate)
-    }
+
 
     // 통계 관련
-    // 일일 전체 Task 개수
-    suspend fun getTotalTaskCnt(targetDate: Date):Int
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.getTotalTaskCnt(targetDate)
+    /**
+     * 주간 통계 관련!
+     */
+    suspend fun getTaskCntByDate(targetDate: Date): Int
+            = withContext(Dispatchers.IO){
+        return@withContext taskDao.getTaskCntByDate(targetDate)
+    }
+
+    suspend fun getRemainTaskCntByDate(targetDate: Date): Int
+            = withContext(Dispatchers.IO){
+        return@withContext taskDao.getRemainTaskCntByDate(targetDate)
     }
 
     // 완료한 전체 Task 개수
     suspend fun getCompleteTaskCnt(targetDate: Date):Int
-        = withContext(Dispatchers.IO){
+            = withContext(Dispatchers.IO){
         return@withContext taskDao.getCompleteTaskCnt(targetDate)
     }
 
-    /**
-     * 주간 통계 관련!
-     */
 
     suspend fun getWeeklyCounterList(mDate:Date):List<TaskCounter>
         = withContext(Dispatchers.IO) {
@@ -99,7 +90,7 @@ class TaskRepository(
         while(cnt < 7){
             val qDate = calendar.time
             // 일일 task 개수
-            val dTotalCnt = taskDao.getTotalTaskCnt(qDate)
+            val dTotalCnt = taskDao.getTaskCntByDate(qDate)
             // 일일 task 완료 개수
             val dCompleteCnt = taskDao.getCompleteTaskCnt(qDate)
             // dto
@@ -114,4 +105,42 @@ class TaskRepository(
         }
         return@withContext mTaskCounterList;
     }
+
+    /**
+     *  전체 통계 관련
+     *  for AllStatisticsPage
+     */
+    // 전체 목표 수
+    suspend fun getAllTaskCnt(): Long
+            = withContext(Dispatchers.IO) {
+        return@withContext taskDao.getAllTaskCnt()
+    }
+
+    // 평균 목표 수
+    suspend fun getAvgTaskCnt(): Float
+        = withContext(Dispatchers.IO) {
+        return@withContext taskDao.getAvgTaskCnt()
+    }
+    // 월간 목표 수
+    suspend fun getMonthTaskCnt(mDate: Date): Long
+        = withContext(Dispatchers.IO) {
+        return@withContext taskDao.getMonthTaskCnt(mDate)
+    }
+    // 최장 기록
+    suspend fun getMaxTaskTime(): Long
+        = withContext(Dispatchers.IO) {
+        return@withContext taskDao.getMaxTaskTime()
+    }
+    // 최단 기록
+    suspend fun getMinTaskTime(): Long
+        = withContext(Dispatchers.IO) {
+        return@withContext taskDao.getMinTaskTime()
+    }
+    // 평균 기록
+    suspend fun getAvgTaskTime(): Float
+        = withContext(Dispatchers.IO) {
+        return@withContext taskDao.getAvgTaskTime()
+    }
+
+
 }

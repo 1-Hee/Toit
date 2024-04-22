@@ -33,6 +33,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
+import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono50
@@ -57,6 +60,8 @@ import com.one.toit.ui.compose.style.red300
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.ToitPointCard
 import com.one.toit.util.PreferenceUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 
@@ -64,7 +69,7 @@ import java.util.Date
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TotalSummaryUnit(
-
+    taskViewModel: TaskViewModel
 ){
     // 오늘 날짜 정보 init
     val date = Date();
@@ -84,8 +89,41 @@ fun TotalSummaryUnit(
     val nickNameKey = stringResource(id = R.string.key_nickname)
     var userNickname by remember { mutableStateOf(prefs.getValue(nickNameKey)) } // 사용자 닉네임
 
+    /**
+     * 표시할 통계 정보
+     */
+    // 전체 목표 수
+    val mTaskTotalCnt = remember { mutableLongStateOf(0) }
+    // 평균 목표 수
+    val mTaskCntAvg = remember { mutableFloatStateOf(0f) }
+    // 월간 목표 수
+    val mMonthCnt = remember { mutableLongStateOf(0L) }
+    // 최장 기록
+    val mMaxTime = remember { mutableLongStateOf(0L) }
+    // 최단 기록
+    val mMinTime = remember { mutableLongStateOf(0L) }
+    // 평균 기록
+    val mAvgTime = remember { mutableFloatStateOf(0f) }
+
     // 스크롤 컴포저블 state
     val outerState = rememberScrollState()
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO){
+            // 전체 목표 수
+            mTaskTotalCnt.value = taskViewModel.getAllTaskCnt()
+            // 평균 목표 수
+            mTaskCntAvg.value = taskViewModel.getAvgTaskCnt()
+            // 월간 목표 수
+            mMonthCnt.value = taskViewModel.getMonthTaskCnt(date)
+            // 최장 기록
+            mMaxTime.value = taskViewModel.getMaxTaskTime()
+            // 최단 기록
+            mMinTime.value = taskViewModel.getMinTaskTime()
+            // 평균 기록
+            mAvgTime.value = taskViewModel.getAvgTaskTime()
+        }
+    }
+
 
     // 가장 외곽
     Column(
@@ -97,14 +135,6 @@ fun TotalSummaryUnit(
     ) {
         // 일자
         Spacer(modifier = Modifier.height(36.dp))
-//        Text(
-//            text = stringResource(R.string.txt_statistics_date, mYear, mMonth),
-//            style = MaterialTheme.typography.caption.copy(
-//                color = black,
-//                fontSize = 16.sp
-//            ),
-//        )
-//        Spacer(modifier = Modifier.height(24.dp))
         Box(modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()){
@@ -114,78 +144,51 @@ fun TotalSummaryUnit(
             )
         }
         Spacer(modifier = Modifier.height(48.dp))
-//        // 일자
-//        Row(
-//            modifier = Modifier
-//                .wrapContentSize(),
-//            verticalAlignment = Alignment.Bottom,
-//            horizontalArrangement = Arrangement.spacedBy(8.dp)
-//        ){
-//            // 이름
-//            Text(
-//                text = userNickname,
-//                style = MaterialTheme.typography.caption.copy(
-//                    color = purple300,
-//                    fontSize = 18.sp,
-//                    fontWeight = FontWeight.Bold
-//                )
-//            )
-//            // suffix
-//            Text(
-//                text = stringResource(R.string.txt_h_monthly_report),
-//                style = MaterialTheme.typography.caption.copy(
-//                    color = mono600,
-//                    fontSize = 16.sp,
-//                    fontWeight = FontWeight.Medium
-//                )
-//            )
-//        }
-//        Spacer(modifier = Modifier.height(24.dp))
-        // temp
+
         // todo 실제 데이터로...
         val dataList = listOf<StatisticsData>(
             // 전체 목표 수
             StatisticsData(
                 stringResource(R.string.txt_h_total_todo),
                 stringResource(R.string.txt_desc_total_todo, userNickname),
-                "${1234} ${stringResource(id = R.string.txt_unit)}",
+                "${mTaskTotalCnt.value} ${stringResource(id = R.string.txt_unit)}",
                 0 // 개수
             ),
             // 평균 목표 수
             StatisticsData(
                 stringResource(R.string.txt_h_avg_todo),
                 stringResource(R.string.txt_desc_avg_todo, userNickname),
-                "${13.5f} ${stringResource(id = R.string.txt_unit)}",
+                "${mTaskCntAvg.value} ${stringResource(id = R.string.txt_unit)}",
                 0 // 개수
             ),
             // n월 누적 할일 목록
             StatisticsData(
                 stringResource(R.string.txt_h_cumulative_todo, mMonth),
                 stringResource(R.string.txt_desc_cumulative_todo, mMonth),
-                "${1234} ${stringResource(id = R.string.txt_unit)}",
+                "${mMonthCnt.value} ${stringResource(id = R.string.txt_unit)}",
                 0 // 개수
             ),
             // 최장 기록
-            // todo 실제 값으로...
+            // todo 시간 값이 무조건 long 또는 float 으로 리턴 되므로 이에 따른 로직 재구성 필요
             StatisticsData(
                 stringResource(R.string.txt_h_todo_max),
                 stringResource(R.string.txt_desc_todo_max, userNickname),
-                "12:34",
-                1 // 시간
+                "${mMaxTime.value} sec",
+                0 // 시간
             ),
             // 최단 기록
             StatisticsData(
                 stringResource(R.string.txt_h_todo_min),
                 stringResource(R.string.txt_desc_todo_min, userNickname),
-                "12:34",
-                1 // 시간
+                "${mMinTime.value} sec",
+                0 // 시간
             ),
             // 평균 기록
             StatisticsData(
                 stringResource(R.string.txt_h_todo_avg),
                 stringResource(R.string.txt_desc_todo_avg, userNickname),
-                "12:34",
-                1 // 시간
+                "${mAvgTime.value} sec",
+                0 // 시간
             )
         )
         Column(
@@ -259,7 +262,7 @@ fun StatisticsCard(
             .fillMaxWidth()
             .height(96.dp)
             .clickable {
-               animationPlayed = !animationPlayed
+                animationPlayed = !animationPlayed
             },
         backgroundColor = white,
         elevation = 2.dp,

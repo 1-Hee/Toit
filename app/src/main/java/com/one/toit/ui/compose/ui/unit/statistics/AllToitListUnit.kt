@@ -31,11 +31,11 @@ fun AllToitListUnit(
     val lazyListState: LazyListState = rememberLazyListState()
     var searchedKeyword by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit){
-        withContext(Dispatchers.Main) {
-            maxCnt = taskViewModel.getAllTaskCnt()
-        }
-    }
+//    LaunchedEffect(Unit){
+//        withContext(Dispatchers.Main) {
+//            // maxCnt = taskViewModel.getAllTaskCnt()
+//        }
+//    }
 
 //    LaunchedEffect(pageIndex, searchedKeyword) {
 //        withContext(Dispatchers.Main) {
