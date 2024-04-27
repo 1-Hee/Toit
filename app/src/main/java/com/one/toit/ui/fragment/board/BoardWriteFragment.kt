@@ -148,13 +148,18 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                 // 기한 설정
                 R.id.et_limit_input -> {
                     val context = requireContext()
-                    val timeArr:Array<Int> = Time.getTimeLimit()
-                    Timber.i("array : %s", timeArr.contentToString())
-                    val mFlag = Time.isEnoughTimeDiff(timeArr[0], timeArr[1])
+                    // 현재 시간 기준 Date 객체 생성하여 비교!
+                    val mDate = Date();
+                    val calendar = Calendar.getInstance()
+                    calendar.time = mDate;
+                    calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE)+10)
+                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                    val min = calendar.get(Calendar.MINUTE)
+                    val mFlag = Time.isEnoughTimeDiff(calendar.time);
                     if(mFlag){
                         val dialog = CustomTimeDialog(
-                            hour = timeArr[0],
-                            min = timeArr[1],
+                            hour = hour,
+                            min = min,
                             listener = dialogListener,
                         )
                         dialog.show(requireActivity().supportFragmentManager, null)
@@ -163,7 +168,6 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                             context.getString(R.string.msg_invalid_limit)
                         )
                     }
-
                 }
                 // 등록 버튼!
                 R.id.l_btn_write_todo -> {
@@ -223,34 +227,11 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
     // 다이얼로그 리스너
     private val dialogListener = object : CustomTimeDialog.OnDialogClickListener {
         override fun onSelectTime(hour: Int, min: Int) {
-            val flag = Time.isEnoughTimeDiff(hour, min)
             val context = requireContext()
-            if(flag){
-                mTaskLimit = Time.getLimitDate(hour, min)
-                val calendar = Calendar.getInstance()
-                calendar.time = mTaskLimit
-                var mHour = calendar.get(Calendar.HOUR_OF_DAY)
-                var mMinute = calendar.get(Calendar.MINUTE)
-                val isBurstTime = Time.isBurstTime(hour, min)
-                if(isBurstTime){ // 혹시 시간이 오버됐다면,
-                    mHour = 23
-                    mMinute = 59 // 23:59로 강제로 고정
-                    mTaskLimit = Time.getDate(mHour, mMinute) // 마감기한도 변경
-                }
-                val strHour = String.format("%02d", mHour)
-                val strMin = String.format("%02d", mMinute)
-                val timeStr = "$strHour:$strMin"
-                mBinding.setVariable(BR.limitText, timeStr)
-                mBinding.notifyChange()
-            }else {
-                mTaskLimit = null
-                val strNoLimit = context.getString(R.string.txt_no_limit)
-                mBinding.setVariable(BR.limitText, strNoLimit)
-                mBinding.notifyChange()
-                AppUtil.toast(context, context.getString(R.string.msg_invailid_time_diff))
-            }
-            Timber.d("hour : $hour , min : $min, flag => $flag")
-
+            mTaskLimit = Time.getLimitDate(hour, min)
+            val timeStr = Time.getTimeString(context, mTaskLimit)
+            mBinding.setVariable(BR.limitText, timeStr)
+            mBinding.notifyChange()
         }
         override fun onCancel() {
         }

@@ -24,39 +24,14 @@ class CustomTimeDialog(
     override fun initViewModel() {}
     override fun initView() {
         // 시간 설정
-        mBinding.npHour.minValue = 0
-        val maxHour = min(hour, 23)
-        mBinding.npHour.maxValue = maxHour
-        mBinding.npHour.value = 0
+        mBinding.npHour.minValue = hour
+        mBinding.npHour.maxValue = 23
+        mBinding.npHour.value = hour
 
         // 분 설정
-        mBinding.npMinute.minValue = 0
-        val maxMin = max(min, 59)
-        mBinding.npMinute.maxValue = maxMin
-        mBinding.npMinute.value = 10
-
-        // 값 감지 및 유효성 체크용 리스너
-        mBinding.npHour.setOnValueChangedListener { picker, oldVal, newVal ->
-            val mMinute = mBinding.npMinute.value // 현재 선택된 분
-            val isBurstTime = Time.isBurstTime(newVal, mMinute) // 시, 분으로 유효성을 점검함
-            resetToLegalTimes(isBurstTime) //  유효성을 검사!
-        }
-
-        mBinding.npMinute.setOnValueChangedListener { picker, oldVal, newVal ->
-            val mHour = mBinding.npHour.value // 현재 선택된 시간
-            val isBurstTime = Time.isBurstTime(mHour, newVal) // 시, 분으로 유효성을 점검함
-            resetToLegalTimes(isBurstTime) //  유효성을 검사!
-         }
-    }
-
-    // 유효성 체크 후 강제로 값을 변경하는 메서드
-    private fun resetToLegalTimes(isBurstTime : Boolean){
-        if(isBurstTime) {
-            mBinding.npHour.value = 0;
-            mBinding.npMinute.value = 10
-            val context = requireContext();
-            AppUtil.toast(context, context.getString(R.string.msg_invalid_time))
-        }
+        mBinding.npMinute.minValue = min
+        mBinding.npMinute.maxValue = 59
+        mBinding.npMinute.value = min
     }
 
     private val viewClickListener = object : ViewClickListener {

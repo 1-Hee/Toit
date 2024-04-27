@@ -117,43 +117,22 @@ class AppUtil {
 
     // 시간 파싱 작업에 사용할 유틸리티
     object Time {
-        fun getTimeLimit(): Array<Int> {
-            val mDate = Date();
-            val calendar = Calendar.getInstance()
-            calendar.time = mDate
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            val min = calendar.get(Calendar.MINUTE)
-            return arrayOf(23-hour, 60-min)
+        // 시간이 10분 이상 차이가 나는지 점검하는 메서드
+        fun isEnoughTimeDiff(mDate:Date):Boolean{
+            val cDate = Date() // 비교할 날짜!
+            val cCalendar = Calendar.getInstance() // date1
+            cCalendar.time = cDate
+            cCalendar.set(Calendar.HOUR_OF_DAY, 23)
+            cCalendar.set(Calendar.MINUTE, 59)
+            val mCalendar = Calendar.getInstance() // date2
+            mCalendar.time = mDate
+            mCalendar.set(Calendar.MINUTE, (mCalendar.get(Calendar.MINUTE)+10));
+            val comparison = cCalendar.time.compareTo(mCalendar.time)
+            return comparison > 0;
         }
 
-        // 선택된 시간이 10분 이상 차이가 나는지 점검하는 메서드
-        fun isEnoughTimeDiff(hour:Int, min:Int):Boolean{
-            val inputTime = hour * 60 * 60 * 1000L + min * 60 * 1000L
-            return inputTime >= 10 * 60 * 1000 // 10분 이상인지 확인
-        }
-
-        // todo 시간 계산하는 부분을 뺄셈을 통해서 구하는 방식이 아니라, 현재시간 ~ 23:59 까지로 고정시키기
-        /**
-         * 기한 설정 후 ,마감 기한이 내일을 넘기는지 판단하는 메서드
-         */
-        fun isBurstTime(hour: Int, min: Int):Boolean{
-            // 현재 시간과 셈해서
-            val mDate = Date();
-            val calendar = Calendar.getInstance()
-            calendar.time = mDate
-            var currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-            var currentMinute = calendar.get(Calendar.MINUTE)
-            currentHour += hour;
-            currentMinute += min;
-            currentHour += currentMinute/60;
-            currentMinute %= 60;
-            return currentHour >= 24
-        }
-
-        /**
-         * 시간과 분을 입력했을때 Date를 리턴해주는 함수
-         */
-        fun getDate(hour: Int, min: Int):Date {
+        // 시간과 분 정보를 받아 Date 객체 리턴하는 메서드
+        fun getLimitDate(hour: Int, min: Int):Date {
             val mDate = Date();
             val calendar = Calendar.getInstance()
             calendar.time = mDate
@@ -162,22 +141,16 @@ class AppUtil {
             return calendar.time
         }
 
-        // 시간과 분 정보를 받아 Date 객체 리턴하는 메서드
-        fun getLimitDate(hour: Int, min: Int):Date {
-            val mDate = Date();
+        fun getTimeString(context: Context, mDate: Date?):String{
+            val txtNoLimit = context.resources.getString(R.string.txt_no_limit)
+            if(mDate == null) return txtNoLimit
             val calendar = Calendar.getInstance()
             calendar.time = mDate
-            val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-            val currentMinute = calendar.get(Calendar.MINUTE)
-            var mMinute = (currentMinute + min)
-            val mHour = (currentHour + hour + (mMinute/60))%24
-            mMinute %= 60
-
-            Timber.d("limit hour : $mHour , limit min : $mMinute")
-
-            calendar.set(Calendar.HOUR_OF_DAY,mHour)
-            calendar.set(Calendar.MINUTE, mMinute)
-            return calendar.time
+            val mHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val mMinute = calendar.get(Calendar.MINUTE)
+            val strHour = String.format("%02d", mHour)
+            val strMin = String.format("%02d", mMinute)
+            return "$strHour:$strMin"
         }
         // 저장된 date 를 기반으로 제한시간 문자열 리턴하는 메서드
         fun getLimitString(mDate:Date):String {
@@ -190,7 +163,6 @@ class AppUtil {
                 .append(":").append(String.format("%02d", mMinute)) // min
             return sb.toString()
         }
-
         // Date 값을 기준으로 시간을 추출하는 메서드
         fun getFullLog(context:Context, mDate:Date):String{
             val suffix = context.getString(R.string.suffix_create)

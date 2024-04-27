@@ -71,8 +71,9 @@ interface TaskDao {
     fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task> // 페이징 추가
 
     // 통계 관련...
-    // 일일 전체 Task 개수
-    // getCompleteTaskCnt
+    /**
+     *  시간대별 달성 추이 확인
+     */
 
     /**
      * 주간 통계 관련!
@@ -112,14 +113,14 @@ interface TaskDao {
     fun getAllTaskCnt(): Long
 
     // 평균 목표 수
-    // todo... 고쳐야댐 ㅠㅠ
-    @Query("SELECT AVG(cnt) AS avg_count " +
-            "FROM ( " +
-            "    SELECT tr.create_at as mDate, COUNT(tr.task_id) AS cnt " +
-            "    FROM table_task_registration tr " +
-            "    INNER JOIN table_task_information ti ON tr.task_id = ti.fk_task_id " +
-            "    GROUP BY tr.create_at" +
-            " ) AS counts; ")
+    @Query("SELECT AVG(cnt) " +
+            "FROM(" +
+            "   SELECT COUNT(tr.task_id) as cnt " +
+            "   FROM table_task_registration tr " +
+            "   INNER JOIN table_task_information ti " +
+            "   ON task_id = fk_task_id " +
+            "   GROUP BY DATE(tr.create_at)" +
+            ") as sub_table;")
     fun getAvgTaskCnt(): Float
     // 월간 목표 수
     @Query("SELECT COUNT(tr.task_id) FROM table_task_registration tr " +
@@ -129,41 +130,33 @@ interface TaskDao {
     fun getMonthTaskCnt(mDate: Date): Long
 
     // 최장 기록
-    @Query("SELECT CASE " +
-            "   WHEN task_complete IS NOT NULL" +
+    @Query("SELECT MAX(" +
+            "   CASE WHEN task_complete IS NOT NULL " +
             "       THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
-            "   ELSE null END " +
+            "   ELSE null END)" +
             "FROM table_task_registration tr " +
             "INNER JOIN table_task_information ti " +
-            "ON task_id = fk_task_id " +
-            "ORDER BY 1 DESC LIMIT 1"
+            "ON task_id = fk_task_id;"
     )
     fun getMaxTaskTime(): Long
     // 최단 기록
-    @Query("SELECT CASE " +
-            "   WHEN task_complete IS NOT NULL" +
+    @Query("SELECT MIN(" +
+            "   CASE WHEN task_complete IS NOT NULL " +
             "       THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
-            "   ELSE null END as task_gap " +
+            "   ELSE null END)" +
             "FROM table_task_registration tr " +
             "INNER JOIN table_task_information ti " +
-            "ON task_id = fk_task_id " +
-            "WHERE task_gap > 0 "+
-            "ORDER BY 1 ASC LIMIT 1"
+            "ON task_id = fk_task_id;"
     )
     fun getMinTaskTime(): Long
     // 평균 기록
-    // todo 0값은 어떻게 할지...
-    @Query("SELECT AVG( " +
-            " CASE " +
-            "   WHEN (strftime('%s', task_complete) - strftime('%s', create_at)) > 0 " +
-            "       THEN (strftime('%s', task_complete) - strftime('%s', create_at))" +
-            "   ELSE null " +
-            " END " +
-            " ) " +
-            "FROM table_task_registration tr " +
+    @Query("SELECT AVG(" +
+            "   CASE WHEN(strftime('%s', task_complete) - strftime('%s', create_at)) > 0 " +
+            "   THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
+            "   ELSE null END" +
+            ") FROM table_task_registration tr " +
             "INNER JOIN table_task_information ti " +
-            "ON task_id = fk_task_id "
-    )
+            "ON task_id = fk_task_id;")
     fun getAvgTaskTime():Float
 
 
