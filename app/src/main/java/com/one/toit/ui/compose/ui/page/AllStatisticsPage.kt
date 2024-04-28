@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
+import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -44,6 +45,7 @@ import com.one.toit.ui.compose.ui.unit.statistics.TotalSummaryUnit
 fun AllStatisticsPage(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
     val context = LocalContext.current
@@ -136,7 +138,7 @@ fun AllStatisticsPage(
             // Content of each tab
             when (selectedTabIndex) {
                 0 -> {
-                    TotalSummaryUnit(taskViewModel)
+                    TotalSummaryUnit(taskViewModel, taskPointViewModel)
                 }
                 1 -> {
                     AllToitListUnit(context, taskViewModel, launcher)

@@ -93,7 +93,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ToitPointCard(
     modifier: Modifier = Modifier,
-    toitPoint:Int,
+    toitPoint:Long,
     durationMillis:Int = 1500
 ){
 

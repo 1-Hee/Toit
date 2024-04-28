@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
+import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -90,6 +93,7 @@ import java.util.Date
 fun ProfilePage(
     navController : NavHostController,
     taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ) {
     Timber.plant(Timber.DebugTree())
@@ -106,19 +110,21 @@ fun ProfilePage(
     /**
      * 사용자 프로필 통계 정보
      */
-    var toitPoint by remember { mutableStateOf(123456) }
-    var dayCnt by remember { mutableStateOf(getDiffTime(context)) }
+    var toitPoint by remember { mutableLongStateOf(123456) }
+    var dayCnt by remember { mutableLongStateOf(getDiffTime(context)) }
 
     // 오늘 taskValue 값!
     var totalCnt by remember { mutableIntStateOf(0) }
     var completeCnt by remember { mutableIntStateOf(0) }
     var updateState by remember { mutableStateOf(false) }
+    //
     LaunchedEffect(updateState) {
         withContext(Dispatchers.Main) {
             val date = Date()
             totalCnt = taskViewModel.getTaskCntByDate(date)
             completeCnt = taskViewModel.getCompleteTaskCnt(date)
-            Timber.i("total : %s / complete : %s", totalCnt, completeCnt)
+            // Timber.i("total : %s / complete : %s", totalCnt, completeCnt)
+            toitPoint = taskPointViewModel.getToitPoint()
             updateState = true
         }
     }

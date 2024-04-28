@@ -47,6 +47,7 @@ import androidx.navigation.compose.rememberNavController
 import com.one.toit.R
 import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.ui.BaseComposeActivity
+import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.nav.StatisticsRoute
 import com.one.toit.ui.compose.style.mono300
@@ -64,6 +65,7 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
     // viewModel
     private lateinit var pageViewModel: PageViewModel
     private lateinit var taskViewModel: TaskViewModel
+    private lateinit var taskPointViewModel: TaskPointViewModel
     private lateinit var launcher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +81,10 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
             }
         }
         setContent {
-            StatisticsScreenView(pageViewModel, taskViewModel, launcher)
+            StatisticsScreenView(
+                pageViewModel, taskViewModel,
+                taskPointViewModel, launcher
+            )
         }
     }
     override fun initViewModel() {
@@ -90,6 +95,7 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
         pageViewModel.setPageName(context.getString(R.string.title_dilay_outline))
         val factory = ApplicationFactory(this.application)
         taskViewModel = getApplicationScopeViewModel(TaskViewModel::class.java, factory)
+        taskPointViewModel = getApplicationScopeViewModel(TaskPointViewModel::class.java, factory)
     }
 }
 
@@ -97,6 +103,7 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
 fun StatisticsScreenView(
     pageViewModel: PageViewModel,
     taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
     val navController = rememberNavController()
@@ -108,11 +115,13 @@ fun StatisticsScreenView(
 
     ) {
         Box(Modifier.padding(it)){
-            StatisticsNavGraph(navController, taskViewModel, launcher)
+            StatisticsNavGraph(
+                navController, taskViewModel,
+                taskPointViewModel, launcher
+            )
         }
     }
 }
-
 @Composable
 fun StatisticsTopBarComponent(
     pageViewModel: PageViewModel,
@@ -159,6 +168,7 @@ fun StatisticsTopBarComponent(
 fun StatisticsNavGraph(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ) {
     NavHost(
@@ -172,7 +182,7 @@ fun StatisticsNavGraph(
             WeeklyPage(navController, taskViewModel, launcher)
         }
         composable(route = StatisticsRoute.AllStatisticsPage.route){
-            AllStatisticsPage(navController, taskViewModel, launcher)
+            AllStatisticsPage(navController, taskViewModel, taskPointViewModel, launcher)
         }
     }
 }

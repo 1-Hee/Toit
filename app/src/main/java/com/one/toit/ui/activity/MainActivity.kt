@@ -63,6 +63,7 @@ import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.viewmodel.PageViewModel
 import com.one.toit.data.viewmodel.TaskInfoViewModel
+import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.ui.page.NavStatisticsPage
@@ -77,6 +78,7 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     // 자식 엔티티
     private lateinit var taskInfoViewModel: TaskInfoViewModel
+    private lateinit var taskPointViewModel: TaskPointViewModel;
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var launcher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,13 +97,13 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
             }
         }
         setContent {
-            MainScreenView(pageViewModel, taskViewModel, launcher)
+            MainScreenView(pageViewModel, taskViewModel, taskPointViewModel, launcher)
         }
-        lifecycleScope.launch {
-            val date = Date()
-            val data = taskRegisterViewModel.readTaskRegisterListByDate(date)
-            Timber.i("taskList .. %s", data)
-        }
+//        lifecycleScope.launch {
+//            val date = Date()
+//            val data = taskRegisterViewModel.readTaskRegisterListByDate(date)
+//            Timber.i("taskList .. %s", data)
+//        }
     }
     override fun initViewModel() {
         super.initViewModel()
@@ -112,6 +114,7 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
         taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
         taskInfoViewModel = getApplicationScopeViewModel(TaskInfoViewModel::class.java, factory)
         taskViewModel = getApplicationScopeViewModel(TaskViewModel::class.java, factory)
+        taskPointViewModel = getApplicationScopeViewModel(TaskPointViewModel::class.java, factory)
     }
 
     //  권한 요청 함수
@@ -163,6 +166,7 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
 fun MainScreenView(
     pageViewModel: PageViewModel,
     taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ) {
     val navController = rememberNavController()
@@ -171,7 +175,7 @@ fun MainScreenView(
         bottomBar = { MainBottomNavigation(navController, pageViewModel) }
     ) {
         Box(Modifier.padding(it)){
-            MainNavGraph(navController, taskViewModel, launcher)
+            MainNavGraph(navController, taskViewModel, taskPointViewModel, launcher)
         }
     }
 }
@@ -221,6 +225,7 @@ fun MainTopBarComponent(
 fun MainNavGraph(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ) {
     NavHost(
@@ -235,7 +240,7 @@ fun MainNavGraph(
             NavStatisticsPage(navController, taskViewModel, launcher)
         }
         composable(MainRoute.Profile.route) {
-            ProfilePage(navController, taskViewModel, launcher)
+            ProfilePage(navController, taskViewModel, taskPointViewModel, launcher)
         }
     }
 }

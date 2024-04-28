@@ -25,7 +25,9 @@ import com.one.toit.base.ui.BaseFragment
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.dto.WarningDTO
 import com.one.toit.data.model.TaskInfo
+import com.one.toit.data.model.TaskPoint
 import com.one.toit.data.viewmodel.TaskInfoViewModel
+import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.databinding.FragmentBoardReadBinding
@@ -50,6 +52,8 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     private lateinit var taskInfoViewModel: TaskInfoViewModel
     private lateinit var taskViewModel: TaskViewModel
+    private lateinit var taskPointViewModel: TaskPointViewModel
+
     // 저장된 파일 이름
     private var mFileName:String = ""
     // 카메라로부터 받은 비트맵
@@ -71,6 +75,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
         taskRegisterViewModel = getFragmentScopeViewModel(TaskRegisterViewModel::class.java, factory)
         taskInfoViewModel = getFragmentScopeViewModel(TaskInfoViewModel::class.java, factory)
         taskViewModel = getFragmentScopeViewModel(TaskViewModel::class.java, factory)
+        taskPointViewModel = getFragmentScopeViewModel(TaskPointViewModel::class.java, factory)
     }
     override fun initView() {
         // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
@@ -287,6 +292,19 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                         if(mTaskInfo != null){
                             lifecycleScope.launch(Dispatchers.IO){
                                 taskInfoViewModel.modifyTaskInfo(mTaskInfo)
+                                /**
+                                 *  점수 계산 로직
+                                 */
+                                val mDate = Date()
+                                // mTaskInfo
+                                var mPoint = taskViewModel.getTaskPoint(mDate, mTaskInfo.fkTaskId)
+                                val isFirst = taskPointViewModel.checkIsFirst(mDate)
+                                if(isFirst) mPoint += 300 // 첫 등록시 300 점 추가
+                                // 점수 엔티티 생성
+                                val mTaskPoint = getTaskPoint(mPoint, mTaskInfo)
+                                val pointId = taskPointViewModel.addTaskPoint(mTaskPoint)
+                                Timber.d("point id .. %s", pointId)
+                                //
                                 val msg = context.resources.getString(R.string.msg_todo_complete)
                                 mTaskDTO?.taskCertification = mImageUri?.toString()
                                 mBinding.setVariable(BR.mTaskDTO, mTaskDTO)
@@ -296,12 +314,19 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                                 requireActivity().setResult(Activity.RESULT_OK)
                                 requireActivity().finish()
                             }
-
                         }
                     }
                 }
             })
         dialog.show(requireActivity().supportFragmentManager, null)
+    }
+
+    // 점수 모델 생성 매서드
+    private fun getTaskPoint(mPoint:Int, taskInfo:TaskInfo):TaskPoint {
+        return TaskPoint(
+            fkTaskId = taskInfo.fkTaskId,
+            point = mPoint
+        )
     }
 
     private fun parseToTaskInfo(dto:TaskDTO?): TaskInfo? {

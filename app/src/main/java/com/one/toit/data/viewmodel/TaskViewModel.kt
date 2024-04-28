@@ -123,4 +123,12 @@ class TaskViewModel(
     suspend fun getAvgTaskTime(): Float {
         return repository.getAvgTaskTime()
     }
+
+    /**
+     *  점수 산정을 위한 메서드
+     */
+    // 점수 구하는 메서드!
+    suspend fun getTaskPoint(mDate: Date, fkTaskId: Long):Int {
+        return repository.getTaskPoint(mDate, fkTaskId)
+    }
 }

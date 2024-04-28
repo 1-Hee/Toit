@@ -159,5 +159,33 @@ interface TaskDao {
             "ON task_id = fk_task_id;")
     fun getAvgTaskTime():Float
 
+    /**
+     *  점수 산정을 위한 메서드
+     */
+
+    // 메모 점수 산정을 위한 메모 길이
+    @Query(
+        "SELECT LENGTH(ti.task_memo) " +
+                "FROM table_task_information ti " +
+                "WHERE ti.fk_task_id = :fkTaskId;"
+    )
+    fun getMemoLength(fkTaskId:Long):Int
+
+    /**
+     * 달성 시간 구하는 메서드
+     * CASE 문을 통해 달성 시간이 없을 경우 - 값이 나오도록 함!
+     */
+    @Query(
+        "SELECT (CASE " +
+                "   WHEN task_limit IS NOT NULL " + // 제한이 있으면,
+                "   THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
+                "   ELSE -1 END) as complete_time " +
+                "FROM table_task_registration " +
+                "INNER JOIN table_task_information " +
+                "ON task_id = fk_task_id " +
+                "WHERE fk_task_id = :fkTaskId; "
+    )
+    fun getCompleteTime(fkTaskId: Long):Long
+
 
 }

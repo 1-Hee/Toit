@@ -143,5 +143,43 @@ class TaskRepository(
         return@withContext taskDao.getAvgTaskTime()
     }
 
+    /**
+     *  점수 산정을 위한 메서드
+     */
+
+    // 메모 점수 산정을 위한 메모 길이
+    private suspend fun getMemoLength(fkTaskId:Long):Int
+            = withContext(Dispatchers.IO) {
+        Timber.d("getMemoLength... %s", fkTaskId)
+        return@withContext taskDao.getMemoLength(fkTaskId)
+    }
+
+    // 달성 시간 구하는 메서드
+    private suspend fun getCompleteTime(fkTaskId: Long):Long
+            = withContext(Dispatchers.IO) {
+        Timber.d("getCompleteTime.. %s", fkTaskId)
+        return@withContext taskDao.getCompleteTime(fkTaskId)
+    }
+
+    // 점수 구하는 메서드!
+    suspend fun getTaskPoint(mDate: Date, fkTaskId: Long):Int
+            = withContext(Dispatchers.IO){
+        var mPoint = 0;
+        val mLength = getMemoLength(fkTaskId)
+        // 메모 계수 적용하여 10자 이상 작성하면 10점
+        if(mLength > 10) mPoint += 10
+
+        val completeTime = getCompleteTime(fkTaskId)
+        if(completeTime > 0){ // 마감시간 있음
+            val time = ( completeTime / 60 ) + 1
+            mPoint += 30
+            val extraPoint = ( (5 * (time * (time + 1)).toDouble())) / 2
+            Timber.d("추가 점수 : %s", extraPoint)
+            mPoint += extraPoint.toInt()
+        }else { // 마감시간 없음
+            mPoint += 30
+        }
+        return@withContext mPoint
+    }
 
 }

@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
+import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
@@ -69,7 +70,8 @@ import java.util.Date
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TotalSummaryUnit(
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    taskPointViewModel: TaskPointViewModel
 ){
     // 오늘 날짜 정보 init
     val date = Date();
@@ -92,6 +94,8 @@ fun TotalSummaryUnit(
     /**
      * 표시할 통계 정보
      */
+    // Toit 점수
+    var mToitPoint by remember { mutableLongStateOf(0) }
     // 전체 목표 수
     val mTaskTotalCnt = remember { mutableLongStateOf(0) }
     // 평균 목표 수
@@ -109,6 +113,8 @@ fun TotalSummaryUnit(
     val outerState = rememberScrollState()
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO){
+            // toit 점수
+            mToitPoint = taskPointViewModel.getToitPoint()
             // 전체 목표 수
             mTaskTotalCnt.value = taskViewModel.getAllTaskCnt()
             // 평균 목표 수
@@ -121,6 +127,7 @@ fun TotalSummaryUnit(
             mMinTime.value = taskViewModel.getMinTaskTime()
             // 평균 기록
             mAvgTime.value = taskViewModel.getAvgTaskTime()
+
         }
     }
 
@@ -140,7 +147,7 @@ fun TotalSummaryUnit(
             .wrapContentHeight()){
             ToitPointCard(
                 modifier = Modifier.align(Alignment.Center),
-                toitPoint = 123456
+                toitPoint = mToitPoint
             )
         }
         Spacer(modifier = Modifier.height(48.dp))
@@ -329,7 +336,6 @@ fun StatisticsCard(
                         .align(Alignment.Center)
                 )
             }
-
 //           Row(
 //               modifier = Modifier
 //                   .wrapContentSize()
@@ -354,5 +360,4 @@ fun StatisticsCard(
 //           }
         }
     }
-
 }
