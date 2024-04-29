@@ -137,6 +137,8 @@
     <string name="txt_set_limit">기한 설정</string>
     <string name="txt_dead_line">마감 기한</string>
     <string name="txt_see_detail_statistics">자세한 통계 보기</string>
+    <string name="msg_complete_update">업데이트가 완료되었습니다.</string>
+    <string name="msg_update_fail_restart">업데이트에 실패하뎠습니다. 업데이트를 다시 하시려면 앱을 재시작해주세요.</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

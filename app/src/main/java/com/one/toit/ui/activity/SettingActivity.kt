@@ -148,11 +148,6 @@ class SettingActivity : BaseComposeActivity() {
         ) == PackageManager.PERMISSION_GRANTED
         permissionFlag[2] = cameraFlag
 
-        // 위치 권한
-        val locationFlag = ContextCompat.checkSelfPermission(
-            this, Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        permissionFlag[3] = locationFlag
     }
 
     // 앱 설정 이동시키는 메서드
@@ -338,13 +333,6 @@ fun AppSettingPage(
                 settingName = "카메라",
                 description = "앱에서 휴대전화의 카메라에 접근하는 것을 허용합니다.",
                 status = permissionFlag[2],
-                openSetting = openSetting
-            )
-            SettingUnit(
-                imgVector = Icons.Rounded.LocationOn,
-                settingName = "위치",
-                description = "사용자의 위치 정보를 조회합니다.",
-                status = permissionFlag[3],
                 openSetting = openSetting
             )
             Spacer(modifier = Modifier.height(24.dp))

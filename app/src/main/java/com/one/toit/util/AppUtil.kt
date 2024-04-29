@@ -14,7 +14,11 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.one.toit.R
+import com.one.toit.data.dto.ChartEntry
 import com.one.toit.data.dto.MediaDTO
 import com.one.toit.data.dto.TaskCounter
 import timber.log.Timber
@@ -292,6 +296,27 @@ class AppUtil {
                 }
                 return if(size <= 0) 0f else mTotalRatio / size
             }
+        }
+
+        // 일간 목표 달성율 계산 메서드
+        fun test(){
+            /**
+             * 시간대에 따른 추이 계싼해서 렌더링하는 메서드
+             */
+            // step1. 오늘의 할일 개수 전체를 셈함.
+
+
+            // step2. 일단 표시 시간은 무조건 1시간 단위로 함
+            // 근데 현재 시간 - 7 했을때, 0보다 크다면 0 ~ n-7 구간까지 합침.
+            val date = Date();
+
+
+
+
+            ///////
+
+            val testData = mutableStateOf(mutableMapOf<String, ChartEntry>())
+            // dummy!
         }
     }
 }

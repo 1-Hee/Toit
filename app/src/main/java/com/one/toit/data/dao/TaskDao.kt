@@ -187,5 +187,14 @@ interface TaskDao {
     )
     fun getCompleteTime(fkTaskId: Long):Long
 
+    /**
+     * 주어진 시간대 까지의 목표 달성 기록을 체크
+     */
+    @Query("SELECT COUNT(a.task_id) FROM table_task_registration a " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE DATE(a.create_at) = DATE(:targetDate) " +
+            "AND strftime('%H', task_complete) <= strftime('%H', :targetDate)")
+    fun getAchievementCnt(targetDate: Date):Int
 
 }

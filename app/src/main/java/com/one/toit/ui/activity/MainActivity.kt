@@ -7,13 +7,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +27,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +54,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.one.toit.R
 import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.ui.BaseComposeActivity
@@ -67,6 +78,7 @@ import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.ui.page.NavStatisticsPage
+import com.one.toit.util.AppUtil
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
@@ -74,13 +86,82 @@ import java.util.Date
 class MainActivity : BaseComposeActivity(), LifecycleOwner {
     // viewModel
     private lateinit var pageViewModel: PageViewModel
-    // 부모 엔티티
-    private lateinit var taskRegisterViewModel: TaskRegisterViewModel
-    // 자식 엔티티
-    private lateinit var taskInfoViewModel: TaskInfoViewModel
     private lateinit var taskPointViewModel: TaskPointViewModel;
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var launcher: ActivityResultLauncher<Intent>
+
+    // 업데이트 감지
+    private fun checkAppUpdate(){
+        val appUpdateManager = AppUpdateManagerFactory.create(this)
+        appUpdateManager.registerListener(installListener)
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            // This example applies an immediate update. To apply a flexible update
+            // instead, pass in AppUpdateType.FLEXIBLE
+            val updateFlag = appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            if (updateFlag && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)){ // 즉시 업데이트
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    activityResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build())
+            }else if(updateFlag
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)){ // 유연한 업데이트
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    activityResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build())
+            }
+            /**
+             * 사용자가 앱 포그라운드에 진입했을 때,
+             * 업데이트 상에 문제가 있으면 다시 업데이트를 요청하는 메서드
+             */
+            // 업데이트 실패시
+            if (appUpdateInfo.updateAvailability()
+                == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+            ) {
+                // If an in-app update is already running, resume the update.
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    activityResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build())
+            }
+        }
+    }
+
+    /**
+     * 업데이트 결과 수신을 위한 콜백 함수
+     */
+    private val activityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()) {
+            result: ActivityResult ->
+        // handle callback
+        if (result.resultCode != RESULT_OK) {
+            AppUtil.toast(this, this.getString(R.string.msg_update_fail_restart))
+            // If the update is canceled or fails,
+            // you can request to start the update again.
+        }
+    }
+
+    /**
+     *  인앱 업데이트 상황을 감지하기 위한 리스너,
+     *  현재 업데이트 진행 상황을 로깅할 수 있음
+     */
+    // Create a listener to track request state updates.
+    private val installListener = InstallStateUpdatedListener { state ->
+        // (Optional) Provide a download progress bar.
+        if (state.installStatus() == InstallStatus.DOWNLOADING) { // 다운로드 중일 때!
+            val bytesDownloaded = state.bytesDownloaded()
+            val totalBytesToDownload = state.totalBytesToDownload()
+            // Show update progress bar.
+        }else if (state.installStatus() == InstallStatus.DOWNLOADED) { // 다운도르 완료 시
+            AppUtil.toast(this, this.getString(R.string.msg_complete_update))
+        }
+        // Log state or install the update.
+    }
+    override fun onResume() {
+        super.onResume()
+        checkAppUpdate() // 업데이트 여부 체크
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {} // 광고 init
@@ -99,11 +180,6 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
         setContent {
             MainScreenView(pageViewModel, taskViewModel, taskPointViewModel, launcher)
         }
-//        lifecycleScope.launch {
-//            val date = Date()
-//            val data = taskRegisterViewModel.readTaskRegisterListByDate(date)
-//            Timber.i("taskList .. %s", data)
-//        }
     }
     override fun initViewModel() {
         super.initViewModel()
@@ -111,8 +187,6 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
         pageViewModel.init()
         pageViewModel.setPageName(baseContext.getString(R.string.p_todo))
         val factory = ApplicationFactory(this.application)
-        taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
-        taskInfoViewModel = getApplicationScopeViewModel(TaskInfoViewModel::class.java, factory)
         taskViewModel = getApplicationScopeViewModel(TaskViewModel::class.java, factory)
         taskPointViewModel = getApplicationScopeViewModel(TaskPointViewModel::class.java, factory)
     }
@@ -124,7 +198,6 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.CAMERA
         )
         // API Version >= 33
@@ -134,7 +207,6 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.CAMERA
         )
         val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){

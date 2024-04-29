@@ -231,4 +231,8 @@ dependencies {
 //    implementation("androidx.camera:camera-lifecycle:1.1.0")
 //    implementation("androidx.camera:camera-view:1.1.0-alpha03")
 //    implementation("com.google.guava:guava:29.0-jre")
+
+    val app_update_version = "2.1.0"
+    implementation("com.google.android.play:app-update:$app_update_version")
+    implementation("com.google.android.play:app-update-ktx:$app_update_version") // for kotlin
 }

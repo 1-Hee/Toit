@@ -1,13 +1,16 @@
 package com.one.toit.data.repository
 
 import com.one.toit.data.dao.TaskDao
+import com.one.toit.data.dto.ChartEntry
 import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.model.Task
+import com.one.toit.ui.compose.style.purple100
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
+import kotlin.math.round
 
 class TaskRepository(
     private val taskDao:TaskDao
@@ -180,6 +183,53 @@ class TaskRepository(
             mPoint += 30
         }
         return@withContext mPoint
+    }
+
+    /**
+     * 주어진 시간대 까지의 목표 달성 기록을 체크
+     */
+    private suspend fun getAchievementCnt(targetDate: Date):Int
+        = withContext(Dispatchers.IO){
+        Timber.d("getAchievementCnt .. %s", targetDate)
+        return@withContext taskDao.getAchievementCnt(targetDate)
+    }
+
+    suspend fun getAchievementMap(targetDate: Date, totalCnt:Int) : MutableMap<String, ChartEntry> {
+        val calendar = Calendar.getInstance()
+        calendar.time = targetDate
+        // 00시부터 6시까지인지 확인.
+        val gap = 5
+        val cHour = calendar.get(Calendar.HOUR_OF_DAY)
+        val isDawn =  cHour - gap <= 0;
+        val mChartEntryMap = mutableMapOf<String, ChartEntry>()
+
+        if(isDawn){ // 00시부터 현재까지 1시간 단위로 맵핑..!
+            for(i in 0..cHour){
+                val timeStr = String.format("%02d:00", i)
+                calendar.set(Calendar.HOUR_OF_DAY, i);
+                val timeCnt = getAchievementCnt(calendar.time)
+                val ratio = timeCnt / totalCnt.toFloat()
+                val volume = round(ratio * 100).toInt()
+                val entry = ChartEntry(volume)
+                mChartEntryMap[timeStr] = entry
+            }
+        }else {
+            val mStart = cHour - gap;
+            for (i in mStart..cHour) {
+                val timeStr = if (i == mStart) {
+                    String.format("~%02d:00", i)
+                } else {
+                    String.format("%02d:00", i)
+                }
+                calendar.set(Calendar.HOUR_OF_DAY, i);
+                val timeCnt = getAchievementCnt(calendar.time)
+                val ratio = timeCnt / totalCnt.toFloat()
+                val volume = round(ratio * 100).toInt()
+                val entry = ChartEntry(volume)
+                mChartEntryMap[timeStr] = entry
+            }
+        }
+        return mChartEntryMap
     }
 
 }

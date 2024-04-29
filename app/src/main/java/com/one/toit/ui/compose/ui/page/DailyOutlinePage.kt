@@ -107,31 +107,17 @@ fun DailyOutlinePage(
     /**
      * 시간대에 따른 추이 계싼해서 렌더링하는 메서드
      */
-    // dummy
-    val test = mutableListOf<String>()
-    val date = Date()
-    val calendar = Calendar.getInstance()
-    calendar.time = date
-    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-    for(i in 0..hour step 2){
-        val hourUnit = if(i > 9){
-            "$i:00"
-        }else {
-            "0$i:00"
+    // 차트 맵 변수
+    var achieveMap by remember { mutableStateOf(mutableMapOf<String, ChartEntry>()) }
+    // step1. 오늘의 할일 개수 전체를 셈함.
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.Main){
+            val date = Date()
+            val totalCnt = taskViewModel.getTaskCntByDate(date);
+            val mAchieveMap = taskViewModel.getAchievementMap(date, totalCnt)
+            achieveMap = mAchieveMap
         }
-        test.add(hourUnit)
     }
-
-    val testData by remember { mutableStateOf(mutableMapOf<String, ChartEntry>()) }
-    val testList = mutableListOf<Float>()
-    var volume = 0f
-    val step = (100/(test.size-1))
-    test.forEach { date ->
-        testList.add(volume)
-        testData[date] = ChartEntry(volume.toInt())
-        volume += step
-    }
-    // dummy!
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -152,7 +138,7 @@ fun DailyOutlinePage(
                 .wrapContentHeight()
         )
         LineGraphChart(
-            data = testData,
+            data = achieveMap,
             durationMillis = 700,
             maxValue = 100
         )

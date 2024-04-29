@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.one.toit.data.TaskDataBase
+import com.one.toit.data.dto.ChartEntry
 import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.model.Task
 import com.one.toit.data.repository.TaskInfoRepository
@@ -130,5 +131,12 @@ class TaskViewModel(
     // 점수 구하는 메서드!
     suspend fun getTaskPoint(mDate: Date, fkTaskId: Long):Int {
         return repository.getTaskPoint(mDate, fkTaskId)
+    }
+
+    /**
+     * 주어진 시간대 까지의 목표 달성 기록을 체크
+     */
+    suspend fun getAchievementMap(targetDate: Date, totalCnt:Int) : MutableMap<String, ChartEntry>{
+        return repository.getAchievementMap(targetDate, totalCnt)
     }
 }
