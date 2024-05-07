@@ -127,9 +127,7 @@ fun AllStatisticsPage(
                     unselectedContentColor = white
                 )
             }
-
         )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -145,6 +143,5 @@ fun AllStatisticsPage(
                 }
             }
         }
-
     }
 }

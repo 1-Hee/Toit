@@ -29,9 +29,35 @@ class CustomTimeDialog(
         mBinding.npHour.value = hour
 
         // 분 설정
-        mBinding.npMinute.minValue = min
+        mBinding.npMinute.minValue = 0
         mBinding.npMinute.maxValue = 59
         mBinding.npMinute.value = min
+
+        val context = requireContext();
+        mBinding.npHour.setOnValueChangedListener { picker, oldVal, newVal ->
+            val selectMin = mBinding.npMinute.value
+            val flag = newVal <= hour && selectMin < min;
+            if(flag){
+                AppUtil.toast(context,
+                    context.getString(R.string.txt_alert_time_lower)
+                )
+                mBinding.npHour.value = hour
+                mBinding.npMinute.value = min;
+            }
+        }
+
+        mBinding.npMinute.setOnValueChangedListener { picker, oldVal, newVal ->
+            val selectHour = mBinding.npHour.value
+            if(selectHour <= hour){
+                if(newVal < min){
+                    AppUtil.toast(context,
+                        context.getString(R.string.txt_alert_time_lower)
+                    )
+                    mBinding.npHour.value = hour
+                    mBinding.npMinute.value = min;
+                }
+            }
+        }
     }
 
     private val viewClickListener = object : ViewClickListener {

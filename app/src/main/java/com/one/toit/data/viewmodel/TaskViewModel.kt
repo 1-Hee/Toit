@@ -33,6 +33,12 @@ class TaskViewModel(
     suspend fun readTaskList(page:Int):List<Task>{
         return repository.readTaskList(page)
     }
+
+    // 검색
+    suspend fun readTaskListByQuery(query:String): List<Task> {
+        return repository.readTaskListByQuery(query)
+    }
+
     // 페이징 & 검색
     suspend fun readTaskListByQuery(page:Int, query:String): List<Task>{
         return repository.readTaskListByQuery(page, query)

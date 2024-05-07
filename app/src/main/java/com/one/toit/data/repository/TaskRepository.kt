@@ -31,6 +31,11 @@ class TaskRepository(
         return@withContext taskDao.readTaskListByQuery(page, query)
     }
 
+    suspend fun readTaskListByQuery(query:String): List<Task>
+            = withContext(Dispatchers.IO){
+        return@withContext taskDao.readTaskListByQuery(query)
+    }
+
     suspend fun readRemainTaskList():List<Task>
         = withContext(Dispatchers.IO){
         return@withContext taskDao.readRemainTaskList()
