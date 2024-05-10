@@ -11,9 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,7 +34,7 @@ fun AllToitListUnit(
     launcher: ActivityResultLauncher<Intent>? = null
 ){
 
-    var mTaskDTOList by remember { mutableStateOf(mutableListOf<TaskDTO>()) }
+    var mTaskDTOList = remember { mutableStateListOf<TaskDTO>() }
     val lazyListState: LazyListState = rememberLazyListState()
     var searchedKeyword by remember { mutableStateOf("") }
 
@@ -47,7 +46,8 @@ fun AllToitListUnit(
                 val mTaskDTO = parseTaskDTO(task);
                 mDtoList.add(mTaskDTO);
             }
-            mTaskDTOList = mDtoList
+            mTaskDTOList.clear();
+            mTaskDTOList.addAll(mDtoList);
         }
     }
 
@@ -60,8 +60,8 @@ fun AllToitListUnit(
                     val mTaskDTO = parseTaskDTO(task);
                     mDtoList.add(mTaskDTO);
                 }
-                mTaskDTOList = mDtoList
-
+                mTaskDTOList.clear();
+                mTaskDTOList.addAll(mDtoList);
             }else {
                 val mTaskList = taskViewModel.readTaskList()
                 val mDtoList = mutableListOf<TaskDTO>()
@@ -69,7 +69,8 @@ fun AllToitListUnit(
                     val mTaskDTO = parseTaskDTO(task);
                     mDtoList.add(mTaskDTO);
                 }
-                mTaskDTOList = mDtoList
+                mTaskDTOList.clear();
+                mTaskDTOList.addAll(mDtoList);
             }
         }
     }
@@ -87,7 +88,8 @@ fun AllToitListUnit(
     if(mTaskDTOList.isNotEmpty()){
         SortUnit(context, mTaskDTOList){
             if(it.isNotEmpty()){
-                mTaskDTOList = it.toMutableList()
+                mTaskDTOList.clear()
+                mTaskDTOList.addAll(it.toList());
                 Timber.i("첫번째 요소 >>> %s", it[0])
             }
         }

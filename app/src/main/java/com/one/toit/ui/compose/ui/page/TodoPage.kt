@@ -29,18 +29,22 @@ import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
@@ -76,15 +80,35 @@ fun TodoPage(
     val intent = Intent(context, BoardActivity::class.java)
     var checked by remember { mutableStateOf(false) }
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
+    // 현재 화면이 초기 컴포지션이 일어났는지 체크할 플래그 변수
+    var isInitState by remember { mutableStateOf(false) }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    // 컴포저블의 라이프 사이클 관리를 위한 메서드
+    LaunchedEffect(lifecycleState) {
+        // Do something with your state
+        // You may want to use DisposableEffect or other alternatives
+        // instead of LaunchedEffect
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {}
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> {
+                isInitState = true
+                // AppUtil.toast(context, "onResume!!!!")
+            }
+        }
+    }
+
+    // 할일 목록 리스트를 위한 State
     val lazyListState = rememberLazyListState()
     // 일일 taskList
-    val allDailyTaskList = remember { mutableStateOf<List<TaskDTO>>(listOf()) }
-    // 현재 화면이 초기 컴포지션이 일어났는지 체크할 플래그 변수
-    val isInitState = remember { mutableStateOf(false) }
-    Timber.d("초기 상태...? ${isInitState.value}")
+    var dailyTaskList = remember { mutableStateListOf<TaskDTO>() }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit, isInitState){
         withContext(Dispatchers.IO) {
             Timber.e("FIRST INIT CALL...!!!")
             val mDate = Date()
@@ -104,15 +128,18 @@ fun TodoPage(
                 Timber.i("[item] : $mTaskDTO")
                 mDTOList.add(mTaskDTO)
             }
-            allDailyTaskList.value = mDTOList.toList()
-            isInitState.value = true;
-            Timber.d("상태 초기화 됨... ${isInitState.value}")
+            // allDailyTaskList = mDTOList.toList()
+            if(dailyTaskList .isNotEmpty()){
+                dailyTaskList.clear();
+            }
+            dailyTaskList.addAll(mDTOList.toList());
+            Timber.d("상태 초기화 됨... ${isInitState}")
         }
     }
     // AppUtil.toast(context, "토스트 메시지...")
     LaunchedEffect(checked){
         withContext(Dispatchers.Main) {
-            if(isInitState.value && checked){ // 초기화 되고, 체크가 되었을 경우에만!
+            if(isInitState && checked){ // 초기화 되고, 체크가 되었을 경우에만!
                 val mDate = Date()
                 val mDailyList = taskViewModel.readRemainTaskListByDate(mDate)
                 val mDTOList = mutableListOf<TaskDTO>()
@@ -130,9 +157,11 @@ fun TodoPage(
                     Timber.i("[item] : $mTaskDTO")
                     mDTOList.add(mTaskDTO)
                 }
-                allDailyTaskList.value = mDTOList.toList()
+                if(dailyTaskList.isNotEmpty()){
+                    dailyTaskList.clear()
+                }
+                dailyTaskList.addAll(mDTOList.toList())
             }
-
         }
     }
 
@@ -200,14 +229,14 @@ fun TodoPage(
 //                }
 //            }
 
-            if(allDailyTaskList.value.isEmpty()){
+            if(dailyTaskList.isEmpty()){
                 ItemNoContent()
             }else {
                 LazyColumn(state = lazyListState) {
                     item {
                         // header?
                     }
-                    items(allDailyTaskList.value) { item ->
+                    items(dailyTaskList) { item ->
                         // Main items content
                         Spacer(modifier = Modifier.height(4.dp))
                         ItemTodo(taskDTO = item, launcher = launcher)

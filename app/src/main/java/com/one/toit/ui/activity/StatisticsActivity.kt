@@ -3,9 +3,14 @@ package com.one.toit.ui.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,10 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -59,6 +67,7 @@ import com.one.toit.ui.compose.ui.page.AllStatisticsPage
 import com.one.toit.ui.compose.ui.page.DailyOutlinePage
 import com.one.toit.ui.compose.ui.page.WeeklyPage
 import com.one.toit.ui.viewmodel.PageViewModel
+import com.one.toit.util.AppUtil
 import timber.log.Timber
 
 class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
@@ -67,6 +76,7 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var taskPointViewModel: TaskPointViewModel
     private lateinit var launcher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 액티비티 호출용 콜백 함수 런처
@@ -85,6 +95,7 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
                 pageViewModel, taskViewModel,
                 taskPointViewModel, launcher
             )
+            val context = LocalContext.current
         }
     }
     override fun initViewModel() {
@@ -107,12 +118,97 @@ fun StatisticsScreenView(
     launcher: ActivityResultLauncher<Intent>? = null
 ){
     val navController = rememberNavController()
-    Scaffold(
-        topBar = { StatisticsTopBarComponent(pageViewModel) },
-        bottomBar = {
-            StatisticsBottomNavigation(navController, pageViewModel)
-        }
+    val context = LocalContext.current
+    BackHandler(enabled = true){
+        AppUtil.toast(context, "pop!!!!");
+    }
 
+    Scaffold(
+        topBar = { StatisticsTopBarComponent(pageViewModel, navController) },
+        bottomBar = {
+            val context = LocalContext.current
+            // handle on back button press
+//            BackHandler {
+//                AppUtil.toast(context, "detect back btn!!!!");
+//            }
+
+            val items = listOf(
+                StatisticsRoute.DailyOutline,
+                StatisticsRoute.WeeklyPage,
+                StatisticsRoute.AllStatisticsPage
+            )
+            val icons = listOf(
+                Icons.Rounded.CheckCircle,
+                Icons.Rounded.Build,
+                Icons.Rounded.LocationOn
+            )
+
+            BottomNavigation(
+                backgroundColor = Color.White,
+                contentColor = Color(0xff0a090a)
+            ) {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+                items.forEachIndexed { index, item ->
+                    val itemTitle = stringResource(id = item.title)
+                    BottomNavigationItem(
+                        icon = {
+                            if(currentRoute == item.route){
+                                Box(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight()
+                                        .padding(
+                                            start = 8.dp,
+                                            end = 8.dp,
+                                            top = 0.dp,
+                                            bottom = 2.dp
+                                        )
+                                ){
+                                    Box(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(1.5.dp)
+                                        .background(purple200)
+                                        .align(Alignment.TopCenter)
+                                    )
+                                    Icon(
+                                        icons[index],
+                                        contentDescription = stringResource(id = item.title),
+                                        modifier = Modifier
+                                            .width(26.dp)
+                                            .height(26.dp)
+                                            .align(Alignment.Center),
+                                        tint = purple200
+                                    )
+                                }
+                            }else {
+                                Icon(
+                                    icons[index],
+                                    contentDescription = stringResource(id = item.title),
+                                    modifier = Modifier
+                                        .width(26.dp)
+                                        .height(26.dp),
+                                    tint = mono600
+                                )
+                            }
+                        },
+                        selectedContentColor = purple200,
+                        unselectedContentColor = mono300,
+                        selected = currentRoute == item.route,
+                        alwaysShowLabel = false,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpToRoute.let { true }
+                                pageViewModel.setPageName(itemTitle)
+                                Timber.i("bottom : %s : ", pageViewModel.pageName)
+                            }
+                        }
+                    )
+                }
+            }
+        }
     ) {
         Box(Modifier.padding(it)){
             StatisticsNavGraph(
@@ -125,14 +221,13 @@ fun StatisticsScreenView(
 @Composable
 fun StatisticsTopBarComponent(
     pageViewModel: PageViewModel,
+    navController: NavHostController,
 ){
     val activity = (LocalContext.current as? Activity)
-    val context = LocalContext.current
     var pageTitle by remember { mutableStateOf("") }
     LaunchedEffect(pageViewModel.pageName.value){
         pageTitle = pageViewModel.pageName.value
     }
-
     Box(modifier = Modifier
         .fillMaxWidth()
         .height(48.dp)
@@ -183,86 +278,6 @@ fun StatisticsNavGraph(
         }
         composable(route = StatisticsRoute.AllStatisticsPage.route){
             AllStatisticsPage(navController, taskViewModel, taskPointViewModel, launcher)
-        }
-    }
-}
-
-@Composable
-fun StatisticsBottomNavigation(
-    navController: NavHostController,
-    menuViewModel: PageViewModel,
-) {
-    val items = listOf(
-        StatisticsRoute.DailyOutline,
-        StatisticsRoute.WeeklyPage,
-        StatisticsRoute.AllStatisticsPage
-    )
-    val icons = listOf(
-        Icons.Rounded.CheckCircle,
-        Icons.Rounded.Build,
-        Icons.Rounded.LocationOn
-    )
-
-    BottomNavigation(
-        backgroundColor = Color.White,
-        contentColor = Color(0xff0a090a)
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-        items.forEachIndexed { index, item ->
-            val itemTitle = stringResource(id = item.title)
-            BottomNavigationItem(
-                icon = {
-                    if(currentRoute == item.route){
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 2.dp)
-                        ){
-                            Box(modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.5.dp)
-                                .background(purple200)
-                                .align(Alignment.TopCenter)
-                            )
-                            Icon(
-                                icons[index],
-                                contentDescription = stringResource(id = item.title),
-                                modifier = Modifier
-                                    .width(26.dp)
-                                    .height(26.dp)
-                                    .align(Alignment.Center),
-                                tint = purple200
-                            )
-                        }
-                    }else {
-                        Icon(
-                            icons[index],
-                            contentDescription = stringResource(id = item.title),
-                            modifier = Modifier
-                                .width(26.dp)
-                                .height(26.dp),
-                            tint = mono600
-                        )
-                    }
-                },
-                selectedContentColor = purple200,
-                unselectedContentColor = mono300,
-                selected = currentRoute == item.route,
-                alwaysShowLabel = false,
-                onClick = {
-                    navController.navigate(item.route) {
-                        navController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = true }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                        menuViewModel.setPageName(itemTitle)
-                        Timber.i("bottom : %s : ", menuViewModel.pageName)
-                    }
-                }
-            )
         }
     }
 }
