@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -95,7 +96,6 @@ class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
                 pageViewModel, taskViewModel,
                 taskPointViewModel, launcher
             )
-            val context = LocalContext.current
         }
     }
     override fun initViewModel() {
@@ -118,20 +118,9 @@ fun StatisticsScreenView(
     launcher: ActivityResultLauncher<Intent>? = null
 ){
     val navController = rememberNavController()
-    val context = LocalContext.current
-    BackHandler(enabled = true){
-        AppUtil.toast(context, "pop!!!!");
-    }
-
     Scaffold(
         topBar = { StatisticsTopBarComponent(pageViewModel, navController) },
         bottomBar = {
-            val context = LocalContext.current
-            // handle on back button press
-//            BackHandler {
-//                AppUtil.toast(context, "detect back btn!!!!");
-//            }
-
             val items = listOf(
                 StatisticsRoute.DailyOutline,
                 StatisticsRoute.WeeklyPage,
@@ -142,15 +131,24 @@ fun StatisticsScreenView(
                 Icons.Rounded.Build,
                 Icons.Rounded.LocationOn
             )
-
             BottomNavigation(
                 backgroundColor = Color.White,
-                contentColor = Color(0xff0a090a)
+                contentColor = Color(0xff0a090a),
+
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 items.forEachIndexed { index, item ->
-                    val itemTitle = stringResource(id = item.title)
+                    val flag = currentRoute == item.route
+                    if(flag){
+                        val itemTitle = stringResource(id = item.title)
+                        val id = items[index].title
+                        pageViewModel.setPageName(itemTitle)
+                    }
+
+                }
+
+                items.forEachIndexed { index, item ->
                     BottomNavigationItem(
                         icon = {
                             if(currentRoute == item.route){
@@ -201,8 +199,6 @@ fun StatisticsScreenView(
                                 launchSingleTop = true
                                 restoreState = true
                                 popUpToRoute.let { true }
-                                pageViewModel.setPageName(itemTitle)
-                                Timber.i("bottom : %s : ", pageViewModel.pageName)
                             }
                         }
                     )

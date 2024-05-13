@@ -18,8 +18,8 @@ interface TaskDao {
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id "+
-            "LIMIT 20 OFFSET (:page-1)*20")
-    fun readTaskList(page:Int): List<Task> // 페이징 추가한 메서드
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readTaskList(page:Int, size:Int): List<Task> // 페이징 추가한 메서드
 
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
@@ -32,8 +32,8 @@ interface TaskDao {
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
             "WHERE task_title LIKE '%'||:query||'%' " +
-            "LIMIT 20 OFFSET (:page-1)*20")
-    fun readTaskListByQuery(page:Int, query:String): List<Task> // 페이징 & 검색
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readTaskListByQuery(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
@@ -42,8 +42,8 @@ interface TaskDao {
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = '' " +
-            "LIMIT 20 OFFSET(:page-1)*20")
-    fun readRemainTaskList(page:Int): List<Task> // 페이징 추가한 메서드
+            "LIMIT :size OFFSET(:page-1)*:size")
+    fun readRemainTaskList(page:Int, size:Int): List<Task> // 페이징 추가한 메서드
 
     /**
      *  일일 조회
@@ -58,8 +58,8 @@ interface TaskDao {
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
             "WHERE DATE(a.create_at) = DATE(:targetDate) " +
-            "LIMIT 20 OFFSET(:page-1)*20")
-    fun readTaskListByDate(page: Int, targetDate: Date): List<Task> // 페이징 추가
+            "LIMIT :size OFFSET(:page-1)*:size")
+    fun readTaskListByDate(page: Int, size:Int, targetDate: Date): List<Task> // 페이징 추가
 
     @Query("SELECT * FROM table_task_registration a " +
             "INNER JOIN table_task_information " +
@@ -74,8 +74,8 @@ interface TaskDao {
             "ON task_id = fk_task_id " +
             "WHERE COALESCE(task_complete, '') = '' " +
             "AND DATE(a.create_at) = DATE(:targetDate)" +
-            "LIMIT 20 OFFSET(:page-1)*20")
-    fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task> // 페이징 추가
+            "LIMIT :size OFFSET(:page-1)*:size")
+    fun readRemainTaskListByDate(page:Int, size:Int, targetDate: Date): List<Task> // 페이징 추가
 
     // 통계 관련...
     /**

@@ -11,7 +11,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,13 +36,16 @@ fun AllToitListUnit(
     launcher: ActivityResultLauncher<Intent>? = null
 ){
 
-    var mTaskDTOList = remember { mutableStateListOf<TaskDTO>() }
+    val mTaskDTOList = remember { mutableStateListOf<TaskDTO>() }
     val lazyListState: LazyListState = rememberLazyListState()
     var searchedKeyword by remember { mutableStateOf("") }
+    // 페이징 변수
+    var pgNo by remember { mutableIntStateOf(1) }
 
+    // 초기화
     LaunchedEffect(Unit){
         withContext(Dispatchers.Main) {
-            val mTaskList = taskViewModel.readTaskList();
+            val mTaskList = taskViewModel.readTaskList(pgNo);
             val mDtoList = mutableListOf<TaskDTO>()
             mTaskList.forEach { task ->
                 val mTaskDTO = parseTaskDTO(task);
@@ -51,27 +56,39 @@ fun AllToitListUnit(
         }
     }
 
+    // 검색어 감지
     LaunchedEffect(searchedKeyword) {
         withContext(Dispatchers.IO){
-            if(searchedKeyword.isNotBlank()){
-                val mTaskList = taskViewModel.readTaskListByQuery(searchedKeyword)
-                val mDtoList = mutableListOf<TaskDTO>()
-                mTaskList.forEach { task ->
-                    val mTaskDTO = parseTaskDTO(task);
-                    mDtoList.add(mTaskDTO);
-                }
-                mTaskDTOList.clear();
-                mTaskDTOList.addAll(mDtoList);
+            pgNo = 1
+            val mTaskList =  if(searchedKeyword.isNotBlank()){
+                taskViewModel.readTaskListByQuery(pgNo, searchedKeyword)
             }else {
-                val mTaskList = taskViewModel.readTaskList()
-                val mDtoList = mutableListOf<TaskDTO>()
-                mTaskList.forEach { task ->
-                    val mTaskDTO = parseTaskDTO(task);
-                    mDtoList.add(mTaskDTO);
-                }
-                mTaskDTOList.clear();
-                mTaskDTOList.addAll(mDtoList);
+              taskViewModel.readTaskList(pgNo)
             }
+            val mDtoList = mutableListOf<TaskDTO>()
+            mTaskList.forEach { task ->
+                val mTaskDTO = parseTaskDTO(task);
+                mDtoList.add(mTaskDTO);
+            }
+            mTaskDTOList.clear();
+            mTaskDTOList.addAll(mDtoList);
+        }
+    }
+
+    // 페이징 감지
+    LaunchedEffect(pgNo > 1) {
+        withContext(Dispatchers.IO){
+            val mTaskList =  if(searchedKeyword.isNotBlank()){
+                taskViewModel.readTaskListByQuery(pgNo, searchedKeyword)
+            }else {
+                taskViewModel.readTaskList(pgNo)
+            }
+            val mDtoList = mutableListOf<TaskDTO>()
+            mTaskList.forEach { task ->
+                val mTaskDTO = parseTaskDTO(task);
+                mDtoList.add(mTaskDTO);
+            }
+            mTaskDTOList.addAll(mDtoList);
         }
     }
 
@@ -91,6 +108,24 @@ fun AllToitListUnit(
                 mTaskDTOList.clear()
                 mTaskDTOList.addAll(it.toList());
                 Timber.i("첫번째 요소 >>> %s", it[0])
+            }
+        }
+    }
+
+    // observe list scrolling
+    val reachedBottom: Boolean by remember {
+        derivedStateOf {
+            val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
+        }
+    }
+//
+    // load more if scrolled to bottom
+    LaunchedEffect(reachedBottom) {
+        withContext(Dispatchers.Main){
+            val hasNext = taskViewModel.hasNextData(pgNo+1, searchedKeyword)
+            if (reachedBottom && hasNext) {
+                pgNo++
             }
         }
     }

@@ -145,4 +145,17 @@ class TaskViewModel(
     suspend fun getAchievementMap(targetDate: Date, totalCnt:Int) : MutableMap<String, ChartEntry>{
         return repository.getAchievementMap(targetDate, totalCnt)
     }
+
+    /**
+     *  남은 컨텐츠 체크 메서드
+     *  true : all
+     *  false : remain
+     */
+    suspend fun hasNextItem(page:Int, targetDate: Date, isAll:Boolean):Boolean {
+        return repository.hasNextItem(page, targetDate, isAll)
+    }
+
+    suspend fun hasNextData(page: Int, query: String = ""):Boolean {
+        return repository.hasNextData(page, query)
+    }
 }

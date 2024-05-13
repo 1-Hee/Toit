@@ -60,6 +60,7 @@ import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import com.one.toit.util.AppUtil
+import com.one.toit.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -75,13 +76,22 @@ fun TodoPage(
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
-    // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
+
+    // 환경 변수들
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
-    var checked by remember { mutableStateOf(false) }
+    // prefs 로 체크 상태 영속관리
+    val prefs = PreferenceUtil.getInstance(context)
+    val savedFlag = if(prefs.getValue("isShowAll").isNotBlank()){
+        prefs.getValue("isShowAll").toBoolean()
+    }else false;
+    var checked by remember { mutableStateOf(savedFlag) }
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
     // 현재 화면이 초기 컴포지션이 일어났는지 체크할 플래그 변수
     var isInitState by remember { mutableStateOf(false) }
+
+    // 페이징 변수
+    var pgNo by remember { mutableIntStateOf(1) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
@@ -93,26 +103,38 @@ fun TodoPage(
         // instead of LaunchedEffect
         when (lifecycleState) {
             Lifecycle.State.DESTROYED -> {}
-            Lifecycle.State.INITIALIZED -> {}
-            Lifecycle.State.CREATED -> {}
-            Lifecycle.State.STARTED -> {}
-            Lifecycle.State.RESUMED -> {
+            else -> {
                 isInitState = true
-                // AppUtil.toast(context, "onResume!!!!")
             }
+//            Lifecycle.State.INITIALIZED -> {}
+//            Lifecycle.State.CREATED -> {
+//                isInitState = true
+//            }
+//            Lifecycle.State.STARTED -> {
+//                isInitState = true
+//            }
+//            Lifecycle.State.RESUMED -> {
+//                isInitState = true
+//                // AppUtil.toast(context, "onResume!!!!")
+//            }
         }
     }
 
     // 할일 목록 리스트를 위한 State
     val lazyListState = rememberLazyListState()
     // 일일 taskList
-    var dailyTaskList = remember { mutableStateListOf<TaskDTO>() }
-
-    LaunchedEffect(Unit, isInitState){
+    val dailyTaskList = remember { mutableStateListOf<TaskDTO>() }
+    val baseDate = Date()
+    // 초기 리스트 렌더링
+    LaunchedEffect(isInitState, checked){
         withContext(Dispatchers.IO) {
+            pgNo = 1
             Timber.e("FIRST INIT CALL...!!!")
-            val mDate = Date()
-            val mDailyList = taskViewModel.readTaskListByDate(mDate)
+            val mDailyList  = if(isInitState && checked){ // 초기화 되고, 체크가 되었을 경우에만!
+               taskViewModel.readRemainTaskListByDate(pgNo, baseDate)
+            }else {
+               taskViewModel.readTaskListByDate(pgNo, baseDate)
+            }
             val mDTOList = mutableListOf<TaskDTO>()
             mDailyList.forEach { taskItem ->
                 val mTaskDTO = TaskDTO(
@@ -125,45 +147,44 @@ fun TodoPage(
                     taskComplete = taskItem.info.taskComplete,
                     taskCertification = taskItem.info.taskCertification
                 )
-                Timber.i("[item] : $mTaskDTO")
+                //Timber.i("[item] : $mTaskDTO")
                 mDTOList.add(mTaskDTO)
             }
             // allDailyTaskList = mDTOList.toList()
-            if(dailyTaskList .isNotEmpty()){
+            if(isInitState && dailyTaskList.isNotEmpty()){
                 dailyTaskList.clear();
             }
             dailyTaskList.addAll(mDTOList.toList());
-            Timber.d("상태 초기화 됨... ${isInitState}")
         }
     }
-    // AppUtil.toast(context, "토스트 메시지...")
-    LaunchedEffect(checked){
-        withContext(Dispatchers.Main) {
-            if(isInitState && checked){ // 초기화 되고, 체크가 되었을 경우에만!
-                val mDate = Date()
-                val mDailyList = taskViewModel.readRemainTaskListByDate(mDate)
-                val mDTOList = mutableListOf<TaskDTO>()
-                mDailyList.forEach { taskItem ->
-                    val mTaskDTO = TaskDTO(
-                        taskId = taskItem.register.taskId,
-                        taskInfoId = taskItem.info.infoId,
-                        createAt = taskItem.register.createAt,
-                        taskTitle = taskItem.info.taskTitle,
-                        taskMemo = taskItem.info.taskMemo,
-                        taskLimit = taskItem.info.taskLimit,
-                        taskComplete = taskItem.info.taskComplete,
-                        taskCertification = taskItem.info.taskCertification
-                    )
-                    Timber.i("[item] : $mTaskDTO")
-                    mDTOList.add(mTaskDTO)
-                }
-                if(dailyTaskList.isNotEmpty()){
-                    dailyTaskList.clear()
-                }
-                dailyTaskList.addAll(mDTOList.toList())
+
+    // 페이징을 위한 비동기 리캄포지션
+    LaunchedEffect(pgNo > 1) {
+        withContext(Dispatchers.IO) {
+            val mDailyList  = if(checked){ // 초기화 되고, 체크가 되었을 경우에만!
+                taskViewModel.readRemainTaskListByDate(pgNo, baseDate)
+            }else {
+                taskViewModel.readTaskListByDate(pgNo, baseDate)
             }
+            val mDTOList = mutableListOf<TaskDTO>()
+            mDailyList.forEach { taskItem ->
+                val mTaskDTO = TaskDTO(
+                    taskId = taskItem.register.taskId,
+                    taskInfoId = taskItem.info.infoId,
+                    createAt = taskItem.register.createAt,
+                    taskTitle = taskItem.info.taskTitle,
+                    taskMemo = taskItem.info.taskMemo,
+                    taskLimit = taskItem.info.taskLimit,
+                    taskComplete = taskItem.info.taskComplete,
+                    taskCertification = taskItem.info.taskCertification
+                )
+                //Timber.i("[item] : $mTaskDTO")
+                mDTOList.add(mTaskDTO)
+            }
+            dailyTaskList.addAll(mDTOList.toList());
         }
     }
+
 
     Box(
         modifier = Modifier
@@ -200,6 +221,7 @@ fun TodoPage(
                         checked = checked,
                         onCheckedChange = {
                             checked = it
+                            prefs.setValue("isShowAll", it.toString());
                         },
                         modifier = Modifier
                             .wrapContentWidth()
@@ -213,22 +235,24 @@ fun TodoPage(
                     )
                 }
             }
-//            // content
-//            // observe list scrolling
-//            val reachedBottom: Boolean by remember {
-//                derivedStateOf {
-//                    val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
-//                    lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
-//                }
-//            }
+            // content
+            // observe list scrolling
+            val reachedBottom: Boolean by remember {
+                derivedStateOf {
+                    val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+                    lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
+                }
+            }
 //
-//            // load more if scrolled to bottom
-//            LaunchedEffect(reachedBottom) {
-//                if (reachedBottom) {
-//                    pageIndex = (pageIndex+1) % Int.MAX_VALUE
-//                }
-//            }
-
+            // load more if scrolled to bottom
+            LaunchedEffect(reachedBottom) {
+                withContext(Dispatchers.Main){
+                    val hasNext = taskViewModel.hasNextItem(pgNo+1, baseDate, !checked)
+                    if (reachedBottom && hasNext) {
+                        pgNo++
+                    }
+                }
+            }
             if(dailyTaskList.isEmpty()){
                 ItemNoContent()
             }else {

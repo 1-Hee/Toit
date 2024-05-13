@@ -5,6 +5,7 @@ import com.one.toit.data.dto.ChartEntry
 import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.model.Task
 import com.one.toit.ui.compose.style.purple100
+import com.one.toit.util.AppUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -15,6 +16,8 @@ import kotlin.math.round
 class TaskRepository(
     private val taskDao:TaskDao
 ) {
+
+    private val size = AppUtil.LIST_SIZE;
     suspend fun readTaskList():List<Task>
         = withContext(Dispatchers.IO){
         return@withContext taskDao.readTaskList()
@@ -22,13 +25,13 @@ class TaskRepository(
     // 페이징 추가
     suspend fun readTaskList(page:Int):List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskList(page)
+        return@withContext taskDao.readTaskList(page, size)
     }
 
     // 페이징 & 검색
     suspend fun readTaskListByQuery(page:Int, query:String): List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskListByQuery(page, query)
+        return@withContext taskDao.readTaskListByQuery(page, size, query)
     }
 
     suspend fun readTaskListByQuery(query:String): List<Task>
@@ -43,7 +46,7 @@ class TaskRepository(
     // 페이징 추가
     suspend fun readRemainTaskList(page:Int):List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readRemainTaskList(page)
+        return@withContext taskDao.readRemainTaskList(page, size)
     }
 
     suspend fun readTaskListByDate(targetDate: Date): List<Task>
@@ -53,7 +56,7 @@ class TaskRepository(
     // 페이징 추가
     suspend fun readTaskListByDate(page:Int, targetDate: Date): List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskListByDate(page, targetDate)
+        return@withContext taskDao.readTaskListByDate(page, size, targetDate)
     }
 
     suspend fun readRemainTaskListByDate(targetDate: Date): List<Task>
@@ -64,7 +67,7 @@ class TaskRepository(
     // 페이징 추가
     suspend fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task>
         = withContext(Dispatchers.IO){
-        return@withContext taskDao.readRemainTaskListByDate(page, targetDate)
+        return@withContext taskDao.readRemainTaskListByDate(page, size, targetDate)
     }
 
 
@@ -237,4 +240,32 @@ class TaskRepository(
         return mChartEntryMap
     }
 
+    // 체크
+    /**
+     *  true : all + date
+     *  false : remain + date
+     */
+   suspend fun hasNextItem(page:Int, targetDate: Date, isAll:Boolean):Boolean
+    = withContext(Dispatchers.IO) {
+        val list =  if(isAll){
+            taskDao.readTaskListByDate(page, size, targetDate)
+        }else {
+           taskDao.readRemainTaskListByDate(page, size, targetDate)
+        }
+        return@withContext list.isNotEmpty()
+    }
+
+    /**
+     * all ,
+     * query
+     */
+    suspend fun hasNextData(page: Int, query: String = ""):Boolean
+        = withContext(Dispatchers.IO) {
+        val list = if (query.isBlank()) {
+            taskDao.readTaskList(page, size);
+        } else {
+            taskDao.readTaskListByQuery(page, size, query)
+        }
+        return@withContext list.isNotEmpty()
+    }
 }

@@ -41,6 +41,8 @@ class AppUtil {
         fun toast(context: Context, msg:String){
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
+
+        const val LIST_SIZE = 10;
     }
     object UIManager {
         // 키보드 숨김 메서드
