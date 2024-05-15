@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 
 @Suppress("UNREACHABLE_CODE")
 class AppUtil {
@@ -123,6 +124,31 @@ class AppUtil {
 
     // 시간 파싱 작업에 사용할 유틸리티
     object Time {
+        // 기한이 지났는지 체크를 위한 메서드
+        fun compareCreatedDate(createAt:Date?):Boolean{
+            // 오늘 날짜와 비교하여 수정 가능 여부를 결정
+            val cDate = Date();
+            val cCalendar = Calendar.getInstance()
+            cCalendar.time = cDate
+            val createdDate:Date = if(createAt == null) {
+                val mDate = Date();
+                val mCalendar = Calendar.getInstance()
+                mCalendar.time = mDate
+                mCalendar.set(Calendar.DAY_OF_MONTH,
+                    (mCalendar.get(Calendar.DAY_OF_MONTH) - 1)
+                );
+                mCalendar.time
+            }else {
+                createAt
+            }
+            val dbCalendar = Calendar.getInstance()
+            dbCalendar.time = createdDate
+            // 날짜 차이 계산
+            val differenceInMillis: Long = abs(dbCalendar.getTimeInMillis() - cCalendar.getTimeInMillis())
+            val differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24)
+            return differenceInDays >= 1
+        }
+
         // 시간이 10분 이상 차이가 나는지 점검하는 메서드
         fun isEnoughTimeDiff(mDate:Date):Boolean{
             val cDate = Date() // 비교할 날짜!

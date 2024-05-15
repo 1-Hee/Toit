@@ -35,7 +35,7 @@ fun SimpleTopBar(activity:Activity, title:String){
         Icon(
             Icons.Rounded.KeyboardArrowLeft,
             contentDescription = "icBack",
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(24.dp)
                 .clickable {
                     activity.finish()
                 }

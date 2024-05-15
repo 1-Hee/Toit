@@ -3,14 +3,9 @@ package com.one.toit.ui.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.window.OnBackInvokedDispatcher
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,14 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -64,11 +55,10 @@ import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
-import com.one.toit.ui.compose.ui.page.AllStatisticsPage
-import com.one.toit.ui.compose.ui.page.DailyOutlinePage
+import com.one.toit.ui.compose.ui.page.DailyPage
+import com.one.toit.ui.compose.ui.page.TotalPage
 import com.one.toit.ui.compose.ui.page.WeeklyPage
 import com.one.toit.ui.viewmodel.PageViewModel
-import com.one.toit.util.AppUtil
 import timber.log.Timber
 
 class StatisticsActivity :  BaseComposeActivity(), LifecycleObserver{
@@ -122,9 +112,9 @@ fun StatisticsScreenView(
         topBar = { StatisticsTopBarComponent(pageViewModel, navController) },
         bottomBar = {
             val items = listOf(
-                StatisticsRoute.DailyOutline,
-                StatisticsRoute.WeeklyPage,
-                StatisticsRoute.AllStatisticsPage
+                StatisticsRoute.Daily,
+                StatisticsRoute.Weekly,
+                StatisticsRoute.Total
             )
             val icons = listOf(
                 Icons.Rounded.CheckCircle,
@@ -264,16 +254,16 @@ fun StatisticsNavGraph(
 ) {
     NavHost(
         navController,
-        startDestination = StatisticsRoute.DailyOutline.route
+        startDestination = StatisticsRoute.Daily.route
     )  {
-        composable(route = StatisticsRoute.DailyOutline.route) {
-            DailyOutlinePage(navController, taskViewModel, launcher)
+        composable(route = StatisticsRoute.Daily.route) {
+            DailyPage(navController, taskViewModel, launcher)
         }
-        composable(route = StatisticsRoute.WeeklyPage.route){
+        composable(route = StatisticsRoute.Weekly.route){
             WeeklyPage(navController, taskViewModel, launcher)
         }
-        composable(route = StatisticsRoute.AllStatisticsPage.route){
-            AllStatisticsPage(navController, taskViewModel, taskPointViewModel, launcher)
+        composable(route = StatisticsRoute.Total.route){
+            TotalPage(navController, taskViewModel, taskPointViewModel, launcher)
         }
     }
 }

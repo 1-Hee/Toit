@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
+import kotlin.math.abs
 
 
 class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
@@ -121,11 +122,18 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             }
             mBinding.setVariable(BR.limitText, mLimitText)
 
+            val createAt:Date? = mTaskDTO?.createAt;
             // 완료 여부 판정
-            val isComplete = mTaskDTO?.taskComplete != null
+            val isOverDay = Time.compareCreatedDate(createAt);
+            // 하루 이상 차이가 나는지 확인 +
+            // 완료 여부 판정
+            val isComplete = if(isOverDay) true else {
+                mTaskDTO?.taskComplete != null;
+            }
+
             if(isComplete) {
                 val timeLog = Time.getFullString(mTaskDTO?.taskComplete)
-                val suffixStr = context.resources.getString(R.string.suffix_complete)
+                val suffixStr = if(isOverDay) context.resources.getString(R.string.suffix_complete) else ""
                 mBinding.setVariable(BR.limitDesc, "$timeLog $suffixStr")
                 mBinding.setVariable(BR.isComplete, true)
             }else {
@@ -238,6 +246,8 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
             taskTitle = taskTitle,
             taskMemo = taskMemo,
             taskLimit = taskLimit,
+            taskComplete = mTaskDTO.taskComplete,
+            taskCertification = mTaskDTO.taskCertification
         )
     }
 

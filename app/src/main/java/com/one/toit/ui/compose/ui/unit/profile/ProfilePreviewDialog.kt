@@ -13,22 +13,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.one.toit.R
+import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.skydoves.landscapist.CircularReveal
@@ -74,19 +83,30 @@ fun ProfilePreviewDialog(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
             }
-            GlideImage(
-                imageModel = profilePath,
-                // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
-                contentScale = ContentScale.Crop,
-                circularReveal = CircularReveal(duration = 0),
-                // 이미지 로딩 전 표시할 place holder 이미지
-                placeHolder = painterResource(id = R.drawable.ic_profile),
-                // 에러 발생 시 표시할 이미지
-                error = painterResource(id = R.drawable.ic_profile),
-                modifier = Modifier
-                    .size(256.dp)
-                    .padding(4.dp)
-            )
+            val iconModifier = Modifier
+                .size(256.dp)
+                .padding(4.dp)
+            var isSuccessIcon by remember { mutableStateOf(true) }
+            if(isSuccessIcon){
+                GlideImage(
+                    imageModel = profilePath,
+                    // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
+                    contentScale = ContentScale.Crop,
+                    circularReveal = CircularReveal(duration = 0),
+                    // 이미지 로딩 전 표시할 place holder 이미지
+                    modifier = iconModifier,
+                    failure =  {
+                        isSuccessIcon = false;
+                    }
+                )
+            }else {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_person),
+                    contentDescription = "icon_profile",
+                    modifier = iconModifier.padding(16.dp),
+                    tint = mono300
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

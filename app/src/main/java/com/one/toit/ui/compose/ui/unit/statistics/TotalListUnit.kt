@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.model.Task
 import com.one.toit.data.viewmodel.TaskViewModel
+import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +31,7 @@ import timber.log.Timber
 import java.util.Date
 
 @Composable
-fun AllToitListUnit(
+fun TotalListUnit(
     context: Context,
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
@@ -92,17 +93,17 @@ fun AllToitListUnit(
         }
     }
 
-    SearchUnit(
-        onSearch = {
-            keyword -> searchedKeyword = keyword
-            Timber.d("search keyword is >> %s", keyword)
-       },
-        onDelete = {
-            searchedKeyword = ""
-        }
-    );
-
     if(mTaskDTOList.isNotEmpty()){
+        SearchUnit(
+            onSearch = {
+                    keyword -> searchedKeyword = keyword
+                Timber.d("search keyword is >> %s", keyword)
+            },
+            onDelete = {
+                searchedKeyword = ""
+            }
+        );
+
         SortUnit(context, mTaskDTOList){
             if(it.isNotEmpty()){
                 mTaskDTOList.clear()
@@ -110,6 +111,8 @@ fun AllToitListUnit(
                 Timber.i("첫번째 요소 >>> %s", it[0])
             }
         }
+    }else {
+        ItemNoContent();
     }
 
     // observe list scrolling
@@ -143,11 +146,11 @@ private fun parseTaskDTO(task: Task):TaskDTO{
     val taskId: Long = task.register.taskId
     val taskInfoId:Long = task.info.infoId
     val createAt: Date = task.register.createAt
-    var taskTitle: String = task.info.taskTitle
-    var taskMemo: String = task.info.taskMemo
-    var taskLimit: Date? = task.info.taskLimit
-    var taskComplete: Date? = task.info.taskComplete
-    var taskCertification: String? = task.info.taskCertification
+    val taskTitle: String = task.info.taskTitle
+    val taskMemo: String = task.info.taskMemo
+    val taskLimit: Date? = task.info.taskLimit
+    val taskComplete: Date? = task.info.taskComplete
+    val taskCertification: String? = task.info.taskCertification
     return  TaskDTO(
         taskId, taskInfoId, createAt, taskTitle,
         taskMemo, taskLimit, taskComplete,

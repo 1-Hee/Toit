@@ -1,6 +1,7 @@
 package com.one.toit.data.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -142,8 +143,9 @@ class TaskViewModel(
     /**
      * 주어진 시간대 까지의 목표 달성 기록을 체크
      */
-    suspend fun getAchievementMap(targetDate: Date, totalCnt:Int) : MutableMap<String, ChartEntry>{
-        return repository.getAchievementMap(targetDate, totalCnt)
+    suspend fun getAchievementMap(context:Context, targetDate: Date, totalCnt:Int)
+        : MutableMap<String, ChartEntry>{
+        return repository.getAchievementMap(context, targetDate, totalCnt)
     }
 
     /**

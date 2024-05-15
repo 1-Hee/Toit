@@ -1,5 +1,7 @@
 package com.one.toit.data.repository
 
+import android.content.Context
+import com.one.toit.R
 import com.one.toit.data.dao.TaskDao
 import com.one.toit.data.dto.ChartEntry
 import com.one.toit.data.dto.TaskCounter
@@ -202,7 +204,11 @@ class TaskRepository(
         return@withContext taskDao.getAchievementCnt(targetDate)
     }
 
-    suspend fun getAchievementMap(targetDate: Date, totalCnt:Int) : MutableMap<String, ChartEntry> {
+    suspend fun getAchievementMap(
+        context: Context,
+        targetDate: Date,
+        totalCnt:Int
+    ) : MutableMap<String, ChartEntry> {
         val calendar = Calendar.getInstance()
         calendar.time = targetDate
         // 00시부터 6시까지인지 확인.
@@ -213,7 +219,7 @@ class TaskRepository(
 
         if(isDawn){ // 00시부터 현재까지 1시간 단위로 맵핑..!
             for(i in 0..cHour){
-                val timeStr = String.format("%02d:00", i)
+                val timeStr = String.format(context.getString(R.string.unit_dp_hour), i)
                 calendar.set(Calendar.HOUR_OF_DAY, i);
                 val timeCnt = getAchievementCnt(calendar.time)
                 val ratio = timeCnt / totalCnt.toFloat()
@@ -225,9 +231,9 @@ class TaskRepository(
             val mStart = cHour - gap;
             for (i in mStart..cHour) {
                 val timeStr = if (i == mStart) {
-                    String.format("~%02d:00", i)
+                    String.format(context.getString(R.string.unit_dp_hour_prev), i)
                 } else {
-                    String.format("%02d:00", i)
+                    String.format(context.getString(R.string.unit_dp_hour), i)
                 }
                 calendar.set(Calendar.HOUR_OF_DAY, i);
                 val timeCnt = getAchievementCnt(calendar.time)

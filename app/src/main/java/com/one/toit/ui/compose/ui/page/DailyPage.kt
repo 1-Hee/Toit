@@ -44,12 +44,11 @@ import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Calendar
 import java.util.Date
 
 // @Preview(showBackground = true)
 @Composable
-fun DailyOutlinePage(
+fun DailyPage(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
@@ -114,7 +113,7 @@ fun DailyOutlinePage(
         withContext(Dispatchers.Main){
             val date = Date()
             val totalCnt = taskViewModel.getTaskCntByDate(date);
-            val mAchieveMap = taskViewModel.getAchievementMap(date, totalCnt)
+            val mAchieveMap = taskViewModel.getAchievementMap(context, date, totalCnt)
             achieveMap = mAchieveMap
         }
     }

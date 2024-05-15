@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,11 +68,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
+import kotlin.math.ceil
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 // 전체 통계 대쉬보드
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TotalSummaryUnit(
+fun SummaryUnit(
     taskViewModel: TaskViewModel,
     taskPointViewModel: TaskPointViewModel
 ){
@@ -158,21 +164,21 @@ fun TotalSummaryUnit(
             StatisticsData(
                 stringResource(R.string.txt_h_total_todo),
                 stringResource(R.string.txt_desc_total_todo, userNickname),
-                "${mTaskTotalCnt.value} ${stringResource(id = R.string.txt_unit)}",
+                mTaskTotalCnt.value,
                 0 // 개수
             ),
             // 평균 목표 수
             StatisticsData(
                 stringResource(R.string.txt_h_avg_todo),
                 stringResource(R.string.txt_desc_avg_todo, userNickname),
-                "${mTaskCntAvg.value} ${stringResource(id = R.string.txt_unit)}",
+                mTaskCntAvg.value,
                 0 // 개수
             ),
             // n월 누적 할일 목록
             StatisticsData(
                 stringResource(R.string.txt_h_cumulative_todo, mMonth),
                 stringResource(R.string.txt_desc_cumulative_todo, mMonth),
-                "${mMonthCnt.value} ${stringResource(id = R.string.txt_unit)}",
+                mMonthCnt.value,
                 0 // 개수
             ),
             // 최장 기록
@@ -180,22 +186,22 @@ fun TotalSummaryUnit(
             StatisticsData(
                 stringResource(R.string.txt_h_todo_max),
                 stringResource(R.string.txt_desc_todo_max, userNickname),
-                "${mMaxTime.value} sec",
-                0 // 시간
+                mMaxTime.value,
+                1 // 시간
             ),
             // 최단 기록
             StatisticsData(
                 stringResource(R.string.txt_h_todo_min),
                 stringResource(R.string.txt_desc_todo_min, userNickname),
-                "${mMinTime.value} sec",
-                0 // 시간
+                mMinTime.value,
+                1 // 시간
             ),
             // 평균 기록
             StatisticsData(
                 stringResource(R.string.txt_h_todo_avg),
                 stringResource(R.string.txt_desc_todo_avg, userNickname),
-                "${mAvgTime.value} sec",
-                0 // 시간
+                mAvgTime.value,
+                1 // 시간
             )
         )
         Column(
@@ -217,7 +223,7 @@ fun TotalSummaryUnit(
 data class StatisticsData(
     val key: String,
     val desc:String,
-    val value:String,
+    val value:Number,
     val type:Int = 0
 )
 
@@ -267,14 +273,11 @@ fun StatisticsCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(96.dp)
-            .clickable {
-                animationPlayed = !animationPlayed
-            },
+            .height(96.dp),
         backgroundColor = white,
         elevation = 2.dp,
         contentColor = black,
-        shape = RoundedCornerShape(36.dp),
+        shape = RoundedCornerShape(8.dp),
     ) {
         Box(modifier = Modifier
             .fillMaxSize()
@@ -324,40 +327,59 @@ fun StatisticsCard(
                     )
                 }
                 // 값
-                Text(
-                    text = data.value,
-                    style = MaterialTheme.typography.caption.copy(
-                        color = mono600,
-                        fontSize = 16.sp * animateSize,
-                        fontWeight = FontWeight.Medium
-                    ),
+                Row(
                     modifier = Modifier
                         .wrapContentSize()
                         .align(Alignment.Center)
-                )
+                        //.padding(12.dp)
+                    , horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    var dpStr = ""
+                    val icon = when(data.type){
+                        1 -> {
+                            val sec = data.value.toFloat().roundToInt()
+                            val min = sec / 60;
+                            val hour = min / 60;
+                            dpStr = if(hour + min > 0){
+                                String.format("%02d", hour) + ":" + String.format("%02d", min);
+                            }else {
+                                stringResource(R.string.txt_no_record)
+                            }
+                            painterResource(id = R.drawable.ic_time)
+                        }
+                        else -> {
+                            val dpValue = if(data.value is Int){
+                                data.value
+                            }else {
+                                (data.value.toFloat() * 10).roundToInt() / 10.0
+                            }
+                            dpStr = "$dpValue "+ stringResource(id = R.string.txt_unit)
+                            null
+                        }
+                    }
+                    Text(
+                        text = dpStr,
+                        style = MaterialTheme.typography.caption.copy(
+                            color = mono600,
+                            fontSize = 14.sp * animateSize,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                    if(icon != null){
+                        Icon(
+                            painter = icon,
+                            contentDescription =  "icon",
+                            modifier = Modifier
+                                .size(12.dp),
+                            tint = mono600
+                        )
+                    }
+                }
             }
-//           Row(
-//               modifier = Modifier
-//                   .wrapContentSize()
-//                   .align(Alignment.CenterEnd)
-//                   .padding(12.dp),
-//               horizontalArrangement = Arrangement.spacedBy(8.dp),
-//               verticalAlignment = Alignment.CenterVertically
-//           ) {
-//               val icon = when(data.type){
-//                   0 -> painterResource(id = R.drawable.ic_statistics)
-//                   1 -> painterResource(id = R.drawable.ic_time)
-//                   else -> painterResource(id = R.drawable.ic_create_todo)
-//               }
-//               Icon(
-//                   painter = icon,
-//                   contentDescription =  "icon",
-//                   modifier = Modifier
-//                       .size(24.dp),
-//                   tint = mono600
-//               )
-//
-//           }
         }
     }
 }

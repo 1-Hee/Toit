@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -16,7 +15,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +25,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,14 +44,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallStateUpdatedListener
@@ -64,6 +59,8 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.one.toit.R
 import com.one.toit.base.fatory.ApplicationFactory
 import com.one.toit.base.ui.BaseComposeActivity
+import com.one.toit.data.viewmodel.TaskPointViewModel
+import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.nav.MainRoute
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono500
@@ -72,16 +69,10 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.page.ProfilePage
 import com.one.toit.ui.compose.ui.page.TodoPage
+import com.one.toit.ui.compose.ui.page.TodoStatusPage
 import com.one.toit.ui.viewmodel.PageViewModel
-import com.one.toit.data.viewmodel.TaskInfoViewModel
-import com.one.toit.data.viewmodel.TaskPointViewModel
-import com.one.toit.data.viewmodel.TaskRegisterViewModel
-import com.one.toit.data.viewmodel.TaskViewModel
-import com.one.toit.ui.compose.ui.page.NavStatisticsPage
 import com.one.toit.util.AppUtil
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Date
 
 class MainActivity : BaseComposeActivity(), LifecycleOwner {
     // viewModel
@@ -307,9 +298,9 @@ fun MainNavGraph(
         composable(route = MainRoute.Todo.route) {
             TodoPage(navController, taskViewModel, launcher)
         }
-        composable(MainRoute.NavStatistics.route) {
+        composable(MainRoute.TodoStatus.route) {
             // GraphPage(navController)
-            NavStatisticsPage(navController, taskViewModel, launcher)
+            TodoStatusPage(navController, taskViewModel, launcher)
         }
         composable(MainRoute.Profile.route) {
             ProfilePage(navController, taskViewModel, taskPointViewModel, launcher)
@@ -324,7 +315,7 @@ fun MainBottomNavigation(
 ) {
     val items = listOf<MainRoute>(
         MainRoute.Todo,
-        MainRoute.NavStatistics,
+        MainRoute.TodoStatus,
         MainRoute.Profile
     )
     BottomNavigation(

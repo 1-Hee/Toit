@@ -138,38 +138,41 @@ interface TaskDao {
 
     // 최장 기록
     @Query("SELECT MAX(" +
-            "   CASE WHEN task_complete IS NOT NULL " +
-            "       THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
+            "   CASE WHEN task_limit IS NULL THEN null " +
+            "        WHEN task_complete IS NOT NULL" +
+            "           THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
             "   ELSE null END)" +
             "FROM table_task_registration tr " +
             "INNER JOIN table_task_information ti " +
-            "ON task_id = fk_task_id;"
+            "ON task_id = fk_task_id; "
     )
     fun getMaxTaskTime(): Long
     // 최단 기록
     @Query("SELECT MIN(" +
-            "   CASE WHEN task_complete IS NOT NULL " +
-            "       THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
+            "   CASE WHEN task_limit IS NULL THEN NULL " +
+            "        WHEN task_complete IS NOT NULL " +
+            "           THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
             "   ELSE null END)" +
             "FROM table_task_registration tr " +
             "INNER JOIN table_task_information ti " +
-            "ON task_id = fk_task_id;"
+            "ON task_id = fk_task_id; "
     )
     fun getMinTaskTime(): Long
     // 평균 기록
     @Query("SELECT AVG(" +
-            "   CASE WHEN(strftime('%s', task_complete) - strftime('%s', create_at)) > 0 " +
-            "   THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
+            "   CASE  WHEN task_limit IS NULL THEN NULL " +
+            "         WHEN (strftime('%s', task_complete) - strftime('%s', create_at)) > 0 " +
+            "           THEN (strftime('%s', task_complete) - strftime('%s', create_at)) " +
             "   ELSE null END" +
             ") FROM table_task_registration tr " +
             "INNER JOIN table_task_information ti " +
-            "ON task_id = fk_task_id;")
+            "ON task_id = fk_task_id; "
+    )
     fun getAvgTaskTime():Float
 
     /**
      *  점수 산정을 위한 메서드
      */
-
     // 메모 점수 산정을 위한 메모 길이
     @Query(
         "SELECT LENGTH(ti.task_memo) " +

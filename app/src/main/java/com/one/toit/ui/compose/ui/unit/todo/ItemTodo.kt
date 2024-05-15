@@ -105,10 +105,17 @@ fun ItemTodo(
                 if (isSuccess) {
                     showPreViewDialog = true
                 } else {
-                    intent.putExtra("pageIndex", 2)
-                    intent.putExtra("taskDTO", taskDTO)
-                    intent.putExtra("isComplete", false)
-                    launcher?.launch(intent)
+                    // 현재 날찌와 비교를 한다.
+                    val createAt = taskDTO.createAt
+                    val isOverDay = Time.compareCreatedDate(createAt);
+                    if(isOverDay){
+                        showPreViewDialog = true
+                    }else {
+                        intent.putExtra("pageIndex", 2)
+                        intent.putExtra("taskDTO", taskDTO)
+                        intent.putExtra("isComplete", false)
+                        launcher?.launch(intent)
+                    }
                 }
             }
     ){

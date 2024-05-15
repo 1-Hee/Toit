@@ -38,11 +38,11 @@ import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
-import com.one.toit.ui.compose.ui.unit.statistics.AllToitListUnit
-import com.one.toit.ui.compose.ui.unit.statistics.TotalSummaryUnit
+import com.one.toit.ui.compose.ui.unit.statistics.SummaryUnit
+import com.one.toit.ui.compose.ui.unit.statistics.TotalListUnit
 
 @Composable
-fun AllStatisticsPage(
+fun TotalPage(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
     taskPointViewModel: TaskPointViewModel,
@@ -136,10 +136,10 @@ fun AllStatisticsPage(
             // Content of each tab
             when (selectedTabIndex) {
                 0 -> {
-                    TotalSummaryUnit(taskViewModel, taskPointViewModel)
+                    SummaryUnit(taskViewModel, taskPointViewModel)
                 }
                 1 -> {
-                    AllToitListUnit(context, taskViewModel, launcher)
+                    TotalListUnit(context, taskViewModel, launcher)
                 }
             }
         }

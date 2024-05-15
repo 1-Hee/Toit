@@ -46,9 +46,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,6 +81,7 @@ import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.SimpleTopBar
 import com.one.toit.ui.compose.ui.unit.WarningDialog
 import com.one.toit.data.viewmodel.TaskRegisterViewModel
+import com.one.toit.ui.compose.style.mono900
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
@@ -328,8 +333,9 @@ fun AppSettingPage(
                 status = permissionFlag[1],
                 openSetting = openSetting
             )
+            val iconProfile = ImageVector.vectorResource(id = R.drawable.ic_camera)
             SettingUnit(
-                imgVector = Icons.Rounded.AddCircle, // change
+                imgVector = iconProfile, // change
                 settingName = "카메라",
                 description = "앱에서 휴대전화의 카메라에 접근하는 것을 허용합니다.",
                 status = permissionFlag[2],
@@ -462,7 +468,8 @@ fun SettingUnit(
                 androidx.compose.material.Icon(
                     imageVector = imgVector,
                     contentDescription = "icon",
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
+                    tint = mono900
                 )
                 Text(
                     text = settingName,

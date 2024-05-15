@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,6 +41,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,11 +53,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,6 +84,8 @@ import com.one.toit.ui.compose.style.mono800
 import com.one.toit.ui.compose.style.mono900
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
+import com.one.toit.ui.compose.style.red300
+import com.one.toit.ui.compose.style.red400
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.AdmobBanner
 import com.one.toit.ui.compose.ui.unit.ToitPointCard
@@ -80,6 +94,7 @@ import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
+import com.patrykandpatrick.vico.core.extension.setFieldValue
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.Dispatchers
@@ -107,6 +122,18 @@ fun ProfilePage(
     val nickNameKey = stringResource(id = R.string.key_nickname)
     var userNickname by remember { mutableStateOf(prefs.getValue(nickNameKey)) } // 사용자 닉네임
     var userProfile by remember { mutableStateOf(prefs.getValue(profileImgKey)) } // 사용자 프로필 이미지 주소
+
+    /*
+     defaultWidth,
+            defaultHeight,
+            viewportWidth,
+            viewportHeight,
+            tintColor,
+     */
+
+
+    // ImageBitmap, ImageVector, or Painter.
+
     /**
      * 사용자 프로필 통계 정보
      */
@@ -221,20 +248,34 @@ fun ProfilePage(
                         .fillMaxSize()
                         .background(color = mono100)
                     ){
-                        GlideImage(
-                            imageModel = userProfile,
-                            // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
-                            contentScale = ContentScale.Crop,
-                            circularReveal = CircularReveal(duration = 0),
-                            // 이미지 로딩 전 표시할 place holder 이미지
-                            placeHolder = painterResource(id = R.drawable.ic_profile),
-                            // 에러 발생 시 표시할 이미지
-                            error = painterResource(id = R.drawable.ic_profile),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .align(Alignment.Center)
-                                .clickable { isShowProfilePreview = true },
-                        )
+                        val iconModifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center)
+                            .clickable {
+                                isShowProfilePreview = true
+                            };
+                        var isSuccessIcon by remember { mutableStateOf(true) }
+                        if(isSuccessIcon){
+                            GlideImage(
+                                imageModel = userProfile,
+                                // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
+                                contentScale = ContentScale.Crop,
+                                circularReveal = CircularReveal(duration = 0),
+                                // 이미지 로딩 전 표시할 place holder 이미지
+                                modifier = iconModifier,
+                                failure =  {
+                                    isSuccessIcon = false;
+                                }
+                            )
+                        }else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_person),
+                                contentDescription = "icon_profile",
+                                modifier = iconModifier
+                                    .padding(12.dp),
+                                tint = mono300
+                            )
+                        }
                     }
                 }
                 // 프로필 명

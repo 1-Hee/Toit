@@ -126,30 +126,27 @@ fun TodoPage(
     val dailyTaskList = remember { mutableStateListOf<TaskDTO>() }
     val baseDate = Date()
     // 초기 리스트 렌더링
-    LaunchedEffect(isInitState, checked){
+    LaunchedEffect(isInitState){
         withContext(Dispatchers.IO) {
             pgNo = 1
-            Timber.e("FIRST INIT CALL...!!!")
-            val mDailyList  = if(isInitState && checked){ // 초기화 되고, 체크가 되었을 경우에만!
-               taskViewModel.readRemainTaskListByDate(pgNo, baseDate)
-            }else {
-               taskViewModel.readTaskListByDate(pgNo, baseDate)
+            val mDTOList = loadTaskDTOList(
+                isInitState, checked, pgNo, baseDate, taskViewModel
+            )
+            // allDailyTaskList = mDTOList.toList()
+            if(isInitState && dailyTaskList.isNotEmpty()){
+                dailyTaskList.clear();
             }
-            val mDTOList = mutableListOf<TaskDTO>()
-            mDailyList.forEach { taskItem ->
-                val mTaskDTO = TaskDTO(
-                    taskId = taskItem.register.taskId,
-                    taskInfoId = taskItem.info.infoId,
-                    createAt = taskItem.register.createAt,
-                    taskTitle = taskItem.info.taskTitle,
-                    taskMemo = taskItem.info.taskMemo,
-                    taskLimit = taskItem.info.taskLimit,
-                    taskComplete = taskItem.info.taskComplete,
-                    taskCertification = taskItem.info.taskCertification
-                )
-                //Timber.i("[item] : $mTaskDTO")
-                mDTOList.add(mTaskDTO)
-            }
+            dailyTaskList.addAll(mDTOList.toList());
+        }
+    }
+
+    // 달성 목표 토글에 따른 리 컴포지션 핸들링
+    LaunchedEffect(checked) {
+        withContext(Dispatchers.IO){
+            pgNo = 1
+            val mDTOList = loadTaskDTOList(
+                isInitState, checked, pgNo, baseDate, taskViewModel
+            )
             // allDailyTaskList = mDTOList.toList()
             if(isInitState && dailyTaskList.isNotEmpty()){
                 dailyTaskList.clear();
@@ -294,4 +291,30 @@ fun TodoPage(
             )
         }
     }
+}
+private suspend fun loadTaskDTOList(
+    isInitState:Boolean, checked:Boolean,
+    pgNo:Int, baseDate: Date, taskViewModel: TaskViewModel
+):List<TaskDTO>{
+    val mDailyList  = if(isInitState && checked){ // 초기화 되고, 체크가 되었을 경우에만!
+        taskViewModel.readRemainTaskListByDate(pgNo, baseDate)
+    }else {
+        taskViewModel.readTaskListByDate(pgNo, baseDate)
+    }
+    val mDTOList = mutableListOf<TaskDTO>()
+    mDailyList.forEach { taskItem ->
+        val mTaskDTO = TaskDTO(
+            taskId = taskItem.register.taskId,
+            taskInfoId = taskItem.info.infoId,
+            createAt = taskItem.register.createAt,
+            taskTitle = taskItem.info.taskTitle,
+            taskMemo = taskItem.info.taskMemo,
+            taskLimit = taskItem.info.taskLimit,
+            taskComplete = taskItem.info.taskComplete,
+            taskCertification = taskItem.info.taskCertification
+        )
+        //Timber.i("[item] : $mTaskDTO")
+        mDTOList.add(mTaskDTO)
+    }
+    return mDTOList
 }
