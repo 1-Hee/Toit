@@ -27,6 +27,8 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Create
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -282,7 +284,7 @@ fun TodoPage(
             }
         ){
             Icon(
-                painter = painterResource(id = R.drawable.ic_create_todo),
+                Icons.Rounded.Create,
                 contentDescription = "버튼 아이콘",
                 modifier = Modifier
                     .width(26.dp)

@@ -19,15 +19,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         android:paddingHorizontal="12dp"
         android:paddingVertical="8dp"
         >
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_back"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_arrow_left"
             android:scaleType="fitCenter"
             app:layout_constraintStart_toStartOf="parent"

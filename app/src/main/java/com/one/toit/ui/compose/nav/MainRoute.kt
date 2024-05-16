@@ -10,9 +10,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.one.toit.R
 
 sealed class MainRoute(
-    val title: Int, val icon: ImageVector? = null, val route:String
+    val title: Int, val route:String
 ){
-    object Todo: MainRoute(title = R.string.p_todo, icon = Icons.Rounded.List, route = "TodoPage")
-    object TodoStatus: MainRoute(title = R.string.p_statistics, icon = Icons.Rounded.Favorite, route = "TodoStatusPage")
-    object Profile: MainRoute(title = R.string.p_profile, icon = Icons.Rounded.Person, route = "ProfilePage")
+    object Todo: MainRoute(title = R.string.p_todo, route = "TodoPage")
+    object TodoStatus: MainRoute(title = R.string.p_statistics, route = "TodoStatusPage")
+    object Profile: MainRoute(title = R.string.p_profile, route = "ProfilePage")
 }

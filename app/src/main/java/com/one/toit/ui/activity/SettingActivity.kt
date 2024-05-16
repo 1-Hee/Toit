@@ -326,8 +326,9 @@ fun AppSettingPage(
                 status = permissionFlag[0],
                 openSetting = openSetting
             )
+            val iconGallery = ImageVector.vectorResource(id = R.drawable.ic_gallery)
             SettingUnit(
-                imgVector = Icons.Rounded.AccountBox,
+                imgVector = iconGallery,
                 settingName = "사진 및 동영상",
                 description = "앱에서 사용할 사진 및 동영상 데이터의 열람을 허용합니다.",
                 status = permissionFlag[1],

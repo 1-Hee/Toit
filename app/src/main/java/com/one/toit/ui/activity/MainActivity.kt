@@ -24,6 +24,8 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.List
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -318,49 +321,56 @@ fun MainBottomNavigation(
         MainRoute.TodoStatus,
         MainRoute.Profile
     )
+    val iconList = listOf(
+        Icons.Rounded.List,
+        ImageVector.vectorResource(id = R.drawable.ic_fire),
+        Icons.Rounded.Person
+    )
+
+
     BottomNavigation(
         backgroundColor = Color.White,
         contentColor = Color(0xff0a090a)
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-        items.forEach { item ->
+        items.forEachIndexed { index, item ->
             val itemTitle = stringResource(id = item.title)
             BottomNavigationItem(
                 icon = {
-                   if(currentRoute == item.route){
-                       Box(
-                           Modifier
-                               .fillMaxWidth()
-                               .fillMaxHeight()
-                               .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 2.dp)
-                       ){
-                           Box(modifier = Modifier
-                               .fillMaxWidth()
-                               .height(1.5.dp)
-                               .background(purple200)
-                               .align(Alignment.TopCenter)
-                           )
-                           Icon(
-                               item.icon as ImageVector,
-                               contentDescription = stringResource(id = item.title),
-                               modifier = Modifier
-                                   .width(26.dp)
-                                   .height(26.dp)
-                                   .align(Alignment.Center),
-                               tint = purple200
-                           )
-                       }
-                   }else {
-                       Icon(
-                           item.icon as ImageVector,
-                           contentDescription = stringResource(id = item.title),
-                           modifier = Modifier
-                               .width(26.dp)
-                               .height(26.dp),
-                           tint = mono600
-                       )
-                   }
+                    if(currentRoute == item.route){
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 2.dp)
+                        ){
+                            Box(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.5.dp)
+                                .background(purple200)
+                                .align(Alignment.TopCenter)
+                            )
+                            Icon(
+                                iconList[index],
+                                contentDescription = stringResource(id = item.title),
+                                modifier = Modifier
+                                    .width(26.dp)
+                                    .height(26.dp)
+                                    .align(Alignment.Center),
+                                tint = purple200
+                            )
+                        }
+                    }else {
+                        Icon(
+                            iconList[index],
+                            contentDescription = stringResource(id = item.title),
+                            modifier = Modifier
+                                .width(26.dp)
+                                .height(26.dp),
+                            tint = mono600
+                        )
+                    }
                 },
                 selectedContentColor = purple200,
                 unselectedContentColor = mono300,
