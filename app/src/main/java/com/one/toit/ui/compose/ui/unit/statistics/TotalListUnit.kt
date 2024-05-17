@@ -17,15 +17,20 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.model.Task
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
@@ -43,10 +48,19 @@ fun TotalListUnit(
     // 페이징 변수
     var pgNo by remember { mutableIntStateOf(1) }
 
+    var refreshing by remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = refreshing)
+    val scope = rememberCoroutineScope()
+    // 정렬 옵션
+    var orderIdx by remember { mutableIntStateOf(0) }
     // 초기화
-    LaunchedEffect(Unit){
+    LaunchedEffect(refreshing, searchedKeyword, orderIdx){
         withContext(Dispatchers.Main) {
-            val mTaskList = taskViewModel.readTaskList(pgNo);
+            val mTaskList = if(searchedKeyword.isNotBlank()){
+                taskViewModel.readSortedListByQuery(pgNo, searchedKeyword, orderIdx)
+            }else {
+                taskViewModel.readSortedTaskList(pgNo, orderIdx)
+            }
             val mDtoList = mutableListOf<TaskDTO>()
             mTaskList.forEach { task ->
                 val mTaskDTO = parseTaskDTO(task);
@@ -54,90 +68,102 @@ fun TotalListUnit(
             }
             mTaskDTOList.clear();
             mTaskDTOList.addAll(mDtoList);
+            refreshing = false
         }
     }
 
-    // 검색어 감지
-    LaunchedEffect(searchedKeyword) {
-        withContext(Dispatchers.IO){
-            pgNo = 1
-            val mTaskList =  if(searchedKeyword.isNotBlank()){
-                taskViewModel.readTaskListByQuery(pgNo, searchedKeyword)
-            }else {
-              taskViewModel.readTaskList(pgNo)
-            }
-            val mDtoList = mutableListOf<TaskDTO>()
-            mTaskList.forEach { task ->
-                val mTaskDTO = parseTaskDTO(task);
-                mDtoList.add(mTaskDTO);
-            }
-            mTaskDTOList.clear();
-            mTaskDTOList.addAll(mDtoList);
-        }
-    }
+//    // 검색어 감지
+//    LaunchedEffect(searchedKeyword) {
+//        withContext(Dispatchers.IO){
+//            pgNo = 1
+//            val mTaskList =  if(searchedKeyword.isNotBlank()){
+//                taskViewModel.readTaskListByQuery(pgNo, searchedKeyword)
+//            }else {
+//              taskViewModel.readTaskList(pgNo)
+//            }
+//            val mDtoList = mutableListOf<TaskDTO>()
+//            mTaskList.forEach { task ->
+//                val mTaskDTO = parseTaskDTO(task);
+//                mDtoList.add(mTaskDTO);
+//            }
+//            mTaskDTOList.clear();
+//            mTaskDTOList.addAll(mDtoList);
+//        }
+//    }
 
     // 페이징 감지
     LaunchedEffect(pgNo > 1) {
         withContext(Dispatchers.IO){
-            val mTaskList =  if(searchedKeyword.isNotBlank()){
-                taskViewModel.readTaskListByQuery(pgNo, searchedKeyword)
-            }else {
-                taskViewModel.readTaskList(pgNo)
+            if(pgNo > 1){
+                val mTaskList =  if(searchedKeyword.isNotBlank()){
+                    taskViewModel.readSortedListByQuery(pgNo, searchedKeyword, orderIdx)
+                }else {
+                    taskViewModel.readSortedTaskList(pgNo, orderIdx)
+                }
+                val mDtoList = mutableListOf<TaskDTO>()
+                mTaskList.forEach { task ->
+                    val mTaskDTO = parseTaskDTO(task);
+                    mDtoList.add(mTaskDTO);
+                }
+                mTaskDTOList.addAll(mDtoList);
+                refreshing = false
             }
-            val mDtoList = mutableListOf<TaskDTO>()
-            mTaskList.forEach { task ->
-                val mTaskDTO = parseTaskDTO(task);
-                mDtoList.add(mTaskDTO);
-            }
-            mTaskDTOList.addAll(mDtoList);
         }
     }
-
-    if(mTaskDTOList.isNotEmpty()){
-        SearchUnit(
-            onSearch = {
-                    keyword -> searchedKeyword = keyword
-                Timber.d("search keyword is >> %s", keyword)
-            },
-            onDelete = {
-                searchedKeyword = ""
-            }
-        );
-
-        SortUnit(context, mTaskDTOList){
-            if(it.isNotEmpty()){
-                mTaskDTOList.clear()
-                mTaskDTOList.addAll(it.toList());
-                Timber.i("첫번째 요소 >>> %s", it[0])
-            }
+    SearchUnit(
+        onSearch = { keyword -> searchedKeyword = keyword
+            Timber.d("search keyword is >> %s", keyword)
+        },
+        onDelete = {
+            searchedKeyword = ""
         }
-    }else {
+    )
+    SortUnit(context){
+        orderIdx = it
+        refreshing = true
+    }
+
+    if(mTaskDTOList.isEmpty()){
         ItemNoContent();
-    }
-
-    // observe list scrolling
-    val reachedBottom: Boolean by remember {
-        derivedStateOf {
-            val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
-            lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
-        }
-    }
-//
-    // load more if scrolled to bottom
-    LaunchedEffect(reachedBottom) {
-        withContext(Dispatchers.Main){
-            val hasNext = taskViewModel.hasNextData(pgNo+1, searchedKeyword)
-            if (reachedBottom && hasNext) {
-                pgNo++
+    }else {
+        // observe list scrolling
+        val reachedBottom: Boolean by remember {
+            derivedStateOf {
+                val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
             }
         }
-    }
-
-    LazyColumn(state = lazyListState) {
-        items(mTaskDTOList) { item ->
-            Spacer(modifier = Modifier.height(4.dp))
-            ItemTodo(taskDTO = item, launcher = launcher)
-            Spacer(modifier = Modifier.height(16.dp))
+        // load more if scrolled to bottom
+        LaunchedEffect(reachedBottom) {
+            withContext(Dispatchers.Main){
+                val hasNext = taskViewModel.hasNextData(pgNo+1, searchedKeyword)
+                if (reachedBottom && hasNext) {
+                    pgNo++
+                }
+            }
+        }
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = {
+                // 새로고침 로직을 구현합니다. 예를 들어, 네트워크 요청을 보냅니다.
+                refreshing = true
+                // Simulate a network request
+                scope.launch {
+                    delay(1000) // Simulate network delay
+                    // Update your list here
+                    refreshing = false // Indicate that the refresh has finished
+                }
+            },
+        ) {
+            LazyColumn(state = lazyListState) {
+                items(mTaskDTOList) { item ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    ItemTodo(taskDTO = item, launcher = launcher){
+                        refreshing = true
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
         }
     }
 }

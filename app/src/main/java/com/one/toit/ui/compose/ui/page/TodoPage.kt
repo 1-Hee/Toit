@@ -1,5 +1,6 @@
 package com.one.toit.ui.compose.ui.page
 
+//import com.one.toit.data.dto.TaskDTO
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
@@ -38,19 +39,17 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
-import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
-//import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
@@ -61,12 +60,17 @@ import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
 import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
-import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 /**
  *  TODO DB쪽과의 시간 차이로 인해서 렌더링 이슈가 살짝 있음
@@ -78,7 +82,6 @@ fun TodoPage(
     taskViewModel: TaskViewModel,
     launcher: ActivityResultLauncher<Intent>? = null
 ){
-
     // 환경 변수들
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
@@ -87,17 +90,20 @@ fun TodoPage(
     val savedFlag = if(prefs.getValue("isShowAll").isNotBlank()){
         prefs.getValue("isShowAll").toBoolean()
     }else false;
+    // for 토글 버튼
     var checked by remember { mutableStateOf(savedFlag) }
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
-    // 현재 화면이 초기 컴포지션이 일어났는지 체크할 플래그 변수
-    var isInitState by remember { mutableStateOf(false) }
 
     // 페이징 변수
     var pgNo by remember { mutableIntStateOf(1) }
 
+    // 상태 리프레쉬 + 초기 여부 판단
+    var refreshing by remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = refreshing)
+    val scope = rememberCoroutineScope()
+
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
-
     // 컴포저블의 라이프 사이클 관리를 위한 메서드
     LaunchedEffect(lifecycleState) {
         // Do something with your state
@@ -105,85 +111,69 @@ fun TodoPage(
         // instead of LaunchedEffect
         when (lifecycleState) {
             Lifecycle.State.DESTROYED -> {}
-            else -> {
-                isInitState = true
+            Lifecycle.State.STARTED,
+            Lifecycle.State.CREATED -> {
+                refreshing = true
             }
-//            Lifecycle.State.INITIALIZED -> {}
-//            Lifecycle.State.CREATED -> {
-//                isInitState = true
-//            }
-//            Lifecycle.State.STARTED -> {
-//                isInitState = true
-//            }
-//            Lifecycle.State.RESUMED -> {
-//                isInitState = true
-//                // AppUtil.toast(context, "onResume!!!!")
-//            }
+            Lifecycle.State.RESUMED -> {
+                refreshing = true
+                scope.launch {
+                    delay(500)
+                }
+                refreshing = false
+            }
+            else -> {}
         }
     }
 
     // 할일 목록 리스트를 위한 State
     val lazyListState = rememberLazyListState()
     // 일일 taskList
-    val dailyTaskList = remember { mutableStateListOf<TaskDTO>() }
+    var dailyTaskList = remember { mutableStateListOf<TaskDTO>() }
     val baseDate = Date()
     // 초기 리스트 렌더링
-    LaunchedEffect(isInitState){
+    LaunchedEffect(checked, refreshing){
         withContext(Dispatchers.IO) {
             pgNo = 1
             val mDTOList = loadTaskDTOList(
-                isInitState, checked, pgNo, baseDate, taskViewModel
+                true, checked, pgNo, baseDate, taskViewModel
             )
-            // allDailyTaskList = mDTOList.toList()
-            if(isInitState && dailyTaskList.isNotEmpty()){
-                dailyTaskList.clear();
-            }
-            dailyTaskList.addAll(mDTOList.toList());
+            refreshing = true
+            dailyTaskList.clear()
+            dailyTaskList.addAll(mDTOList)
+            refreshing = false;
         }
     }
 
-    // 달성 목표 토글에 따른 리 컴포지션 핸들링
-    LaunchedEffect(checked) {
-        withContext(Dispatchers.IO){
-            pgNo = 1
-            val mDTOList = loadTaskDTOList(
-                isInitState, checked, pgNo, baseDate, taskViewModel
-            )
-            // allDailyTaskList = mDTOList.toList()
-            if(isInitState && dailyTaskList.isNotEmpty()){
-                dailyTaskList.clear();
-            }
-            dailyTaskList.addAll(mDTOList.toList());
-        }
-    }
 
     // 페이징을 위한 비동기 리캄포지션
-    LaunchedEffect(pgNo > 1) {
-        withContext(Dispatchers.IO) {
-            val mDailyList  = if(checked){ // 초기화 되고, 체크가 되었을 경우에만!
-                taskViewModel.readRemainTaskListByDate(pgNo, baseDate)
-            }else {
-                taskViewModel.readTaskListByDate(pgNo, baseDate)
+    LaunchedEffect(pgNo) {
+        if(pgNo>1){
+            withContext(Dispatchers.IO) {
+                val mDailyList  = if(checked){ // 초기화 되고, 체크가 되었을 경우에만!
+                    taskViewModel.readRemainTaskListByDate(pgNo, baseDate)
+                }else {
+                    taskViewModel.readTaskListByDate(pgNo, baseDate)
+                }
+                val mDTOList = mutableListOf<TaskDTO>()
+                mDailyList.forEach { taskItem ->
+                    val mTaskDTO = TaskDTO(
+                        taskId = taskItem.register.taskId,
+                        taskInfoId = taskItem.info.infoId,
+                        createAt = taskItem.register.createAt,
+                        taskTitle = taskItem.info.taskTitle,
+                        taskMemo = taskItem.info.taskMemo,
+                        taskLimit = taskItem.info.taskLimit,
+                        taskComplete = taskItem.info.taskComplete,
+                        taskCertification = taskItem.info.taskCertification
+                    )
+                    //Timber.i("[item] : $mTaskDTO")
+                    mDTOList.add(mTaskDTO)
+                }
+                dailyTaskList.addAll(mDTOList.toList());
             }
-            val mDTOList = mutableListOf<TaskDTO>()
-            mDailyList.forEach { taskItem ->
-                val mTaskDTO = TaskDTO(
-                    taskId = taskItem.register.taskId,
-                    taskInfoId = taskItem.info.infoId,
-                    createAt = taskItem.register.createAt,
-                    taskTitle = taskItem.info.taskTitle,
-                    taskMemo = taskItem.info.taskMemo,
-                    taskLimit = taskItem.info.taskLimit,
-                    taskComplete = taskItem.info.taskComplete,
-                    taskCertification = taskItem.info.taskCertification
-                )
-                //Timber.i("[item] : $mTaskDTO")
-                mDTOList.add(mTaskDTO)
-            }
-            dailyTaskList.addAll(mDTOList.toList());
         }
     }
-
 
     Box(
         modifier = Modifier
@@ -255,15 +245,28 @@ fun TodoPage(
             if(dailyTaskList.isEmpty()){
                 ItemNoContent()
             }else {
-                LazyColumn(state = lazyListState) {
-                    item {
-                        // header?
-                    }
-                    items(dailyTaskList) { item ->
-                        // Main items content
-                        Spacer(modifier = Modifier.height(4.dp))
-                        ItemTodo(taskDTO = item, launcher = launcher)
-                        Spacer(modifier = Modifier.height(16.dp))
+                SwipeRefresh(
+                    state = swipeRefreshState,
+                    onRefresh = {
+                        // 새로고침 로직을 구현합니다. 예를 들어, 네트워크 요청을 보냅니다.
+                        refreshing = true
+                        // Simulate a network request
+                        scope.launch {
+                            delay(1000) // Simulate network delay
+                            // Update your list here
+                            refreshing = false // Indicate that the refresh has finished
+                        }
+                    },
+                ) {
+                    LazyColumn(state = lazyListState) {
+                        items(dailyTaskList) { item ->
+                            // Main items content
+                            Spacer(modifier = Modifier.height(4.dp))
+                            ItemTodo(taskDTO = item, launcher = launcher){
+                                refreshing = true
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
                 }
             }

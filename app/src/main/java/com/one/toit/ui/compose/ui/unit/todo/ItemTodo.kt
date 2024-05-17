@@ -52,7 +52,8 @@ import com.one.toit.util.AppUtil.Time
 fun ItemTodo(
     taskDTO: TaskDTO,
     isSuccess:Boolean = taskDTO.taskComplete != null,
-    launcher: ActivityResultLauncher<Intent>? = null
+    launcher: ActivityResultLauncher<Intent>? = null,
+    onRefresh : () -> Unit
 ){
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
@@ -87,6 +88,7 @@ fun ItemTodo(
                     taskRegisterViewModel.removeTaskRegisterById(taskDTO.taskId)
                     AppUtil.toast(context, msg)
                 }
+                onRefresh()
             },
             title = stringResource(R.string.title_remove_todo),
             content = stringResource(R.string.txt_guide_remove_todo),

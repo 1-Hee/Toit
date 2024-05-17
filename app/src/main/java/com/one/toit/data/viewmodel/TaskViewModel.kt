@@ -35,6 +35,11 @@ class TaskViewModel(
         return repository.readTaskList(page)
     }
 
+    // 페이징 + 정렬
+    suspend fun readSortedTaskList(page:Int, orderIdx:Int):List<Task>{
+        return repository.readSortedTaskList(page, orderIdx)
+    }
+
     // 검색
     suspend fun readTaskListByQuery(query:String): List<Task> {
         return repository.readTaskListByQuery(query)
@@ -43,6 +48,11 @@ class TaskViewModel(
     // 페이징 & 검색
     suspend fun readTaskListByQuery(page:Int, query:String): List<Task>{
         return repository.readTaskListByQuery(page, query)
+    }
+
+    // 페이징 & 검색 + 정렬
+    suspend fun readSortedListByQuery(page:Int, query:String, orderIdx: Int): List<Task>{
+        return repository.readSortedListByQuery(page, query, orderIdx)
     }
 
     suspend fun readRemainTaskList():List<Task>{
@@ -153,7 +163,7 @@ class TaskViewModel(
      *  true : all
      *  false : remain
      */
-    suspend fun hasNextItem(page:Int, targetDate: Date, isAll:Boolean):Boolean {
+    suspend fun hasNextItem(page:Int, targetDate: Date, isAll:Boolean = true):Boolean {
         return repository.hasNextItem(page, targetDate, isAll)
     }
 

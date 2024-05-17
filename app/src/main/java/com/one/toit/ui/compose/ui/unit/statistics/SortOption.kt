@@ -49,13 +49,11 @@ import java.util.Locale
 @Composable
 fun SortUnit(
     context: Context,
-    taskDTOList:List<TaskDTO>,
-    onSort : (List<TaskDTO>) -> Unit
+    onSort : (index:Int) -> Unit
 ){
     var expanded by remember { mutableStateOf(false) }
     val options = context.resources.getStringArray(R.array.option_todo_sort)
     var selectedOption by remember { mutableStateOf(options[0]) }
-    var mTaskDTOList by remember { mutableStateOf(taskDTOList) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,8 +116,7 @@ fun SortUnit(
                     onClick = {
                         selectedOption = option
                         expanded = false
-                        mTaskDTOList = sortList(index, mTaskDTOList)
-                        onSort(mTaskDTOList)
+                        onSort(index)
                     },
                 ) {
                     Text(
@@ -130,58 +127,6 @@ fun SortUnit(
         }
     }
 }
-
-// 정렬 함수
-private fun sortList(sIndex:Int, list: List<TaskDTO>): List<TaskDTO> {
-    val taskList:List<TaskDTO> = when(sIndex){
-        1 -> {  // 이름순
-            list.sortedBy { it.taskTitle }
-        }
-        2 -> { // 최신순
-            list.sortedByDescending { it.createAt }
-        }
-        3 -> { // 과거 순
-            list.sortedBy { it.createAt }
-        }
-        4 -> { // 목표 상태
-            list.sortedByDescending {
-                val mValue = if(it.taskComplete == null){
-                    Long.MIN_VALUE
-                }else {
-                    it.taskComplete!!.time
-                }
-                mValue
-            }
-        }
-        5 -> { // 시간 짧은 순
-            list.sortedBy {
-                val mValue = if(it.taskComplete == null){
-                    Long.MAX_VALUE
-                }else {
-                    val start = it.createAt
-                    val end = it.taskComplete!!
-                    end.time - start.time
-                }
-                mValue
-            }
-        }
-        6 -> { // 시간 긴 순
-            list.sortedByDescending {
-                val mValue = if(it.taskComplete == null){
-                    Long.MIN_VALUE
-                }else {
-                    val start = it.createAt
-                    val end = it.taskComplete!!
-                    end.time - start.time
-                }
-                mValue
-            }
-        }
-        else -> list
-    }
-    return taskList
-}
-
 
 // 바닥 선만 그려주는 메서드
 @Composable

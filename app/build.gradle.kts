@@ -130,7 +130,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.3.1")
 
     // debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.material:material:1.2.0")
+    implementation("androidx.compose.material:material:1.3.1")
     implementation("com.google.android.material:material:1.6.0-alpha01")
     implementation("io.coil-kt:coil-compose:2.2.2")
 
@@ -236,4 +236,9 @@ dependencies {
     val app_update_version = "2.1.0"
     implementation("com.google.android.play:app-update:$app_update_version")
     implementation("com.google.android.play:app-update-ktx:$app_update_version") // for kotlin
+
+    // for xml
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.24.7-alpha")
+
+
 }

@@ -143,10 +143,14 @@ class AppUtil {
             }
             val dbCalendar = Calendar.getInstance()
             dbCalendar.time = createdDate
-            // 날짜 차이 계산
-            val differenceInMillis: Long = abs(dbCalendar.getTimeInMillis() - cCalendar.getTimeInMillis())
-            val differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24)
-            return differenceInDays >= 1
+            val flag = cCalendar.get(Calendar.YEAR) == dbCalendar.get(Calendar.YEAR)
+                    && cCalendar.get(Calendar.MONTH) == dbCalendar.get(Calendar.MONTH)
+                    && cCalendar.get(Calendar.DAY_OF_MONTH) == dbCalendar.get(Calendar.DAY_OF_MONTH)
+//            // 날짜 차이 계산
+//            val differenceInMillis: Long = abs(dbCalendar.getTimeInMillis() - cCalendar.getTimeInMillis())
+//            val differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24)
+//            return differenceInDays >= 1
+            return !flag
         }
 
         // 시간이 10분 이상 차이가 나는지 점검하는 메서드

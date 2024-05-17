@@ -164,12 +164,12 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
         launcher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { // 액티비티 종료시 결과릴 리턴받기 위한 콜백 함수
-                result -> Timber.d("onActivityResult.......")
-            if (result.resultCode == Activity.RESULT_OK) {
-                Timber.i("OK......")
-            }else if(result.resultCode == Activity.RESULT_CANCELED){
-                Timber.i("CANCEL......")
-            }
+//                result -> Timber.d("onActivityResult.......")
+//            if (result.resultCode == Activity.RESULT_OK) {
+//                Timber.i("OK......")
+//            }else if(result.resultCode == Activity.RESULT_CANCELED){
+//                Timber.i("CANCEL......")
+//            }
         }
         setContent {
             MainScreenView(pageViewModel, taskViewModel, taskPointViewModel, launcher)
@@ -384,7 +384,6 @@ fun MainBottomNavigation(
                         launchSingleTop = true
                         restoreState = true
                         pageViewModel.setPageName(itemTitle)
-                        Timber.i("bottom : %s : ", pageViewModel.pageName)
                     }
                 }
             )

@@ -24,6 +24,24 @@ interface TaskDao {
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
+            "ORDER BY :order "+
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readSortedTaskList(page:Int, size:Int, order:String): List<Task> // 페이징 추가한 메서드
+
+//    @Query("SELECT task_id, create_at, " + // 1 , 2
+//            "info_id, fk_task_id, task_title, " + // 3, 4, 5
+//            "task_memo, task_limit, task_complete, " + // 6, 7, 8
+//            "task_certification " + // 9
+//            "FROM table_task_registration " +
+//            "INNER JOIN table_task_information " +
+//            "ON task_id = fk_task_id " +
+//            "ORDER BY :order "+
+//            "LIMIT :size OFFSET (:page-1)*:size")
+//    fun readSortedTaskList(page:Int, size:Int, order:String): List<Task> // 페이징 + 정렬옵션
+
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
             "WHERE task_title LIKE '%'||:query||'%' "
     )
     fun readTaskListByQuery(query:String): List<Task> // 검색
@@ -34,6 +52,15 @@ interface TaskDao {
             "WHERE task_title LIKE '%'||:query||'%' " +
             "LIMIT :size OFFSET (:page-1)*:size")
     fun readTaskListByQuery(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
+
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE task_title LIKE '%'||:query||'%' " +
+            "ORDER BY :order "+
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readSortedListByQuery(page:Int, size:Int, query:String, order: String): List<Task> // 페이징, 검색, 정렬
+
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id WHERE COALESCE(task_complete, '') = ''")
@@ -206,5 +233,7 @@ interface TaskDao {
             "WHERE DATE(a.create_at) = DATE(:targetDate) " +
             "AND strftime('%H', task_complete) <= strftime('%H', :targetDate)")
     fun getAchievementCnt(targetDate: Date):Int
+
+
 
 }

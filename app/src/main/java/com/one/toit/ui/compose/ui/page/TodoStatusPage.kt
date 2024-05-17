@@ -73,7 +73,7 @@ fun TodoStatusPage(
             val date = Date()
             totalCnt = taskViewModel.getTaskCntByDate(date)
             completeCnt = taskViewModel.getCompleteTaskCnt(date)
-            Timber.i("total : %s | complete : %s", totalCnt, completeCnt)
+            // Timber.i("total : %s | complete : %s", totalCnt, completeCnt)
             updateState = true
         }
     }
@@ -160,7 +160,7 @@ fun TodoStatusPage(
                             vertical = 4.dp,
                             horizontal = 2.dp
                         ),
-                    )
+                )
             }
         }
     }
