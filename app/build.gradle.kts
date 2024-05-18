@@ -114,6 +114,13 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
+    // Room 테스트 라이브러리
+    testImplementation("androidx.room:room-testing:2.4.3") // 최신 버전 확인 필요
+    // Coroutine 테스트 라이브러리
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    // Paging 테스트 라이브러리
+    testImplementation("androidx.paging:paging-common:3.1.0") // 최신 버전 확인 필요
+
     // compose
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
@@ -165,6 +172,11 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version") // Room의 Kotlin 확장 (선택 사항)
     kapt("androidx.room:room-compiler:$room_version") // Room 애노테이션 프로세서 (kapt 구성)
+    implementation("androidx.room:room-paging:$room_version") // 페이징 의존성
+    // for paging
+    val paging_version ="3.3.0"
+    implementation("androidx.paging:paging-runtime:$paging_version")
+
 
     // rxjava, rxkotlin implements
     val rx_java_version = "3.1.8"
@@ -238,7 +250,8 @@ dependencies {
     implementation("com.google.android.play:app-update-ktx:$app_update_version") // for kotlin
 
     // for xml
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.24.7-alpha")
+    val swiperefresh_version = "0.24.7-alpha"
+    implementation("com.google.accompanist:accompanist-swiperefresh:$swiperefresh_version")
 
 
 }

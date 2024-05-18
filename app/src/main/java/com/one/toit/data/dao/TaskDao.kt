@@ -1,5 +1,6 @@
 package com.one.toit.data.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import com.one.toit.data.model.Task
@@ -15,18 +16,53 @@ interface TaskDao {
             "INNER JOIN table_task_information" +
             " ON task_id = fk_task_id")
     fun readTaskList(): List<Task>
+
+    /**
+     *  no keyword List 메서드!
+     */
+    // 선택 안함
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id "+
             "LIMIT :size OFFSET (:page-1)*:size")
     fun readTaskList(page:Int, size:Int): List<Task> // 페이징 추가한 메서드
 
-    @Query("SELECT * FROM table_task_registration " +
+    // 이름순
+    @Query("SELECT * " +
+            "FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
-            "ORDER BY :order "+
+            "ORDER BY task_title ASC " +
             "LIMIT :size OFFSET (:page-1)*:size")
-    fun readSortedTaskList(page:Int, size:Int, order:String): List<Task> // 페이징 추가한 메서드
+    fun readTaskListByName(page:Int, size:Int): List<Task> // 페이징 추가한 메서드
+
+    // 최신순
+    @Query("SELECT * " +
+            "FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "ORDER BY create_at DESC " +
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readTaskListByDateDesc(page:Int, size:Int): List<Task>
+
+    // 과거순
+    @Query("SELECT * " +
+            "FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "ORDER BY create_at ASC " +
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readTaskListByDateAsc(page:Int, size:Int): List<Task>
+
+    // 목표 상태
+    @Query("SELECT * " +
+            "FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "ORDER BY task_complete DESC " +
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readTaskListByComplete(page:Int, size:Int): List<Task>
+
 
 //    @Query("SELECT task_id, create_at, " + // 1 , 2
 //            "info_id, fk_task_id, task_title, " + // 3, 4, 5
@@ -44,22 +80,54 @@ interface TaskDao {
             "ON task_id = fk_task_id " +
             "WHERE task_title LIKE '%'||:query||'%' "
     )
-    fun readTaskListByQuery(query:String): List<Task> // 검색
+    fun readQueryList(query:String): List<Task> // 검색
 
+    /**
+     * 키워드 포함한 검색
+     */
+    // 선택 안함
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
             "WHERE task_title LIKE '%'||:query||'%' " +
             "LIMIT :size OFFSET (:page-1)*:size")
-    fun readTaskListByQuery(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
+    fun readQueryList(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
 
+    // 이름순
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +
             "ON task_id = fk_task_id " +
             "WHERE task_title LIKE '%'||:query||'%' " +
-            "ORDER BY :order "+
+            "ORDER BY task_title ASC " +
             "LIMIT :size OFFSET (:page-1)*:size")
-    fun readSortedListByQuery(page:Int, size:Int, query:String, order: String): List<Task> // 페이징, 검색, 정렬
+    fun readQueryListByName(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
+
+    // 최신순
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE task_title LIKE '%'||:query||'%' " +
+            "ORDER BY create_at DESC " +
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readQueryListByDateDesc(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
+
+    // 과거순
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE task_title LIKE '%'||:query||'%' " +
+            "ORDER BY create_at ASC " +
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readQueryListByDateAsc(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
+
+    // 목표 상태
+    @Query("SELECT * FROM table_task_registration " +
+            "INNER JOIN table_task_information " +
+            "ON task_id = fk_task_id " +
+            "WHERE task_title LIKE '%'||:query||'%' " +
+            "ORDER BY task_complete DESC " +
+            "LIMIT :size OFFSET (:page-1)*:size")
+    fun readQueryListByComplete(page:Int, size:Int, query:String): List<Task> // 페이징 & 검색
 
     @Query("SELECT * FROM table_task_registration " +
             "INNER JOIN table_task_information " +

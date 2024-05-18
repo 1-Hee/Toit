@@ -12,6 +12,7 @@ import com.one.toit.data.model.Task
 import com.one.toit.data.repository.TaskInfoRepository
 import com.one.toit.data.repository.TaskRepository
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Date
 
 class TaskViewModel(
@@ -26,47 +27,26 @@ class TaskViewModel(
         repository = TaskRepository(taskDao)
     }
 
-    // read
-    suspend fun readTaskList():List<Task>{
-        return repository.readTaskList()
-    }
-    // 페이징 추가
-    suspend fun readTaskList(page:Int):List<Task>{
-        return repository.readTaskList(page)
-    }
-
     // 페이징 + 정렬
     suspend fun readSortedTaskList(page:Int, orderIdx:Int):List<Task>{
-        return repository.readSortedTaskList(page, orderIdx)
+        val list =  repository.readSortedTaskList(page, orderIdx)
+        Timber.i("idx : %s, size => %s , item : %s",
+            orderIdx, list.size, if(list.isNotEmpty()) list[0].info.taskTitle else "empty"
+        )
+        return list;
     }
 
-    // 검색
-    suspend fun readTaskListByQuery(query:String): List<Task> {
-        return repository.readTaskListByQuery(query)
-    }
-
-    // 페이징 & 검색
-    suspend fun readTaskListByQuery(page:Int, query:String): List<Task>{
-        return repository.readTaskListByQuery(page, query)
-    }
 
     // 페이징 & 검색 + 정렬
-    suspend fun readSortedListByQuery(page:Int, query:String, orderIdx: Int): List<Task>{
-        return repository.readSortedListByQuery(page, query, orderIdx)
+    suspend fun readSortedListWithQuery(page:Int, query:String, orderIdx: Int): List<Task>{
+        val list:List<Task> = repository.readSortedListWithQuery(page, query, orderIdx)
+        Timber.i("idx : %s, size => %s , item : %s",
+            orderIdx, list.size, if(list.isNotEmpty()) list[0].info.taskTitle else "empty"
+        )
+        return list;
     }
 
-    suspend fun readRemainTaskList():List<Task>{
-        return repository.readRemainTaskList()
-    }
-    // 페이징 추가
-    suspend fun readRemainTaskList(page:Int):List<Task>{
-        return repository.readRemainTaskList(page)
-    }
-    // readNotCompleteTaskList
 
-    suspend fun readTaskListByDate(targetDate: Date): List<Task>{
-        return repository.readTaskListByDate(targetDate)
-    }
     // 페이징 추가
     suspend fun readTaskListByDate(page:Int, targetDate: Date): List<Task>{
         return repository.readTaskListByDate(page, targetDate)
@@ -79,16 +59,6 @@ class TaskViewModel(
     suspend fun readRemainTaskListByDate(page:Int, targetDate: Date): List<Task>{
         return repository.readRemainTaskListByDate(page, targetDate)
     }
-
-    /**
-     * getTotalTaskCnt
-     * getCompleteTaskCnt
-     */
-
-    // 통계 관련
-    // 일일 전체 Task 개수
-    //  getTotalTaskCnt
-
 
     /**
      * 주간 통계 관련!

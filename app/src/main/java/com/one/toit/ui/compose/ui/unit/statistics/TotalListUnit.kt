@@ -53,11 +53,13 @@ fun TotalListUnit(
     val scope = rememberCoroutineScope()
     // 정렬 옵션
     var orderIdx by remember { mutableIntStateOf(0) }
+
     // 초기화
     LaunchedEffect(refreshing, searchedKeyword, orderIdx){
         withContext(Dispatchers.Main) {
+            pgNo = 1
             val mTaskList = if(searchedKeyword.isNotBlank()){
-                taskViewModel.readSortedListByQuery(pgNo, searchedKeyword, orderIdx)
+                taskViewModel.readSortedListWithQuery(pgNo, searchedKeyword, orderIdx)
             }else {
                 taskViewModel.readSortedTaskList(pgNo, orderIdx)
             }
@@ -68,7 +70,10 @@ fun TotalListUnit(
             }
             mTaskDTOList.clear();
             mTaskDTOList.addAll(mDtoList);
-            refreshing = false
+            scope.launch {
+                delay(500)
+                refreshing = false
+            }
         }
     }
 
@@ -96,7 +101,7 @@ fun TotalListUnit(
         withContext(Dispatchers.IO){
             if(pgNo > 1){
                 val mTaskList =  if(searchedKeyword.isNotBlank()){
-                    taskViewModel.readSortedListByQuery(pgNo, searchedKeyword, orderIdx)
+                    taskViewModel.readSortedListWithQuery(pgNo, searchedKeyword, orderIdx)
                 }else {
                     taskViewModel.readSortedTaskList(pgNo, orderIdx)
                 }
@@ -106,7 +111,10 @@ fun TotalListUnit(
                     mDtoList.add(mTaskDTO);
                 }
                 mTaskDTOList.addAll(mDtoList);
-                refreshing = false
+                scope.launch {
+                    delay(500)
+                    refreshing = false
+                }
             }
         }
     }
@@ -118,14 +126,17 @@ fun TotalListUnit(
             searchedKeyword = ""
         }
     )
+
+
+
     SortUnit(context){
         orderIdx = it
-        refreshing = true
+        //refreshing = true
     }
 
     if(mTaskDTOList.isEmpty()){
         ItemNoContent();
-    }else {
+    } else {
         // observe list scrolling
         val reachedBottom: Boolean by remember {
             derivedStateOf {
@@ -133,6 +144,7 @@ fun TotalListUnit(
                 lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - 1
             }
         }
+
         // load more if scrolled to bottom
         LaunchedEffect(reachedBottom) {
             withContext(Dispatchers.Main){

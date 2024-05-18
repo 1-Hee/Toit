@@ -20,68 +20,39 @@ class TaskRepository(
 ) {
 
     private val size = AppUtil.LIST_SIZE;
-    suspend fun readTaskList():List<Task>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskList()
-    }
-    // 페이징 추가
-    suspend fun readTaskList(page:Int):List<Task>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskList(page, size)
-    }
 
-    // 페이징 + 정렬
+    // 페이징 + 정렬,
     suspend fun readSortedTaskList(page:Int, orderIdx:Int):List<Task>
         = withContext(Dispatchers.IO){
-        val order = when(orderIdx){
-            1 -> "task_title ASC" // 이름순
-            2 -> "create_at DESC" // 최신순
-            3 -> "create_at ASC" // 과거순
-            4 -> "task_complete ASC" // 목표 상태
-            else -> "task_id ASC"
+        return@withContext when(orderIdx){
+            1 -> taskDao.readTaskListByName(page, size) // 이름순
+            2 -> taskDao.readTaskListByDateDesc(page, size) // 최신순
+            3 -> taskDao.readTaskListByDateAsc(page, size) // 과거순
+            4 -> taskDao.readTaskListByComplete(page, size) // 목표 상태
+            else -> taskDao.readTaskList(page, size) // 선택 안함
         }
-        return@withContext taskDao.readSortedTaskList(page,size, order)
     }
 
     // 페이징 & 검색
-    suspend fun readTaskListByQuery(page:Int, query:String): List<Task>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskListByQuery(page, size, query)
-    }
+//    suspend fun readTaskListByQuery(page:Int, query:String): List<Task>
+//        = withContext(Dispatchers.IO){
+//        return@withContext taskDao.readTaskListByQuery(page, size, query)
+//    }
 
-    // 페이징 & 검색
-    suspend fun readSortedListByQuery(
+    // 페이징 & 검색, 정렬 포함
+    suspend fun readSortedListWithQuery(
         page:Int, query:String, orderIdx: Int
     ): List<Task> = withContext(Dispatchers.IO){
-        val order = when(orderIdx){
-            1 -> "task_title ASC" // 이름순
-            2 -> "create_at DESC" // 최신순
-            3 -> "create_at ASC" // 과거순
-            4 -> "task_complete ASC" // 목표 상태
-            else -> "task_id ASC"
+        return@withContext when(orderIdx){
+            1 -> taskDao.readQueryListByName(page, size, query) // 이름순
+            2 -> taskDao.readQueryListByDateDesc(page, size, query) // 최신순
+            3 -> taskDao.readQueryListByDateAsc(page, size, query) // 과거순
+            4 -> taskDao.readQueryListByComplete(page, size, query) // 목표 상태
+            else -> taskDao.readQueryList(page, size, query) // 선택 안함
         }
-        return@withContext taskDao.readSortedListByQuery(page, size, query, order)
     }
 
-    suspend fun readTaskListByQuery(query:String): List<Task>
-            = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskListByQuery(query)
-    }
 
-    suspend fun readRemainTaskList():List<Task>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readRemainTaskList()
-    }
-    // 페이징 추가
-    suspend fun readRemainTaskList(page:Int):List<Task>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readRemainTaskList(page, size)
-    }
-
-    suspend fun readTaskListByDate(targetDate: Date): List<Task>
-        = withContext(Dispatchers.IO){
-        return@withContext taskDao.readTaskListByDate(targetDate)
-    }
     // 페이징 추가
     suspend fun readTaskListByDate(page:Int, targetDate: Date): List<Task>
         = withContext(Dispatchers.IO){
@@ -297,7 +268,7 @@ class TaskRepository(
         val list = if (query.isBlank()) {
             taskDao.readTaskList(page, size);
         } else {
-            taskDao.readTaskListByQuery(page, size, query)
+            taskDao.readQueryList(page, size, query)
         }
         return@withContext list.isNotEmpty()
     }
