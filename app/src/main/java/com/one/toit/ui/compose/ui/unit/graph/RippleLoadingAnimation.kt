@@ -84,7 +84,7 @@ fun RippleLoadingAnimation(
             // divide the animation delay by number of circles
             delay(timeMillis = (animationDelay / 3L) * (index + 1))
 
-            val random = Random.nextInt(0, 5)
+            val random = Random.nextInt(0, 6)
             val effect = when(random){
                 1 -> LinearOutSlowInEasing
                 2 -> FastOutSlowInEasing
@@ -122,7 +122,7 @@ fun RippleLoadingAnimation(
                     .clip(shape = CircleShape)
                     .background(
                         color = circleColor
-                            .copy(alpha = (1 - animatable.value))
+                        .copy(alpha = (1 - animatable.value))
                     )
             ) {
             }

@@ -148,17 +148,19 @@ fun SummaryUnit(
     ) {
         // 일자
         Spacer(modifier = Modifier.height(36.dp))
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             ToitPointCard(
-                modifier = Modifier.align(Alignment.Center),
                 toitPoint = mToitPoint
             )
         }
         Spacer(modifier = Modifier.height(48.dp))
 
-        // todo 실제 데이터로...
         val dataList = listOf<StatisticsData>(
             // 전체 목표 수
             StatisticsData(
@@ -182,7 +184,6 @@ fun SummaryUnit(
                 0 // 개수
             ),
             // 최장 기록
-            // todo 시간 값이 무조건 long 또는 float 으로 리턴 되므로 이에 따른 로직 재구성 필요
             StatisticsData(
                 stringResource(R.string.txt_h_todo_max),
                 stringResource(R.string.txt_desc_todo_max, userNickname),
@@ -340,8 +341,8 @@ fun StatisticsCard(
                     val icon = when(data.type){
                         1 -> {
                             val sec = data.value.toFloat().roundToInt()
-                            val min = sec / 60;
-                            val hour = min / 60;
+                            val min = (sec / 60) % 60;
+                            val hour = (sec / 60) / 60;
                             dpStr = if(hour + min > 0){
                                 String.format("%02d", hour) + ":" + String.format("%02d", min);
                             }else {

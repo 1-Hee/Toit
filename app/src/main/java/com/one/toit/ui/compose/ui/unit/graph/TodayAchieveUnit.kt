@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,8 +38,14 @@ import com.one.toit.ui.compose.style.mono100
 import com.one.toit.ui.compose.style.mono200
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono400
+import com.one.toit.ui.compose.style.mono50
 import com.one.toit.ui.compose.style.mono600
+import com.one.toit.ui.compose.style.orange300
+import com.one.toit.ui.compose.style.purple100
+import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple300
+import com.one.toit.ui.compose.style.purple400
+import com.one.toit.ui.compose.style.white
 import timber.log.Timber
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -125,6 +132,7 @@ fun TodayAchieveUnit(
             )
         }
         // 그래프
+        val brush = Brush.linearGradient(listOf(purple100, purple200, purple300, purple400))
         Column (
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,7 +149,7 @@ fun TodayAchieveUnit(
                 val startingPoint = Offset(0f, height/2)
                 val endingPoint = Offset(width, height/2)
                 drawLine(
-                    purple300,
+                    brush,
                     strokeWidth = 48.dp.toPx(),
                     start = startingPoint,
                     end = endingPoint,
