@@ -117,10 +117,6 @@ fun TodoPage(
             }
             Lifecycle.State.RESUMED -> {
                 refreshing = true
-                scope.launch {
-                    delay(500)
-                }
-                refreshing = false
             }
             else -> {}
         }
@@ -133,15 +129,15 @@ fun TodoPage(
     val baseDate = Date()
     // 초기 리스트 렌더링
     LaunchedEffect(checked, refreshing){
+        refreshing = false
+        
         withContext(Dispatchers.IO) {
             pgNo = 1
             val mDTOList = loadTaskDTOList(
                 true, checked, pgNo, baseDate, taskViewModel
             )
-            refreshing = true
             dailyTaskList.clear()
             dailyTaskList.addAll(mDTOList)
-            refreshing = false;
         }
     }
 

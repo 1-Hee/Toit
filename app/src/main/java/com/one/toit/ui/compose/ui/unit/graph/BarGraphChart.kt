@@ -24,16 +24,19 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.mono600
+import com.one.toit.ui.compose.style.orange300
 import com.one.toit.ui.compose.style.purple300
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun BarGraphChart(
-    data: MutableMap<String, ChartEntry>,
+    data: MutableMap<String, Number>,
     durationMillis:Int = 1000,
-    maxValue: Int = 128,
+    barColor: Color = orange300
 ) {
+    val dailyCof = 2;
+
     // 애니메이션
     val animatedProgress = remember { Animatable(0.001f) }
     LaunchedEffect(animatedProgress) {
@@ -51,7 +54,7 @@ fun BarGraphChart(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(maxValue.dp)
+            .height(110.dp)
             .horizontalScroll(scrollState),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = if(data.size > 9) Arrangement.spacedBy(16.dp) else Arrangement.SpaceEvenly
@@ -64,7 +67,7 @@ fun BarGraphChart(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = entry.volume.toString(),
+                    text = entry.toString(),
                     style = MaterialTheme.typography.caption.copy(
                         color = mono600,
                         fontSize = 8.sp
@@ -74,13 +77,13 @@ fun BarGraphChart(
 
                 Canvas(modifier = Modifier
                     .wrapContentWidth()
-                    .height((entry.volume*5).dp)
+                    .height((entry.toInt()*dailyCof).dp)
                 ) {
                     val height = size.height
                     val startingPoint = Offset(size.width, height)
                     val endingPoint = Offset(size.width, height - (height*animatedProgress.value))
                     drawLine(
-                        purple300,
+                        barColor,
                         strokeWidth = 16.dp.toPx(),
                         start = startingPoint,
                         end = endingPoint,

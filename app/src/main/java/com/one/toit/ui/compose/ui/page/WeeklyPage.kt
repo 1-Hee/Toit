@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -38,11 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.one.toit.R
-import com.one.toit.data.dto.ChartEntry
 import com.one.toit.data.dto.TaskCounter
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.compose.style.black
-import com.one.toit.ui.compose.style.mono200
+import com.one.toit.ui.compose.style.blue50
+import com.one.toit.ui.compose.style.blue500
+import com.one.toit.ui.compose.style.green100
+import com.one.toit.ui.compose.style.green700
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono500
@@ -50,10 +51,9 @@ import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.purple400
 import com.one.toit.ui.compose.style.white
+import com.one.toit.ui.compose.ui.unit.graph.RippleLoadingAnimation
 import com.one.toit.ui.compose.ui.unit.graph.BarGraphChart
 import com.one.toit.ui.compose.ui.unit.graph.LineGraphChart
-import com.one.toit.ui.compose.ui.unit.graph.PackedPieChart
-import com.one.toit.ui.compose.ui.unit.graph.PackedPieChartEntry
 import com.one.toit.util.AppUtil.Statistics
 import com.one.toit.util.AppUtil.Time
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +69,7 @@ fun WeeklyPage(
 ){
 
     val mTaskCountList = remember { mutableStateOf<List<TaskCounter>>(listOf()) } // 주간 통계 데이터
-    val mMaxValue = remember { mutableIntStateOf(128) }
+    var mMaxValue by remember { mutableIntStateOf(100) }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO){
             val mDate = Date()
@@ -77,15 +77,12 @@ fun WeeklyPage(
             mTaskCountList.value  = mList
         }
     }
-    val weeklyData by remember { mutableStateOf(mutableMapOf<String, ChartEntry>()) }
+    val weeklyData by remember { mutableStateOf(mutableMapOf<String, Number>()) }
     mTaskCountList.value.forEach { item ->
         val volume = item.completeTask;
-        val mChartEntry = ChartEntry(volume, purple200)
         val mDate = Time.getSimpleDateLog(item.date)
-        weeklyData[mDate] = mChartEntry;
-        if(item.completeTask > mMaxValue.value){
-            mMaxValue.value = item.completeTask
-        }
+        weeklyData[mDate] = volume;
+        mMaxValue = max(mMaxValue, item.completeTask)
     }
 
     /// scroll state
@@ -138,14 +135,13 @@ fun WeeklyPage(
         if(!isCheck){
             BarGraphChart(
                 data = weeklyData,
-                durationMillis = 700,
-                maxValue = mMaxValue.value
+                durationMillis = 700
             )
         }else {
             LineGraphChart(
                 data = weeklyData,
                 durationMillis = 700,
-                maxValue = mMaxValue.value
+                isDaily = true
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -161,75 +157,86 @@ fun WeeklyPage(
                 .fillMaxWidth()
                 .wrapContentHeight()
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(48.dp))
         // 주간 목표 달성율
         val titleWeekRatio = stringResource(R.string.title_weekly_ratio)
         val txtGuideWeeklyRatio = stringResource(R.string.txt_guide_weekly_ratio)
         val weekAvgRatio = Statistics.getWeeklyRatio(mTaskCountList.value)// 주간 값으로 계산!
-        PackedPieWeekUnit(
+        BubblePieUnit(
             titleString = titleWeekRatio,
             guideText = txtGuideWeeklyRatio,
-            weekRatio = weekAvgRatio
+            weekRatio = weekAvgRatio,
         )
+
         // 일일 평균 목표 달성율
         val titleAvgDailyRatio = stringResource(R.string.title_average_daily_ratio)
         val txtGuideAvgDailyRatio = stringResource(R.string.txt_guide_average_daily_ratio)
         // 그래프
         val weekAvgDailyRatio = Statistics.getWeeklyDailyAvg(mTaskCountList.value)
-        PackedPieWeekUnit(
+        BubblePieUnit(
             titleString = titleAvgDailyRatio,
             guideText = txtGuideAvgDailyRatio,
-            weekRatio = weekAvgDailyRatio
+            weekRatio = weekAvgDailyRatio,
+            circleColor = green700,
+            bgColor = green100
         )
         // 하단 여백
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
+
 @Composable
-fun PackedPieWeekUnit(
+fun BubblePieUnit(
     titleString:String = "",
     guideText:String = "",
     weekRatio:Float = 1f,
-    completeColor:Color = purple200,
-    noneColor:Color = mono200
+    circleColor: Color = blue500,
+    bgColor:Color = blue50,
+    animationDelay: Int = 1500,
 ){
-    // 일일 평균 목표 달성율
-    Text(
-        text = titleString,
-        style = MaterialTheme.typography.caption
-            .copy(
-                fontSize = 16.sp,
-                color = black,
-            ),
+    Column(
         modifier = Modifier
-            .wrapContentSize()
-            .padding(vertical = 8.dp)
-    )
-    Text(
-        text = guideText,
-        style = MaterialTheme.typography.caption
-            .copy(
-                fontSize = 12.sp,
-                color = mono600,
-            ),
-    )
-
-    val entries: List<PackedPieChartEntry> = listOf(
-        PackedPieChartEntry(completeColor, weekRatio),
-        PackedPieChartEntry(noneColor, 1-weekRatio)
-    )
-    val displayPercentage = "%.2f%%".format(weekRatio * 100)
-    Spacer(modifier = Modifier.height(24.dp))
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()){
-        PackedPieChart(
-            modifier = Modifier.align(Alignment.Center),
-            entries = entries,
-            size = 156.dp,
-            text = displayPercentage
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // 타이틀
+        Text(
+            text = titleString,
+            modifier = Modifier
+                //.fillMaxWidth()
+                .wrapContentHeight()
+                .padding(vertical = 8.dp),
+            style = MaterialTheme.typography.caption
+                .copy(
+                    fontSize = 16.sp,
+                    color = black,
+                ),
         )
+
+        // 설명
+        Text(
+            text = guideText,
+            modifier = Modifier
+                //.fillMaxWidth()
+                .wrapContentHeight(),
+            style = MaterialTheme.typography.caption
+                .copy(
+                    fontSize = 12.sp,
+                    color = mono600,
+                ),
+        )
+        val displayPercentage = "%.2f%%".format(weekRatio * 100)
+        Spacer(modifier = Modifier.height(16.dp))
+        RippleLoadingAnimation(
+            modifier = Modifier.size(156.dp),
+            circleColor = circleColor,
+            bgColor = bgColor,
+            animationDelay = animationDelay,
+            value = displayPercentage
+        )
+        Spacer(modifier = Modifier.height(32.dp))
     }
-    Spacer(modifier = Modifier.height(24.dp))
 }

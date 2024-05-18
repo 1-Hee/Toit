@@ -75,7 +75,6 @@ import com.one.toit.ui.compose.ui.page.TodoPage
 import com.one.toit.ui.compose.ui.page.TodoStatusPage
 import com.one.toit.ui.viewmodel.PageViewModel
 import com.one.toit.util.AppUtil
-import timber.log.Timber
 
 class MainActivity : BaseComposeActivity(), LifecycleOwner {
     // viewModel
@@ -302,7 +301,6 @@ fun MainNavGraph(
             TodoPage(navController, taskViewModel, launcher)
         }
         composable(MainRoute.TodoStatus.route) {
-            // GraphPage(navController)
             TodoStatusPage(navController, taskViewModel, launcher)
         }
         composable(MainRoute.Profile.route) {

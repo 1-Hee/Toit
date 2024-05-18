@@ -206,14 +206,14 @@ class TaskRepository(
         context: Context,
         targetDate: Date,
         totalCnt:Int
-    ) : MutableMap<String, ChartEntry> {
+    ) : MutableMap<String, Number> {
         val calendar = Calendar.getInstance()
         calendar.time = targetDate
         // 00시부터 6시까지인지 확인.
         val gap = 5
         val cHour = calendar.get(Calendar.HOUR_OF_DAY)
         val isDawn =  cHour - gap <= 0;
-        val mChartEntryMap = mutableMapOf<String, ChartEntry>()
+        val mChartEntryMap = mutableMapOf<String, Number>()
 
         if(isDawn){ // 00시부터 현재까지 1시간 단위로 맵핑..!
             for(i in 0..cHour){
@@ -222,8 +222,8 @@ class TaskRepository(
                 val timeCnt = getAchievementCnt(calendar.time)
                 val ratio = timeCnt / totalCnt.toFloat()
                 val volume = round(ratio * 100).toInt()
-                val entry = ChartEntry(volume)
-                mChartEntryMap[timeStr] = entry
+//                val entry = ChartEntry(volume)
+                mChartEntryMap[timeStr] = volume
             }
         }else {
             val mStart = cHour - gap;
@@ -237,8 +237,8 @@ class TaskRepository(
                 val timeCnt = getAchievementCnt(calendar.time)
                 val ratio = timeCnt / totalCnt.toFloat()
                 val volume = round(ratio * 100).toInt()
-                val entry = ChartEntry(volume)
-                mChartEntryMap[timeStr] = entry
+//                val entry = ChartEntry(volume)
+                mChartEntryMap[timeStr] = volume
             }
         }
         return mChartEntryMap

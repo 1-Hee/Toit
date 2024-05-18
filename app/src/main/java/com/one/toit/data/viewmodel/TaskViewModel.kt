@@ -124,7 +124,7 @@ class TaskViewModel(
      * 주어진 시간대 까지의 목표 달성 기록을 체크
      */
     suspend fun getAchievementMap(context:Context, targetDate: Date, totalCnt:Int)
-        : MutableMap<String, ChartEntry>{
+        : MutableMap<String, Number>{
         return repository.getAchievementMap(context, targetDate, totalCnt)
     }
 

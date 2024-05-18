@@ -97,7 +97,7 @@ fun TotalListUnit(
 //    }
 
     // 페이징 감지
-    LaunchedEffect(pgNo > 1) {
+    LaunchedEffect(pgNo) {
         withContext(Dispatchers.IO){
             if(pgNo > 1){
                 val mTaskList =  if(searchedKeyword.isNotBlank()){

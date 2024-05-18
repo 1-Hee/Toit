@@ -146,7 +146,7 @@ fun DailyPage(
      * 시간대에 따른 추이 계싼해서 렌더링하는 메서드
      */
     // 차트 맵 변수
-    var achieveMap by remember { mutableStateOf(mutableMapOf<String, ChartEntry>()) }
+    var achieveMap by remember { mutableStateOf(mutableMapOf<String, Number>()) }
     // step1. 오늘의 할일 개수 전체를 셈함.
     LaunchedEffect(Unit) {
         withContext(Dispatchers.Main){
@@ -176,8 +176,7 @@ fun DailyPage(
         )
         LineGraphChart(
             data = achieveMap,
-            durationMillis = 700,
-            maxValue = 100
+            durationMillis = 700
         )
         Text(
             text = stringResource(R.string.txt_guide_daily_todo_graph),
