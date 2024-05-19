@@ -181,14 +181,15 @@ class TaskRepository(
         if(mLength > 10) mPoint += 10
 
         val completeTime = getCompleteTime(fkTaskId)
+        mPoint += 30
+
         if(completeTime > 0){ // 마감시간 있음
-            val time = ( completeTime / 60 ) + 1
-            mPoint += 30
-            val extraPoint = ( (5 * (time * (time + 1)).toDouble())) / 2
-            Timber.d("추가 점수 : %s", extraPoint)
+//            val time = ( completeTime / 60 ) + 1
+//            mPoint += 30
+//            val extraPoint = ( (5 * (time * (time + 1)).toDouble())) / 2
+//            Timber.d("추가 점수 : %s", extraPoint)
+            val extraPoint = (completeTime / 60)
             mPoint += extraPoint.toInt()
-        }else { // 마감시간 없음
-            mPoint += 30
         }
         return@withContext mPoint
     }

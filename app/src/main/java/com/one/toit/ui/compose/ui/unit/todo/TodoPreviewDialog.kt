@@ -246,7 +246,7 @@ fun TodoPreviewDialog(
                     Image(
                         painter = painter,
                         contentDescription = null,
-                        contentScale = ContentScale.FillWidth,
+                        contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(256.dp)
