@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -69,7 +68,7 @@ fun WeeklyPage(
 ){
 
     val mTaskCountList = remember { mutableStateOf<List<TaskCounter>>(listOf()) } // 주간 통계 데이터
-    var mMaxValue by remember { mutableIntStateOf(100) }
+    var mMaxValue by remember { mutableStateOf(100) }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO){
             val mDate = Date()

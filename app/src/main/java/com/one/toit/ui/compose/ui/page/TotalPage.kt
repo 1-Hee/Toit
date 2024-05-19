@@ -20,7 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,11 +52,11 @@ fun TotalPage(
     // scroll state
     // val outerScrollState = rememberScrollState()
     // tab index
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var selectedTabIndex by remember { mutableStateOf(0) }
 
     // 현재 높이를 저장하기 위한 상태 변수
-    var deviceWidth by remember { mutableIntStateOf(0) }
-    var deviceHeight by remember { mutableIntStateOf(0) }
+    var deviceWidth by remember { mutableStateOf(0) }
+    var deviceHeight by remember { mutableStateOf(0) }
     // LocalDensity를 사용하여 현재 디바이스의 화면 밀도를 가져옴
     val density = LocalDensity.current.density
     // 현재 높이를 구하는 코드

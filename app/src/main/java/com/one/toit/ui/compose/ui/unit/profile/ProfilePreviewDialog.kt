@@ -1,8 +1,11 @@
 package com.one.toit.ui.compose.ui.unit.profile
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,16 +33,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.one.toit.R
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.style.white
+import com.one.toit.util.AppUtil
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -48,6 +55,10 @@ fun ProfilePreviewDialog(
     profilePath:String,
     onDismiss: () -> Unit
 ){
+
+    // 환경 변수
+    val context = LocalContext.current
+
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -83,28 +94,32 @@ fun ProfilePreviewDialog(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
             }
-            val iconModifier = Modifier
-                .size(256.dp)
+            var iconModifier = Modifier
+                .fillMaxSize()
                 .padding(4.dp)
-            var isSuccessIcon by remember { mutableStateOf(true) }
-            if(isSuccessIcon){
-                GlideImage(
-                    imageModel = profilePath,
-                    // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
-                    contentScale = ContentScale.Crop,
-                    circularReveal = CircularReveal(duration = 0),
-                    // 이미지 로딩 전 표시할 place holder 이미지
-                    modifier = iconModifier,
-                    failure =  {
-                        isSuccessIcon = false;
-                    }
-                )
-            }else {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_person),
-                    contentDescription = "icon_profile",
-                    modifier = iconModifier.padding(16.dp),
-                    tint = mono300
+            // parsing uri!
+            val uri = remember(profilePath) { Uri.parse(profilePath) }
+            val painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(context)
+                    .data(uri)
+                    .placeholder(R.drawable.ic_person)
+                    .error(R.drawable.ic_person)
+                    .build()
+            )
+            // 프로필 사진 비었을 경우 스케일 타입, 패딩 재조정
+            val emptyProfile = profilePath.isBlank()
+            if(emptyProfile){ iconModifier = Modifier.size(128.dp) }
+            Box(modifier = Modifier.size(256.dp)){
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = if(emptyProfile) {
+                        ContentScale.Fit
+                    } else {
+                        ContentScale.FillWidth
+                    },
+                    modifier = iconModifier
+                        .align(Alignment.Center)
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))

@@ -1,11 +1,7 @@
 package com.one.toit.ui.compose.ui.unit.graph
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.EaseInBack
 import androidx.compose.animation.core.EaseInBounce
-import androidx.compose.animation.core.EaseInCirc
-import androidx.compose.animation.core.EaseInElastic
-import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.EaseOutBounce
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -32,13 +28,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.one.toit.ui.compose.style.blue500
-import com.one.toit.ui.compose.style.mono100
-import com.one.toit.ui.compose.style.mono300
-import com.one.toit.ui.compose.style.orange300
-import com.one.toit.ui.compose.style.orange50
-import com.one.toit.ui.compose.style.orange500
-import com.one.toit.ui.compose.style.purple300
 import com.one.toit.ui.compose.style.white
 import kotlinx.coroutines.delay
 import kotlin.random.Random

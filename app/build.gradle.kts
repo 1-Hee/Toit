@@ -152,11 +152,6 @@ dependencies {
     // multi dex
     implementation("androidx.multidex:multidex:2.0.1")
 
-    // glide implements
-    val glide_version = "4.16.0"
-    implementation("com.github.bumptech.glide:glide:$glide_version")
-    kapt("com.github.bumptech.glide:compiler:$glide_version")
-
     /** firebase, 나중에 기능구현할 때 풀기 !
      *    // Import the Firebase BoM
      *     implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
@@ -218,19 +213,6 @@ dependencies {
     val flexVersion = "3.0.0"
     implementation("com.google.android.flexbox:flexbox:$flexVersion")
 
-//    // vico
-    // For Jetpack Compose.
-    val vico_version = "1.13.1"
-    implementation("com.patrykandpatrick.vico:compose:$vico_version")
-    // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
-    implementation("com.patrykandpatrick.vico:compose-m2:$vico_version")
-    // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
-    implementation("com.patrykandpatrick.vico:compose-m3:$vico_version")
-    // Houses the core logic for charts and other elements. Included in all other modules.
-    implementation("com.patrykandpatrick.vico:core:$vico_version")
-    // For the view system.
-    implementation("com.patrykandpatrick.vico:views:$vico_version")
-
     // https://developers.google.com/android/guides/opensource?hl=ko#kotlin-dsl
     val oss_version = "17.0.1"
     implementation("com.google.android.gms:play-services-oss-licenses:$oss_version")
@@ -238,12 +220,6 @@ dependencies {
     // admobs
     val admob_version = "22.6.0"
     implementation("com.google.android.gms:play-services-ads:$admob_version")
-
-    // camerax
-//    implementation("androidx.camera:camera-camera2:1.1.0")
-//    implementation("androidx.camera:camera-lifecycle:1.1.0")
-//    implementation("androidx.camera:camera-view:1.1.0-alpha03")
-//    implementation("com.google.guava:guava:29.0-jre")
 
     val app_update_version = "2.1.0"
     implementation("com.google.android.play:app-update:$app_update_version")

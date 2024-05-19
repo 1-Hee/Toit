@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,13 +45,13 @@ fun TotalListUnit(
     val lazyListState: LazyListState = rememberLazyListState()
     var searchedKeyword by remember { mutableStateOf("") }
     // 페이징 변수
-    var pgNo by remember { mutableIntStateOf(1) }
+    var pgNo by remember { mutableStateOf(1) }
 
     var refreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = refreshing)
     val scope = rememberCoroutineScope()
     // 정렬 옵션
-    var orderIdx by remember { mutableIntStateOf(0) }
+    var orderIdx by remember { mutableStateOf(0) }
 
     // 초기화
     LaunchedEffect(refreshing, searchedKeyword, orderIdx){
@@ -76,25 +75,6 @@ fun TotalListUnit(
             }
         }
     }
-
-//    // 검색어 감지
-//    LaunchedEffect(searchedKeyword) {
-//        withContext(Dispatchers.IO){
-//            pgNo = 1
-//            val mTaskList =  if(searchedKeyword.isNotBlank()){
-//                taskViewModel.readTaskListByQuery(pgNo, searchedKeyword)
-//            }else {
-//              taskViewModel.readTaskList(pgNo)
-//            }
-//            val mDtoList = mutableListOf<TaskDTO>()
-//            mTaskList.forEach { task ->
-//                val mTaskDTO = parseTaskDTO(task);
-//                mDtoList.add(mTaskDTO);
-//            }
-//            mTaskDTOList.clear();
-//            mTaskDTOList.addAll(mDtoList);
-//        }
-//    }
 
     // 페이징 감지
     LaunchedEffect(pgNo) {
@@ -126,8 +106,6 @@ fun TotalListUnit(
             searchedKeyword = ""
         }
     )
-
-
 
     SortUnit(context){
         orderIdx = it

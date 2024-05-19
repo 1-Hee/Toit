@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,8 +44,6 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,13 +53,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.one.toit.R
 import com.one.toit.data.viewmodel.TaskPointViewModel
 import com.one.toit.data.viewmodel.TaskViewModel
@@ -77,8 +79,6 @@ import com.one.toit.ui.compose.ui.unit.profile.ProfileMenuDialog
 import com.one.toit.ui.compose.ui.unit.profile.ProfilePreviewDialog
 import com.one.toit.util.AppUtil
 import com.one.toit.util.PreferenceUtil
-import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -108,12 +108,12 @@ fun ProfilePage(
     /**
      * 사용자 프로필 통계 정보
      */
-    var toitPoint by remember { mutableLongStateOf(123456) }
-    var dayCnt by remember { mutableLongStateOf(getDiffTime(context)) }
+    var toitPoint by remember { mutableStateOf<Long>(0L) }
+    var dayCnt by remember { mutableStateOf(getDiffTime(context)) }
 
     // 오늘 taskValue 값!
-    var totalCnt by remember { mutableIntStateOf(0) }
-    var completeCnt by remember { mutableIntStateOf(0) }
+    var totalCnt by remember { mutableStateOf(0) }
+    var completeCnt by remember { mutableStateOf(0) }
     var updateState by remember { mutableStateOf(false) }
     //
     LaunchedEffect(updateState) {
@@ -189,16 +189,15 @@ fun ProfilePage(
             isShowProfilePreview = false
         }
     }
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(white)
+            .verticalScroll(scrollState)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
+                .wrapContentSize()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -219,34 +218,33 @@ fun ProfilePage(
                         .fillMaxSize()
                         .background(color = mono100)
                     ){
-                        val iconModifier = Modifier
+                        val profileModifier = Modifier
                             .fillMaxSize()
                             .align(Alignment.Center)
                             .clickable {
                                 isShowProfilePreview = true
                             };
-                        var isSuccessIcon by remember { mutableStateOf(true) }
-                        if(isSuccessIcon){
-                            GlideImage(
-                                imageModel = userProfile,
-                                // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
-                                contentScale = ContentScale.Crop,
-                                circularReveal = CircularReveal(duration = 0),
-                                // 이미지 로딩 전 표시할 place holder 이미지
-                                modifier = iconModifier,
-                                failure =  {
-                                    isSuccessIcon = false;
-                                }
-                            )
-                        }else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_person),
-                                contentDescription = "icon_profile",
-                                modifier = iconModifier
-                                    .padding(12.dp),
-                                tint = mono300
-                            )
-                        }
+                        val uri = remember(userProfile) { Uri.parse(userProfile) }
+                        val painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(context)
+                                .data(uri)
+                                .placeholder(R.drawable.ic_person)
+                                .error(R.drawable.ic_person)
+                                .build()
+                        )
+                        // 프로필 사진 비었을 경우 스케일 타입 재조정
+                        val emptyProfile = userProfile.isBlank()
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            // 프로필 사진인지 아닌지에 따라 이미지 스케일 재조정
+                            contentScale = if(emptyProfile) {
+                                ContentScale.Inside
+                            } else {
+                                ContentScale.FillWidth
+                            },
+                            modifier = profileModifier
+                        )
                     }
                 }
                 // 프로필 명
@@ -357,16 +355,13 @@ fun ProfilePage(
             ToitPointCard(toitPoint=toitPoint)
             Spacer(modifier = Modifier.height(32.dp))
             UserPhrasesUnit(dayCnt, userNickname)
-            Spacer(modifier = Modifier.height(96.dp))
-
+            Spacer(modifier = Modifier.height(16.dp))
         }
-
         // admobs
         AdmobBanner(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+                .wrapContentHeight()
         )
     }
 }

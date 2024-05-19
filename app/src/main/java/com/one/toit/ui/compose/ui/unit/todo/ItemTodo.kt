@@ -109,6 +109,7 @@ fun ItemTodo(
                 } else {
                     // 현재 날찌와 비교를 한다.
                     val createAt = taskDTO.createAt
+                    val isComplete = taskDTO.taskComplete != null
                     val isOverDay = Time.compareCreatedDate(createAt);
                     if(isOverDay){
                         showPreViewDialog = true

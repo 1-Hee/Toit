@@ -21,13 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.orange300
-import com.one.toit.ui.compose.style.purple300
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun BarGraphChart(

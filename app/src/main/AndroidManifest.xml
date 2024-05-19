@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.one.toit"
+    >
     <!-- 인터넷 사용 권한 설정 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 사진 & 동영상 -->
@@ -31,6 +34,21 @@
         android:theme="@style/Theme.Toit"
         tools:targetApi="34"
         >
+        <!-- 카메라 사용을 위한 provider -->
+        <!--
+            provider 태그설정에서 exported 속성은 true 하면 안됨,
+            앱 수준에서 외부로 내보낼 권한이 없기 때문
+         -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.one.toit.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${ADMOB_APP_KEY}"/>

@@ -26,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -39,12 +38,8 @@ import com.one.toit.R
 import com.one.toit.data.dto.ChartEntry
 import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.mono300
-import com.one.toit.ui.compose.style.mono50
-import com.one.toit.ui.compose.style.mono500
 import com.one.toit.ui.compose.style.mono600
-import com.one.toit.ui.compose.style.mono700
 import com.one.toit.ui.compose.style.mono900
-import com.one.toit.ui.compose.style.purple400
 
 @Composable
 fun PerforatedPieChart(

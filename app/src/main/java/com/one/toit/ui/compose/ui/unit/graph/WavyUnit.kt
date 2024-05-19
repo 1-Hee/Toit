@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -43,10 +42,10 @@ fun WavyUnit() {
         Animatable(initialValue = 0f)
     }
 
-    var sinAmplitude by remember { mutableFloatStateOf(100f) }
-    var cosAmplitude by remember { mutableFloatStateOf(100f) }
-    var waveFrequency by remember { mutableFloatStateOf(2f) }
-    var durationTimes by remember { mutableIntStateOf(1000) }
+    var sinAmplitude by remember { mutableStateOf(100f) }
+    var cosAmplitude by remember { mutableStateOf(100f) }
+    var waveFrequency by remember { mutableStateOf(2f) }
+    var durationTimes by remember { mutableStateOf(1000) }
 
     LaunchedEffect(Unit) {
         repeat(Int.MAX_VALUE){

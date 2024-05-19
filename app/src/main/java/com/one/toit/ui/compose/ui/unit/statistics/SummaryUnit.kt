@@ -11,7 +11,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,8 +34,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,8 +65,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
-import kotlin.math.ceil
-import kotlin.math.round
 import kotlin.math.roundToInt
 
 // 전체 통계 대쉬보드
@@ -101,19 +96,19 @@ fun SummaryUnit(
      * 표시할 통계 정보
      */
     // Toit 점수
-    var mToitPoint by remember { mutableLongStateOf(0) }
+    var mToitPoint by remember { mutableStateOf<Long>(0) }
     // 전체 목표 수
-    val mTaskTotalCnt = remember { mutableLongStateOf(0) }
+    val mTaskTotalCnt = remember { mutableStateOf<Long>(0) }
     // 평균 목표 수
-    val mTaskCntAvg = remember { mutableFloatStateOf(0f) }
+    val mTaskCntAvg = remember { mutableStateOf(0f) }
     // 월간 목표 수
-    val mMonthCnt = remember { mutableLongStateOf(0L) }
+    val mMonthCnt = remember { mutableStateOf(0L) }
     // 최장 기록
-    val mMaxTime = remember { mutableLongStateOf(0L) }
+    val mMaxTime = remember { mutableStateOf(0L) }
     // 최단 기록
-    val mMinTime = remember { mutableLongStateOf(0L) }
+    val mMinTime = remember { mutableStateOf(0L) }
     // 평균 기록
-    val mAvgTime = remember { mutableFloatStateOf(0f) }
+    val mAvgTime = remember { mutableStateOf(0f) }
 
     // 스크롤 컴포저블 state
     val outerState = rememberScrollState()

@@ -6,15 +6,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.one.toit.BR
 import com.one.toit.R
@@ -38,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -47,7 +54,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // bundle로 파싱할 dto 객체
     private var mTaskDTO: TaskDTO? = null
     // 다른 액티비티 이동후 결과 값을 받아 핸들링할 런쳐
-     private lateinit var launcher: ActivityResultLauncher<Intent>
+    private lateinit var launcher: ActivityResultLauncher<Intent>
     // vm
     private lateinit var taskRegisterViewModel: TaskRegisterViewModel
     private lateinit var taskInfoViewModel: TaskInfoViewModel
@@ -59,6 +66,11 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
     // 카메라로부터 받은 비트맵
     private var acceptedBitmap:Bitmap? = null
     private var mImageUri:Uri? = null
+
+    // 촬영된 카메라 이미지를 저장할 파일 객체
+    private var photoFile: File? = null
+    private var currentPhotoPath: String = ""
+
     override fun getDataBindingConfig(): DataBindingConfig {
         mBundle = Bundle() // bundle init
         return DataBindingConfig(R.layout.fragment_board_read)
@@ -153,49 +165,101 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
         mBinding.notifyChange()
     }
 
-    // 카메라로부터 받아온 이미지 비트맵을 uri로 저장하는 메서드
-    // TODO 현재 카메라 기능이 지원중단 되었으므로 향후 카메라X나 카메라2로 기능 이전이 필요...
-    private fun createCaptureImages(result:ActivityResult){
-        if(result.data?.extras != null){
-            Timber.i("result : %s", result)
-            Timber.i("data : %s", result.data)
-            val bitmap:Bitmap? = try {
-                result.data?.extras?.get("data") as Bitmap
-            }catch (e:Exception){
-                null
-            }
-            Timber.i("photo .. %s %s %s", bitmap?.width, bitmap?.height, bitmap?.density)
-            acceptedBitmap = bitmap
-            if (acceptedBitmap != null) {
-                // 이미지 뷰에 바인딩
-                mBinding.ivCapture.setImageBitmap(bitmap)
-                mBinding.isCertified = true
-                mBinding.notifyChange()
-                // 파일명 세팅...
-                // TODO 파일명 세팅 리터칭하기
-                val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                mFileName = "${requireContext().packageName}_${timeStamp}.jpg"
-            }
-        }
-    }
-
+    // 카메라 호출 메서드
     private fun showCamera(){
-        // 카메라 권한
+        // 카메라 권한 체크
         val cameraFlag = ContextCompat.checkSelfPermission(
             requireContext(), android.Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
-        if(cameraFlag){
-            /**
-             * 카메라 촬영 ...
-             */
+        if (cameraFlag) {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            launcher.launch(cameraIntent)
-            // TODO.. 카메라2나 카메라 X로 기능 이전 필요...!
-        }else {
+            // Ensure that there's a camera activity to handle the intent
+            if (cameraIntent.resolveActivity(requireActivity().packageManager) != null) {
+                // Create the File where the photo should go
+                photoFile = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    null
+                }
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "${requireContext().packageName}.provider",
+                        it
+                    )
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    launcher.launch(cameraIntent)
+                }
+            }
+        } else {
             AppUtil.toast(requireContext(), getString(R.string.msg_request_camera_auth))
         }
     }
 
+    // 카메라로부터 받아온 이미지 비트맵을 uri로 저장하는 메서드
+    private fun createCaptureImages(result:ActivityResult){
+        if (result.resultCode == Activity.RESULT_OK) {
+            val bitmap: Bitmap = BitmapFactory.decodeFile(photoFile?.absolutePath)
+            val rotatedBitmap = rotateBitmapImage(bitmap)
+            Timber.i("photo .. %s %s %s", bitmap.width, bitmap.height, bitmap.density)
+            acceptedBitmap = rotatedBitmap
+            if (acceptedBitmap != null) {
+                // 이미지 뷰에 바인딩
+                mBinding.ivCapture.setImageBitmap(rotatedBitmap)
+                mBinding.isCertified = true
+                mBinding.notifyChange()
+                // 파일명 세팅...
+                mFileName = photoFile?.name ?: ""
+            }
+        }
+    }
+
+
+    // new
+    // 카메라로부터 받아온 이미지 데이터를 파일 데이터로 생성하는 멧 ㅓ드
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES) // PICTURES 경로에 완성이 되어야 함.
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */ // 저장될 경로
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            currentPhotoPath = absolutePath
+        }
+    }
+
+    // 회전 각도 계산 메서드
+    private fun getRotationDegrees(photoPath: String): Int {
+        return try {
+            val exifInterface = ExifInterface(photoPath)
+            when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            0
+        }
+    }
+
+    // 비트맵 이미지 회전 메서드
+    private fun rotateBitmapImage(bitmap: Bitmap): Bitmap {
+        val photoPath = currentPhotoPath
+        val rotationDegrees = getRotationDegrees(photoPath)
+        val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+
+    // 저장된 카메라 비트맵을 저장하는 메서드
     private fun saveCapturedPhoto(bitmap:Bitmap) {
         /**
          * 파일 이름 저장
@@ -209,9 +273,7 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                 put(MediaStore.Images.Media.WIDTH, bitmap.width)
                 put(MediaStore.Images.Media.HEIGHT, bitmap.height)
             }
-            // val picturePath = Environment.DIRECTORY_PICTURES
-            // val pictureUri = Uri.parse(picturePath) // 이건 안되는듯...
-            // MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            // 저장된 이미지를 컨텐츠 리졸버에 저장함.
             val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             this.mImageUri = imageUri
             imageUri?.let {
@@ -220,14 +282,11 @@ class BoardReadFragment : BaseFragment<FragmentBoardReadBinding>() {
                     outputStream.flush()
                 }
             }
-
             // 파일 생성 후 미디어 스캐닝 기능
-            Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
-                imageUri?.path.let { path ->
-                    val f = File(path)
-                    mediaScanIntent.data = Uri.fromFile(f)
-                    requireActivity().sendBroadcast(mediaScanIntent)
-                }
+            imageUri?.path.let { path ->
+                val file = File(path)
+                MediaScannerConnection.scanFile(context, arrayOf(file.toString()),
+                    null, null)
             }
         }
    }

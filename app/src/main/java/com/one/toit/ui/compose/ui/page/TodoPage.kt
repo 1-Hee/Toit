@@ -35,7 +35,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.data.viewmodel.TaskViewModel
 import com.one.toit.ui.activity.BoardActivity
@@ -62,14 +63,10 @@ import com.one.toit.ui.compose.ui.unit.todo.ItemNoContent
 import com.one.toit.ui.compose.ui.unit.todo.ItemTodo
 import com.one.toit.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import timber.log.Timber
-import java.util.Date
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Date
 
 
 /**
@@ -95,7 +92,7 @@ fun TodoPage(
     val optionText by remember { mutableStateOf("달성한 목표 숨기기") }
 
     // 페이징 변수
-    var pgNo by remember { mutableIntStateOf(1) }
+    var pgNo by remember { mutableStateOf(1) }
 
     // 상태 리프레쉬 + 초기 여부 판단
     var refreshing by remember { mutableStateOf(false) }

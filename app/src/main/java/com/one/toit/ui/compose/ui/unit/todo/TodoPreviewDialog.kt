@@ -1,7 +1,9 @@
 package com.one.toit.ui.compose.ui.unit.todo
 
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,21 +29,33 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.one.toit.R
 import com.one.toit.data.dto.TaskDTO
 import com.one.toit.ui.activity.BoardActivity
 import com.one.toit.ui.compose.style.black
+import com.one.toit.ui.compose.style.green400
+import com.one.toit.ui.compose.style.green700
+import com.one.toit.ui.compose.style.mono100
+import com.one.toit.ui.compose.style.mono200
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono400
 import com.one.toit.ui.compose.style.mono700
@@ -50,22 +64,31 @@ import com.one.toit.ui.compose.style.white
 import com.one.toit.util.AppUtil.Time
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
+import timber.log.Timber
 
 @Composable
 fun TodoPreviewDialog(
     taskDTO: TaskDTO,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
+    isDisable:Boolean = taskDTO.taskComplete == null,
     launcher: ActivityResultLauncher<Intent>? = null
 ) {
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
-    val completeDateString = remember {
+    val sCreateAt  = remember {
+        mutableStateOf(
+            Time.getFullLog(context, taskDTO.createAt)
+        )
+    }
+    val suffix = " " + stringResource(id = R.string.txt_complete)
+
+    val sCompleteAt = remember { // 완료 일자
         mutableStateOf(
             if(taskDTO.taskComplete == null){
                 ""
             }else {
-               Time.getFullLog(context, taskDTO.taskComplete!!)
+               Time.getTimeLog(context, taskDTO.taskComplete!!, suffix)
             }
         )
     }
@@ -74,9 +97,10 @@ fun TodoPreviewDialog(
     Dialog(
         onDismissRequest = onDismiss
     ) {
+        val corner = 8.dp
         Column(
             Modifier
-                .background(color = white, shape = RoundedCornerShape(16.dp))
+                .background(color = white, shape = RoundedCornerShape(corner))
                 .wrapContentSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -88,8 +112,8 @@ fun TodoPreviewDialog(
                     .background(
                         color = purple200,
                         shape = RoundedCornerShape(
-                            topStart = 16.dp,
-                            topEnd = 16.dp
+                            topStart = corner,
+                            topEnd = corner
                         )
                     ),
                 verticalAlignment = Alignment.CenterVertically,
@@ -99,7 +123,7 @@ fun TodoPreviewDialog(
                     imageVector = Icons.Rounded.Edit,
                     contentDescription = "iconEdit",
                     modifier = Modifier
-                        .size(18.dp)
+                        .size(20.dp)
                         .clickable {
                             // TODO 이쪽에 콜백으로 바꿔서, 리컴포지션 일어나게 하기
                             intent.putExtra("pageIndex", 1)
@@ -109,24 +133,26 @@ fun TodoPreviewDialog(
                         },
                     tint = white
                 )
+                if(!isDisable){
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "iconEdit",
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable {
+                                onDelete()
+                                onDismiss()
+                            },
+                        tint = white
+                    )
+                }
                 Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = "iconEdit",
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clickable {
-                            onDelete()
-                            onDismiss()
-                        },
-                    tint = white
-                )
-                Spacer(modifier = Modifier.width(8.dp))
             }
             Column(
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(8.dp),
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
@@ -205,36 +231,61 @@ fun TodoPreviewDialog(
                         .heightIn(max = 172.dp)
                         .verticalScroll(scrollState)
                 )
-//                // 이미지
+                // 이미지
                 if(taskDTO.taskCertification?.isNotBlank() == true){
-                    GlideImage(
-                        imageModel = taskDTO.taskCertification,
-                        // contentScale 종류 : Crop, Fit, Inside, FillHeight, FillWidth, None
-                        contentScale = ContentScale.Crop,
-                        circularReveal = CircularReveal(duration = 0),
-                        // 이미지 로딩 전 표시할 place holder 이미지
-                        placeHolder = painterResource(id = R.drawable.img_sample),
-                        // 에러 발생 시 표시할 이미지
-                        error = painterResource(id = R.drawable.img_sample),
+                    val uriString = taskDTO.taskCertification?:""
+                    val uri = remember(uriString) { Uri.parse(uriString) }
+
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(context)
+                            .data(uri)
+                            .placeholder(R.drawable.image_placeholder)
+                            .error(R.drawable.image_error)
+                            .build()
+                    )
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillWidth,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(216.dp)
+                            .height(256.dp)
                     )
                 }
 
-                // 날짜
-                Text(
-                    // 파싱 함수 추가
-                    text = completeDateString.value,
-                    style = MaterialTheme.typography.subtitle1.copy(
-                        fontSize = 12.sp,
-                        color = mono400,
-                        textAlign = TextAlign.End
-                    ),
+                // 날짜 & 완성 정보 표시 레이어
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight()
-                )
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // 완료 일자
+                    Text(
+                        // 파싱 함수 추가
+                        text = sCompleteAt.value,
+                        style = MaterialTheme.typography.subtitle1.copy(
+                            fontSize = 12.sp,
+                            color = green700,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                    // 생성 시간
+                    Text(
+                        // 파싱 함수 추가
+                        text = sCreateAt.value,
+                        style = MaterialTheme.typography.subtitle1.copy(
+                            fontSize = 12.sp,
+                            color = mono400,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = Modifier
+                            .wrapContentSize()
+                    )
+                }
             }
         }
     }

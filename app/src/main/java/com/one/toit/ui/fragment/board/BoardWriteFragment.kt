@@ -179,7 +179,6 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                         AppUtil.toast(context, titleCheckMsg)
                     }else { // DB save task...
                         val message = context.getString(R.string.msg_success_todo)
-
                         lifecycleScope.launch(Dispatchers.IO){
                             val taskRegister = TaskRegister()
                             val taskId = taskRegisterViewModel.addTaskRegister(taskRegister)

@@ -39,12 +39,13 @@ class AppUtil {
     // 토스트 메세지
     companion object {
         // 토소트 메세지
-        fun toast(context: Context, msg:String){
+        fun toast(context: Context, msg: String) {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
 
         const val LIST_SIZE = 10;
     }
+
     object UIManager {
         // 키보드 숨김 메서드
         fun hideKeyPad(activity: Activity) {
@@ -61,14 +62,15 @@ class AppUtil {
 
     object Image {
         @Suppress("DEPRECATION")
-        fun getBitmap(uri:Uri, contentResolver: ContentResolver):Bitmap?{
-            val bitmap = if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P){
+        fun getBitmap(uri: Uri, contentResolver: ContentResolver): Bitmap? {
+            val bitmap = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                 MediaStore.Images.Media.getBitmap(contentResolver, uri)
-            }else {
+            } else {
                 val source = ImageDecoder.createSource(contentResolver, uri)
                 ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
                     decoder.setTargetSampleSize(1) // shrinking by
-                    decoder.isMutableRequired = true // this resolve the hardware type of bitmap problem
+                    decoder.isMutableRequired =
+                        true // this resolve the hardware type of bitmap problem
                 }
             }
             return bitmap
@@ -82,7 +84,7 @@ class AppUtil {
             selection: String? = null,
             selectionArgs: Array<String>? = null,
             sortOrder: String? = null
-        ):MutableList<MediaDTO>{
+        ): MutableList<MediaDTO> {
             val mediaDTOList = mutableListOf<MediaDTO>()
             val projection = arrayOf(
                 MediaStore.Images.Media._ID,
@@ -92,26 +94,37 @@ class AppUtil {
                 MediaStore.MediaColumns.SIZE
             )
 
-            val cursor: Cursor = resolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, sortOrder)
+            val cursor: Cursor = resolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
                 ?: return mutableListOf();
-            val idColum:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val dpNameColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val mimeColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)
+            val idColum: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val dpNameColumn: Int =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val mimeColumn: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.MIME_TYPE)
             // option : DATE_MODIFIED, DATE_ADDED, DATE_EXPIRES, DATE_TAKEN
-            val dateColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
-            val sizeColumn:Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
+            val dateColumn: Int =
+                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
+            val sizeColumn: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
 
 
-            while(cursor.moveToNext()){
-                val id:Long = cursor.getLong(idColum)
-                val dpName:String = cursor.getString(dpNameColumn)
-                val mimeType:String = cursor.getString(mimeColumn)
-                val contentUri:Uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
-                val date:Long = cursor.getLong(dateColumn)
-                val fileSize:Long = cursor.getLong(sizeColumn)
+            while (cursor.moveToNext()) {
+                val id: Long = cursor.getLong(idColum)
+                val dpName: String = cursor.getString(dpNameColumn)
+                val mimeType: String = cursor.getString(mimeColumn)
+                val contentUri: Uri = Uri.withAppendedPath(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id.toString()
+                )
+                val date: Long = cursor.getLong(dateColumn)
+                val fileSize: Long = cursor.getLong(sizeColumn)
                 val mediaDTO = MediaDTO(
                     fileName = dpName,
-                    mimeType =  mimeType,
+                    mimeType = mimeType,
                     path = contentUri.toString(),
                     lastUpdate = date,
                     fileSize = fileSize
@@ -125,20 +138,21 @@ class AppUtil {
     // 시간 파싱 작업에 사용할 유틸리티
     object Time {
         // 기한이 지났는지 체크를 위한 메서드
-        fun compareCreatedDate(createAt:Date?):Boolean{
+        fun compareCreatedDate(createAt: Date?): Boolean {
             // 오늘 날짜와 비교하여 수정 가능 여부를 결정
             val cDate = Date();
             val cCalendar = Calendar.getInstance()
             cCalendar.time = cDate
-            val createdDate:Date = if(createAt == null) {
+            val createdDate: Date = if (createAt == null) {
                 val mDate = Date();
                 val mCalendar = Calendar.getInstance()
                 mCalendar.time = mDate
-                mCalendar.set(Calendar.DAY_OF_MONTH,
+                mCalendar.set(
+                    Calendar.DAY_OF_MONTH,
                     (mCalendar.get(Calendar.DAY_OF_MONTH) - 1)
                 );
                 mCalendar.time
-            }else {
+            } else {
                 createAt
             }
             val dbCalendar = Calendar.getInstance()
@@ -154,7 +168,7 @@ class AppUtil {
         }
 
         // 시간이 10분 이상 차이가 나는지 점검하는 메서드
-        fun isEnoughTimeDiff(mDate:Date):Boolean{
+        fun isEnoughTimeDiff(mDate: Date): Boolean {
             val cDate = Date() // 비교할 날짜!
             val cCalendar = Calendar.getInstance() // date1
             cCalendar.time = cDate
@@ -162,13 +176,13 @@ class AppUtil {
             cCalendar.set(Calendar.MINUTE, 59)
             val mCalendar = Calendar.getInstance() // date2
             mCalendar.time = mDate
-            mCalendar.set(Calendar.MINUTE, (mCalendar.get(Calendar.MINUTE)+10));
+            mCalendar.set(Calendar.MINUTE, (mCalendar.get(Calendar.MINUTE) + 10));
             val comparison = cCalendar.time.compareTo(mCalendar.time)
             return comparison > 0;
         }
 
         // 시간과 분 정보를 받아 Date 객체 리턴하는 메서드
-        fun getLimitDate(hour: Int, min: Int):Date {
+        fun getLimitDate(hour: Int, min: Int): Date {
             val mDate = Date();
             val calendar = Calendar.getInstance()
             calendar.time = mDate
@@ -177,9 +191,9 @@ class AppUtil {
             return calendar.time
         }
 
-        fun getTimeString(context: Context, mDate: Date?):String{
+        fun getTimeString(context: Context, mDate: Date?): String {
             val txtNoLimit = context.resources.getString(R.string.txt_no_limit)
-            if(mDate == null) return txtNoLimit
+            if (mDate == null) return txtNoLimit
             val calendar = Calendar.getInstance()
             calendar.time = mDate
             val mHour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -188,8 +202,9 @@ class AppUtil {
             val strMin = String.format("%02d", mMinute)
             return "$strHour:$strMin"
         }
+
         // 저장된 date 를 기반으로 제한시간 문자열 리턴하는 메서드
-        fun getLimitString(mDate:Date):String {
+        fun getLimitString(mDate: Date): String {
             val calendar = Calendar.getInstance()
             calendar.time = mDate
             val mHour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -199,13 +214,14 @@ class AppUtil {
                 .append(":").append(String.format("%02d", mMinute)) // min
             return sb.toString()
         }
+
         // Date 값을 기준으로 시간을 추출하는 메서드
-        fun getFullLog(context:Context, mDate:Date):String{
+        fun getFullLog(context: Context, mDate: Date): String {
             val suffix = context.getString(R.string.suffix_create)
             val calendar = Calendar.getInstance()
             calendar.time = mDate
             val mYear = calendar.get(Calendar.YEAR)
-            val mMonth = calendar.get(Calendar.MONTH)+1
+            val mMonth = calendar.get(Calendar.MONTH) + 1
             val mDay = calendar.get(Calendar.DAY_OF_MONTH)
             val mHour = calendar.get(Calendar.HOUR_OF_DAY)
             val mMinute = calendar.get(Calendar.MINUTE)
@@ -227,15 +243,15 @@ class AppUtil {
         }
 
         // Date 값을 기준으로 시간을 추출하는 메서드
-        fun getFullString(mDate:Date?):String{
+        fun getFullString(mDate: Date?): String {
             val sb = StringBuilder()
-            if(mDate == null){
+            if (mDate == null) {
                 return sb.toString()
-            }else {
+            } else {
                 val calendar = Calendar.getInstance()
                 calendar.time = mDate
                 val mYear = calendar.get(Calendar.YEAR)
-                val mMonth = calendar.get(Calendar.MONTH)+1
+                val mMonth = calendar.get(Calendar.MONTH) + 1
                 val mDay = calendar.get(Calendar.DAY_OF_MONTH)
                 val mHour = calendar.get(Calendar.HOUR_OF_DAY)
                 val mMinute = calendar.get(Calendar.MINUTE)
@@ -254,9 +270,10 @@ class AppUtil {
                 return sb.toString()
             }
         }
+
         // 시간 로그
-        fun getTimeLog(context:Context, mDate:Date):String{
-            val suffx = context.resources.getString(R.string.suffix_create);
+        fun getTimeLog(context: Context, mDate: Date, suffix: String = ""): String {
+            val mSuffix = suffix.ifBlank { context.resources.getString(R.string.suffix_create) }
             val calendar = Calendar.getInstance();
             calendar.time = mDate
             val mHour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -266,13 +283,13 @@ class AppUtil {
             sb.append(String.format("%02d", mHour)) // Hour
                 .append(":").append(String.format("%02d", mMinute))
                 .append(":").append(String.format("%02d", mSecond))
-                .append(" ").append(suffx);
+                .append(" ").append(mSuffix);
             return sb.toString()
         }
 
         // Date 값을 기준으로 시간 문자열을 추출하는 메서드
-        fun getTimeLog(mDate: Date?):String{
-            if(mDate == null) return "empty"
+        fun getTimeLog(mDate: Date?): String {
+            if (mDate == null) return "empty"
             val calendar = Calendar.getInstance()
             calendar.time = mDate
             val mHour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -285,8 +302,8 @@ class AppUtil {
         }
 
         // 일일 9/1 이런 문자열 얻기 위한 메서드
-        fun getSimpleDateLog(mDate: Date?):String{
-            if(mDate == null) return ""
+        fun getSimpleDateLog(mDate: Date?): String {
+            if (mDate == null) return ""
             else {
                 val calendar = Calendar.getInstance()
                 calendar.time = mDate
@@ -298,40 +315,42 @@ class AppUtil {
     }
 
     // 통계 관런 계산에 사용할 유틸리티
-    object Statistics{
+    object Statistics {
         // 주간 목표 달성율 계산 메서드
-        fun getWeeklyRatio(mCounterList:List<TaskCounter>):Float{
-            if(mCounterList.size < 7) return 0f;
+        fun getWeeklyRatio(mCounterList: List<TaskCounter>): Float {
+            if (mCounterList.size < 7) return 0f;
             else {
-                var mAllCnt:Float = 0f;
-                var mAllCompleteCnt:Float = 0f;
+                var mAllCnt: Float = 0f;
+                var mAllCompleteCnt: Float = 0f;
                 mCounterList.forEach { item ->
                     mAllCnt += item.totalTask
                     mAllCompleteCnt += item.completeTask
                 }
-                return if(mAllCnt <=0) 0f else mAllCompleteCnt/mAllCnt
+                return if (mAllCnt <= 0) 0f else mAllCompleteCnt / mAllCnt
             }
         }
+
         // 일일 평균 목표 달성율 계산 메서드
-        fun getWeeklyDailyAvg(mCounterList:List<TaskCounter>):Float{
-            if(mCounterList.size < 7) return 0f;
+        fun getWeeklyDailyAvg(mCounterList: List<TaskCounter>): Float {
+            if (mCounterList.size < 7) return 0f;
             else {
                 var mTotalRatio = 0f;
-                var size = mCounterList.size ;
-                for(item in mCounterList){
-                    if(item.totalTask <= 0) {
+                var size = mCounterList.size;
+                for (item in mCounterList) {
+                    if (item.totalTask <= 0) {
                         size--;
                         continue
                     };
-                    val mDailyRatio:Float = ((item.completeTask.toFloat())/(item.totalTask.toFloat()))
+                    val mDailyRatio: Float =
+                        ((item.completeTask.toFloat()) / (item.totalTask.toFloat()))
                     mTotalRatio += mDailyRatio
                 }
-                return if(size <= 0) 0f else mTotalRatio / size
+                return if (size <= 0) 0f else mTotalRatio / size
             }
         }
 
         // 일간 목표 달성율 계산 메서드
-        fun test(){
+        fun test() {
             /**
              * 시간대에 따른 추이 계싼해서 렌더링하는 메서드
              */
@@ -341,8 +360,6 @@ class AppUtil {
             // step2. 일단 표시 시간은 무조건 1시간 단위로 함
             // 근데 현재 시간 - 7 했을때, 0보다 크다면 0 ~ n-7 구간까지 합침.
             val date = Date();
-
-
 
 
             ///////
