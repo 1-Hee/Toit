@@ -138,7 +138,7 @@ class AppUtil {
     // 시간 파싱 작업에 사용할 유틸리티
     object Time {
         // 기한이 지났는지 체크를 위한 메서드
-        fun compareCreatedDate(createAt: Date?): Boolean {
+        fun checkOverDay(createAt: Date?): Boolean {
             // 오늘 날짜와 비교하여 수정 가능 여부를 결정
             val cDate = Date();
             val cCalendar = Calendar.getInstance()
@@ -160,10 +160,6 @@ class AppUtil {
             val flag = cCalendar.get(Calendar.YEAR) == dbCalendar.get(Calendar.YEAR)
                     && cCalendar.get(Calendar.MONTH) == dbCalendar.get(Calendar.MONTH)
                     && cCalendar.get(Calendar.DAY_OF_MONTH) == dbCalendar.get(Calendar.DAY_OF_MONTH)
-//            // 날짜 차이 계산
-//            val differenceInMillis: Long = abs(dbCalendar.getTimeInMillis() - cCalendar.getTimeInMillis())
-//            val differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24)
-//            return differenceInDays >= 1
             return !flag
         }
 
@@ -347,25 +343,6 @@ class AppUtil {
                 }
                 return if (size <= 0) 0f else mTotalRatio / size
             }
-        }
-
-        // 일간 목표 달성율 계산 메서드
-        fun test() {
-            /**
-             * 시간대에 따른 추이 계싼해서 렌더링하는 메서드
-             */
-            // step1. 오늘의 할일 개수 전체를 셈함.
-
-
-            // step2. 일단 표시 시간은 무조건 1시간 단위로 함
-            // 근데 현재 시간 - 7 했을때, 0보다 크다면 0 ~ n-7 구간까지 합침.
-            val date = Date();
-
-
-            ///////
-
-            val testData = mutableStateOf(mutableMapOf<String, ChartEntry>())
-            // dummy!
         }
     }
 }

@@ -4,6 +4,7 @@ package com.one.toit.ui.compose.ui.unit.todo
 import android.app.Application
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,14 +15,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,9 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.one.toit.R
@@ -43,6 +46,7 @@ import com.one.toit.ui.compose.style.black
 import com.one.toit.ui.compose.style.green600
 import com.one.toit.ui.compose.style.mono300
 import com.one.toit.ui.compose.style.mono50
+import com.one.toit.ui.compose.style.mono600
 import com.one.toit.ui.compose.style.purple200
 import com.one.toit.ui.compose.ui.unit.WarningDialog
 import com.one.toit.util.AppUtil
@@ -51,16 +55,18 @@ import com.one.toit.util.AppUtil.Time
 @Composable
 fun ItemTodo(
     taskDTO: TaskDTO,
-    isSuccess:Boolean = taskDTO.taskComplete != null,
     launcher: ActivityResultLauncher<Intent>? = null,
     onRefresh : () -> Unit
 ){
+    // 환경 변수
     val context = LocalContext.current
     val intent = Intent(context, BoardActivity::class.java)
     val application = context.applicationContext as Application
     val taskRegisterViewModel = TaskRegisterViewModel(application)
     var showPreViewDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val isComplete: Boolean = taskDTO.taskComplete != null
+
     // 다이얼로그 팝업
     if (showPreViewDialog) {
         TodoPreviewDialog(
@@ -104,16 +110,15 @@ fun ItemTodo(
             .background(mono50)
             .clickable {
 //                // dommy...
-                if (isSuccess) {
+                if (isComplete) {
                     showPreViewDialog = true
                 } else {
                     // 현재 날찌와 비교를 한다.
                     val createAt = taskDTO.createAt
-                    val isComplete = taskDTO.taskComplete != null
-                    val isOverDay = Time.compareCreatedDate(createAt);
-                    if(isOverDay){
+                    val isOverDay = Time.checkOverDay(createAt);
+                    if (isOverDay) {
                         showPreViewDialog = true
-                    }else {
+                    } else {
                         intent.putExtra("pageIndex", 2)
                         intent.putExtra("taskDTO", taskDTO)
                         intent.putExtra("isComplete", false)
@@ -139,18 +144,54 @@ fun ItemTodo(
                     .wrapContentSize()
                     .align(Alignment.TopStart)
             )
-            // 달성 여부
-            if(isSuccess){
+
+           val modifier = Modifier
+               .size(24.dp)
+               .align(Alignment.TopEnd)
+
+            //case 1. 제한 ok 성공 ok
+            // case 1. 제한시간 있고, 성공한 경우
+            // 아이콘
+            val isSuccess = if(taskDTO.taskLimit != null && taskDTO.taskComplete != null){
+                val tLimit = taskDTO.taskLimit!!
+                val tComplete = taskDTO.taskComplete!!
+                tComplete.before(tLimit)
+            }else {
+                false
+            }
+
+            val isCheck = (isComplete && taskDTO.taskLimit == null) || isSuccess
+            val isOverIcon = (!isComplete && Time.checkOverDay(taskDTO.createAt)) || (isComplete && !isSuccess)
+            if(isCheck) { // 시간 제한 있고, 성공한 경우
+                val vector = ImageVector.vectorResource(id = R.drawable.ic_check)
                 Icon(
-                    Icons.Rounded.Check,
+                    vector,
                     contentDescription = "",
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp)
-                        .align(Alignment.TopEnd),
-                    tint = green600
+                    modifier = modifier,
+                    green600
+                )
+            }else if(isOverIcon){
+                Image(
+                    painter = painterResource(id = R.drawable.ic_time_over),
+                    contentDescription = "",
+                    modifier = modifier
                 )
             }
+//            }else if(isSuccess && !isSuccess){
+//                Image(
+//                    painter = painterResource(id = R.drawable.ic_time_over),
+//                    contentDescription = "",
+//                    modifier = modifier
+//                )
+//            //case 3. 제한시간 없고, 완료한 경우
+//            }else if(taskDTO.taskLimit == null && isComplete){
+//                Image(
+//                    painter = painterResource(id = R.drawable.ic_check),
+//                    contentDescription = "",
+//                    modifier = modifier
+//                )
+//            // case 4. 작성일 기준 시간이 지났는데 완료하지 않은 경우
+//            }
 
             // 남은 시간 표시 로직
             if(taskDTO.taskLimit != null){
@@ -198,4 +239,3 @@ fun ItemTodo(
         }
     }
 }
-

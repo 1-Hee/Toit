@@ -121,22 +121,23 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                 context.resources.getString(R.string.txt_no_limit)
             }
             mBinding.setVariable(BR.limitText, mLimitText)
+            mTaskLimit = mTaskDTO?.taskLimit
 
             val createAt:Date? = mTaskDTO?.createAt;
             // 완료 여부 판정
-            val isOverDay = Time.compareCreatedDate(createAt);
+            val isOverDay = Time.checkOverDay(createAt);
             // 하루 이상 차이가 나는지 확인 +
             // 완료 여부 판정
-            val isComplete = if(isOverDay) true else {
-                mTaskDTO?.taskComplete != null;
-            }
+            val isComplete = mTaskDTO?.taskComplete != null;
 
-            if(isComplete) {
+            if(isComplete) { // 성공시
                 val timeLog = Time.getFullString(mTaskDTO?.taskComplete)
-                val suffixStr = if(isOverDay) context.resources.getString(R.string.suffix_complete) else ""
+                val suffixStr = context.resources.getString(R.string.suffix_complete)
                 mBinding.setVariable(BR.limitDesc, "$timeLog $suffixStr")
                 mBinding.setVariable(BR.isComplete, true)
-            }else {
+            }else if(isOverDay) { // 시간 지났을 경우
+                mBinding.setVariable(BR.isComplete, true)
+            } else {
                 mBinding.setVariable(BR.isComplete, false)
                 setGuideDesc(mHasLimit)
             }
