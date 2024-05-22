@@ -97,16 +97,6 @@ class SettingActivity : BaseComposeActivity() {
     private val permissionFlag:Array<Boolean> = Array(4){false}
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            checkPermission()
-            SettingScreenView(this, permissionFlag,
-                openSetting = { openAppPermissions() },
-                openLicenses = { openOSSActivity() },
-                showBackupDialogs = {},
-                clearAllAppData = { clearAppAppData(this) },
-                removeAdsAction = {}
-            )
-        }
         // launcer init
         launcher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -120,6 +110,17 @@ class SettingActivity : BaseComposeActivity() {
                  */
             }
         }
+
+        setContent {
+            checkPermission()
+            SettingScreenView(this, permissionFlag,
+                openSetting = { openAppPermissions() },
+                openLicenses = { openOSSActivity() },
+                clearAllAppData = { clearAppAppData(this) },
+                removeAdsAction = {}
+            )
+        }
+
         // vm init
         val factory = ApplicationFactory(this.application)
         taskRegisterViewModel = getApplicationScopeViewModel(TaskRegisterViewModel::class.java, factory)
@@ -166,7 +167,7 @@ class SettingActivity : BaseComposeActivity() {
     // 오픈소스 라이선스 팝업
     private fun openOSSActivity(){
         val intent = Intent(this, OssLicensesMenuActivity::class.java)
-        launcher.launch(intent)
+        launcher?.launch(intent)
     }
 
     // 앱 설정 초기화
@@ -199,7 +200,6 @@ fun SettingScreenView(
     permissionFlag: Array<Boolean>,
     openSetting: () -> Unit,
     openLicenses: () -> Unit,
-    showBackupDialogs: () -> Unit,
     clearAllAppData: () -> Unit,
     removeAdsAction:() -> Unit
 ){
@@ -214,7 +214,6 @@ fun SettingScreenView(
                 permissionFlag = permissionFlag,
                 openSetting = openSetting,
                 openLicenses = openLicenses,
-                showBackupDialogs = showBackupDialogs,
                 clearAllAppData = clearAllAppData,
                 removeAdsAction = removeAdsAction
             )
@@ -234,7 +233,6 @@ fun SettingNavGraph(
     permissionFlag: Array<Boolean>,
     openSetting: () -> Unit,
     openLicenses: () -> Unit,
-    showBackupDialogs: () -> Unit,
     clearAllAppData: () -> Unit,
     removeAdsAction:() -> Unit
 ){
@@ -244,7 +242,6 @@ fun SettingNavGraph(
                 permissionFlag = permissionFlag,
                 openSetting = openSetting,
                 openLicenses = openLicenses,
-                showBackupDialogs = showBackupDialogs,
                 clearAllAppData = clearAllAppData,
                 removeAdsAction = removeAdsAction
             )
@@ -257,7 +254,6 @@ fun AppSettingPage(
     permissionFlag:Array<Boolean>,
     openSetting: () -> Unit,
     openLicenses: () -> Unit,
-    showBackupDialogs: () -> Unit,
     clearAllAppData: () -> Unit,
     removeAdsAction:() -> Unit,
 ){
@@ -389,22 +385,21 @@ fun AppSettingPage(
                     .padding(vertical = 8.dp)
                     .clickable { openLicenses() }
             )
-            // TODO 개인 정보 처리 방침
             Spacer(modifier = Modifier.height(16.dp))
-            // 앱 설정 복원하기
-            Text(
-                text = restoreText,
-                style = MaterialTheme.typography.caption
-                    .copy(
-                        color = black,
-                        fontSize = 16.sp
-                    ),
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(vertical = 8.dp)
-                    .clickable { showBackupDialogs() }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+//            // 앱 설정 복원하기
+//            Text(
+//                text = restoreText,
+//                style = MaterialTheme.typography.caption
+//                    .copy(
+//                        color = black,
+//                        fontSize = 16.sp
+//                    ),
+//                modifier = Modifier
+//                    .wrapContentSize()
+//                    .padding(vertical = 8.dp)
+//                    .clickable { showBackupDialogs() }
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
             // 앱 데이터 초기화
             Text(
                 text = appDataClearText,
@@ -423,18 +418,18 @@ fun AppSettingPage(
             // TODO 표시 문구 추가하기..?
             Spacer(modifier = Modifier.height(16.dp))
             // 광고 제거 하기
-            Text(
-                text = removeAdsText,
-                style = MaterialTheme.typography.caption
-                    .copy(
-                        color = black,
-                        fontSize = 16.sp
-                    ),
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(vertical = 8.dp)
-                    .clickable { removeAdsAction() }
-            )
+//            Text(
+//                text = removeAdsText,
+//                style = MaterialTheme.typography.caption
+//                    .copy(
+//                        color = black,
+//                        fontSize = 16.sp
+//                    ),
+//                modifier = Modifier
+//                    .wrapContentSize()
+//                    .padding(vertical = 8.dp)
+//                    .clickable { removeAdsAction() }
+//            )
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -509,7 +504,7 @@ fun SettingUnit(
 @Composable
 fun DefaultPreView(){
     MyApplicationTheme {
-        SettingScreenView(SettingActivity(), Array(4) { false },{},{},{},{},{})
+        SettingScreenView(SettingActivity(), Array(4) { false },{},{},{},{})
     }
 }
 

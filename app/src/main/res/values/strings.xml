@@ -4,7 +4,7 @@
     <string name="p_statistics">할 일 현황</string>
     <string name="p_profile">마이 페이지</string>
     <string name="p_graph">ToIt Statistics</string>
-    <string name="sample_guide">성공은 작은 노력의 쌓임입니다.\n오늘 하루도 조금 더 나아가세요.</string>
+    <string name="sample_guide">오늘도 Toit과 함께 목표 달성!</string>
 
     <string name="p_app_setting">환경 설정</string>
     <string name="p_app_statistics">상세 통계</string>
@@ -138,7 +138,7 @@
     <string name="txt_dead_line">마감 기한</string>
     <string name="txt_see_detail_statistics">자세한 통계 보기</string>
     <string name="msg_complete_update">업데이트가 완료되었습니다.</string>
-    <string name="msg_update_fail_restart">업데이트에 실패하뎠습니다. 업데이트를 다시 하시려면 앱을 재시작해주세요.</string>
+    <string name="msg_update_fail_restart">업데이트에 실패하였습니다. 업데이트를 다시 하시려면 앱을 재시작해주세요.</string>
     <string name="txt_alert_time_lower">마감 기한은 최소 현재 시각보다 10분 이후여야 합니다.</string>
     <string name="txt_no_todo_line1">등록하신 TODO List가 없네요 🤔</string>
     <string name="txt_no_todo_line2">지금 바로 등록해볼까요?</string>
@@ -151,6 +151,11 @@
     <string name="guide_take_photo2">단, 목표 완료 후에는 사진 수정이 어려우니,\n완료 전에 사진을 다시 한번 확인해주세요.</string>
     <string name="guide_take_photo1">목표 달성시 다이얼로그 창에서\n촬영한 사진을 확인할 수 있어요!</string>
     <string name="title_take_photo">인증 사진을 남겨볼까요?</string>
+    <string name="header_todo">TODO</string>
+    <string name="todo_placeholder">목표를 입력해보세요(최대 28자)</string>
+    <string name="header_memo">메모</string>
+    <string name="desc_memo">memo</string>
+    <string name="memo_placeholder">메모를 입력해보세요</string>
 
     <!-- 통계 값 리스트 -->
     <string-array name="statistics_chart_item_list">

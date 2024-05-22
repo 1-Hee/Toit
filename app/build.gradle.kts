@@ -1,13 +1,13 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Properties
 
 fun getApiKey(propertyKey: String): String {
     /*
         if gradle AGP version under 8.3.0 , can use these method,
-
             return gradleLocalProperties(rootDir).getProperty(propertyKey)
-
         but upper than 8.3.0 you should change codes like this...
      */
     return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
@@ -29,11 +29,35 @@ android {
         applicationId = "com.one.toit"
         minSdk = 24
         targetSdk = 33
-        versionCode = 3
+        versionCode = 6
         versionName = "1.0.1"
-        versionName = "1.1.5"
+        versionName = "1.1.8"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("debugSignedKey") {
+            /*
+             */
+        }
+
+        create("releaseSignedKey") {
+            /*
+             */
+        }
+
+        create("release") {
+            val keystorePropertiesFile = rootProject.file("local.properties")
+            val keystoreProperties = Properties().apply {
+                load(FileInputStream(keystorePropertiesFile))
+            }
+
+            keyAlias = keystoreProperties["KEY_ALIAS"] as String
+            keyPassword = keystoreProperties["KEY_PASSWORD"] as String
+            storeFile = file(keystoreProperties["KEYSTORE_PATH"] as String)
+            storePassword = keystoreProperties["KEYSTORE_PASSWORD"] as String
+        }
     }
 
     buildTypes {
@@ -49,17 +73,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-    }
-    signingConfigs {
-        create("debugSignedKey") {
-            /*
-             */
-        }
-
-        create("releaseSignedKey") {
-            /*
-             */
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -76,7 +90,7 @@ android {
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
             .forEach { output ->
                 if(output.outputFile != null){
-                    if(output.outputFile.name.endsWith(".apk")){
+                    if(output.outputFile.name.endsWith(".apk") || output.outputFile.name.endsWith(".aab")){
                         val appPrefix = "to_it"
                         val versionName = variant.versionName
                         val buildType = variant.buildType.name
@@ -172,7 +186,6 @@ dependencies {
     val paging_version ="3.3.0"
     implementation("androidx.paging:paging-runtime:$paging_version")
 
-
     // rxjava, rxkotlin implements
     val rx_java_version = "3.1.8"
     val rx_kotlin_version = "3.0.1"
@@ -228,6 +241,5 @@ dependencies {
     // for xml
     val swiperefresh_version = "0.24.7-alpha"
     implementation("com.google.accompanist:accompanist-swiperefresh:$swiperefresh_version")
-
 
 }

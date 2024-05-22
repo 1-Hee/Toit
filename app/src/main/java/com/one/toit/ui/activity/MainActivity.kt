@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -129,7 +130,7 @@ class MainActivity : BaseComposeActivity(), LifecycleOwner {
             result: ActivityResult ->
         // handle callback
         if (result.resultCode != RESULT_OK) {
-            AppUtil.toast(this, this.getString(R.string.msg_update_fail_restart))
+            // AppUtil.toast(this, this.getString(R.string.msg_update_fail_restart))
             // If the update is canceled or fails,
             // you can request to start the update again.
         }

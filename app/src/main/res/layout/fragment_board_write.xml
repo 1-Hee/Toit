@@ -57,105 +57,88 @@
             type="String" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_write_board"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/l_write_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:orientation="vertical"
+        android:onClick="@{(v)->click.onViewClick(v)}"
         >
+        <!-- header -->
         <include
             android:id="@+id/l_board_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             layout="@layout/layout_action_top"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/cl_write_content"
             bind:title="@{title}"
             bind:actionName="@{actionName}"
             bind:click="@{click}"
             />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_write_content"
+        <!-- content -->
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/l_board_header"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
-            android:onClick="@{(v)->click.onViewClick(v)}"
             >
-            <!-- title -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_title_todo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TODO"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/et_title_todo"
-                />
-
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/et_title_todo"
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="목표를 입력해보세요(최대 28자)"
-                android:maxLength="28"
-                android:textSize="14sp"
-                android:textColor="@color/mono600"
-                android:textColorHint="@color/mono400"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title_todo"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/tv_memo_title"
-                android:layout_marginVertical="12dp"
-                android:includeFontPadding="false"
-                android:afterTextChanged="@{(e)->textWatcher.afterTextChanged(e)}"
-                android:onEditorActionListener="@{(t,c,e)->textListener.onEditorAction(t,c,e)}"
-                android:onKeyListener="@{(v,c,e)->onKeyListener.onKey(v,c,e)}"
-                android:singleLine="true"
-                />
-
-            <!-- memo -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_memo_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="메모"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                app:layout_constraintTop_toBottomOf="@id/et_title_todo"
-                app:layout_constraintBottom_toTopOf="@id/et_memo_todo"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tv_memo_title_desc"
-                />
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_memo_title_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="memo"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                app:layout_constraintStart_toEndOf="@id/tv_memo_title"
-                app:layout_constraintBottom_toBottomOf="@id/tv_memo_title"
-                android:layout_marginLeft="6dp"
-                />
-
-            <ScrollView
-                android:id="@+id/sv_memo_todo"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_memo_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/sw_todo_limit"
-                android:layout_marginTop="12dp"
+                android:orientation="vertical"
                 >
+                <!-- title -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_title_todo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/header_todo"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/et_title_todo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/todo_placeholder"
+                    android:maxLength="28"
+                    android:textSize="14sp"
+                    android:textColor="@color/mono600"
+                    android:textColorHint="@color/mono400"
+                    android:layout_marginVertical="12dp"
+                    android:includeFontPadding="false"
+                    android:afterTextChanged="@{(e)->textWatcher.afterTextChanged(e)}"
+                    android:onEditorActionListener="@{(t,c,e)->textListener.onEditorAction(t,c,e)}"
+                    android:onKeyListener="@{(v,c,e)->onKeyListener.onKey(v,c,e)}"
+                    android:singleLine="true"
+                    />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                    <!-- memo -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_memo_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/header_memo"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_memo_title_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/desc_memo"
+                        android:textSize="12sp"
+                        android:textColor="@color/black"
+                        android:layout_marginLeft="6dp"
+                        />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/et_memo_todo"
                     android:layout_width="match_parent"
@@ -163,105 +146,108 @@
                     android:textSize="14sp"
                     android:textColor="@color/mono600"
                     android:textColorHint="@color/mono400"
-                    android:hint="메모를 입력해보세요"
+                    android:hint="@string/memo_placeholder"
                     android:includeFontPadding="false"
                     />
-            </ScrollView>
 
-            <!-- 기한 설정 -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_todo_limit_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:text="기한 설정"
-                app:layout_constraintEnd_toStartOf="@id/sw_todo_limit"
-                app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
-                app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
-                android:layout_marginRight="8dp"
-                />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <!-- 기한 설정 -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_todo_limit_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:text="기한 설정"
+                        app:layout_constraintEnd_toStartOf="@id/sw_todo_limit"
+                        app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
+                        app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
+                        android:layout_marginRight="8dp"
+                        />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/sw_todo_limit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sv_memo_todo"
-                app:layout_constraintBottom_toTopOf="@id/l_btn_write_todo"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="48dp"
-                android:checked="@{isLimit}"
-                android:onClick="@{(v)->click.onViewClick(v)}"
-                />
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_todo_limit_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{limitDescription}"
-                android:textColor="@color/mono700"
-                android:textSize="11sp"
-                app:layout_constraintEnd_toEndOf="@id/sw_todo_limit"
-                app:layout_constraintTop_toBottomOf="@id/sw_todo_limit"
-                tools:text="가이드 텍스트"
-                />
-            <!-- 마감기한 선택창 -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_limit_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="마감 기한"
-                android:textSize="14sp"
-                android:textColor="@color/black"
-                app:layout_constraintEnd_toStartOf="@id/et_limit_input"
-                app:layout_constraintTop_toTopOf="@id/et_limit_input"
-                app:layout_constraintBottom_toBottomOf="@id/et_limit_input"
-                android:layout_marginRight="12dp"
-                android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
-                />
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_todo_limit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="48dp"
+                        android:checked="@{isLimit}"
+                        android:onClick="@{(v)->click.onViewClick(v)}"
+                        />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_todo_limit_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{limitDescription}"
+                        android:textColor="@color/mono700"
+                        android:textSize="11sp"
+                        app:layout_constraintEnd_toEndOf="@id/sw_todo_limit"
+                        app:layout_constraintTop_toBottomOf="@id/sw_todo_limit"
+                        tools:text="가이드 텍스트"
+                        />
+                    <!-- 마감기한 선택창 -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_limit_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="마감 기한"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        app:layout_constraintEnd_toStartOf="@id/et_limit_input"
+                        app:layout_constraintTop_toTopOf="@id/et_limit_input"
+                        app:layout_constraintBottom_toBottomOf="@id/et_limit_input"
+                        android:layout_marginRight="12dp"
+                        android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
+                        />
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/et_limit_input"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{limitText}"
-                android:textSize="14sp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/mono100"
-                android:textAlignment="center"
-                android:drawableRight="@drawable/ic_time"
-                android:drawablePadding="4dp"
-                android:ems="5"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="time"
-                app:layout_constraintEnd_toStartOf="@id/tv_todo_limit_indicator"
-                app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
-                app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
-                android:layout_marginEnd="12dp"
-                android:onClick="@{(v)->click.onViewClick(v)}"
-                android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
-                tools:text="12:34"
-                />
-            <!-- 등록 버튼 -->
-            <include
-                android:id="@+id/l_btn_write_todo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                layout="@layout/layout_btn_circle"
-                bind:click="@{click}"
-                bind:btnName="@{btnName}"
-                bind:bgColor="@{bgColor}"
-                bind:strokeColor="@{strokeColor}"
-                bind:textColor="@{textColor}"
-                bind:rippleColor="@{rippleColor}"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:onClick="@{(v)->click.onViewClick(v)}"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="16dp"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/et_limit_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{limitText}"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/mono100"
+                        android:textAlignment="center"
+                        android:drawableRight="@drawable/ic_time"
+                        android:drawablePadding="4dp"
+                        android:ems="5"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="time"
+                        app:layout_constraintEnd_toStartOf="@id/tv_todo_limit_indicator"
+                        app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
+                        app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
+                        android:layout_marginEnd="12dp"
+                        android:onClick="@{(v)->click.onViewClick(v)}"
+                        android:visibility="@{isLimit?View.VISIBLE:View.GONE}"
+                        tools:text="12:34"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- 등록 버튼 -->
+                <include
+                    android:id="@+id/l_btn_write_todo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/layout_btn_circle"
+                    bind:click="@{click}"
+                    bind:btnName="@{btnName}"
+                    bind:bgColor="@{bgColor}"
+                    bind:strokeColor="@{strokeColor}"
+                    bind:textColor="@{textColor}"
+                    bind:rippleColor="@{rippleColor}"
+                    android:onClick="@{(v)->click.onViewClick(v)}"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

@@ -49,107 +49,88 @@
             type="Boolean" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_modify_board"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/l_modify_board"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:onClick="@{(v)->click.onViewClick(v)}"
         android:background="@color/white"
+        android:orientation="vertical"
         >
-
         <include
             android:id="@+id/l_board_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             layout="@layout/layout_action_top"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/cl_modify_content"
             bind:title="@{title}"
             bind:actionName="@{actionName}"
             bind:click="@{click}"
             />
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_modify_content"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
-            app:layout_constraintTop_toBottomOf="@id/l_board_header"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             >
-
-            <!-- title -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_title_todo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_title_todo"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/et_title_todo"
-                />
-
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/et_title_todo"
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_todo"
-                android:maxLength="28"
-                android:text="@{taskDTO.taskTitle}"
-                android:textSize="14sp"
-                android:textColor="@color/mono600"
-                android:textColorHint="@color/mono400"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title_todo"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/tv_memo_title"
-                android:layout_marginVertical="12dp"
-                android:includeFontPadding="false"
-                android:afterTextChanged="@{(e)->textWatcher.afterTextChanged(e)}"
-                android:onEditorActionListener="@{(t,c,e)->textListener.onEditorAction(t,c,e)}"
-                android:onKeyListener="@{(v,c,e)->onKeyListener.onKey(v,c,e)}"
-                android:singleLine="true"
-                />
-
-            <!-- memo -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_memo_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_title_memo"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                app:layout_constraintTop_toBottomOf="@id/et_title_todo"
-                app:layout_constraintBottom_toTopOf="@id/sv_memo_todo"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tv_memo_title_desc"
-                />
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_memo_title_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/guide_todo_memo"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                app:layout_constraintStart_toEndOf="@id/tv_memo_title"
-                app:layout_constraintBottom_toBottomOf="@id/tv_memo_title"
-                android:layout_marginLeft="6dp"
-                />
-
-            <ScrollView
-                android:id="@+id/sv_memo_todo"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_memo_title"
-                app:layout_constraintBottom_toTopOf="@id/sw_todo_limit"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginTop="12dp"
+                android:orientation="vertical"
                 >
+
+                <!-- title -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_title_todo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txt_title_todo"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/et_title_todo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_todo"
+                    android:maxLength="28"
+                    android:text="@{taskDTO.taskTitle}"
+                    android:textSize="14sp"
+                    android:textColor="@color/mono600"
+                    android:textColorHint="@color/mono400"
+                    android:layout_marginVertical="12dp"
+                    android:includeFontPadding="false"
+                    android:afterTextChanged="@{(e)->textWatcher.afterTextChanged(e)}"
+                    android:onEditorActionListener="@{(t,c,e)->textListener.onEditorAction(t,c,e)}"
+                    android:onKeyListener="@{(v,c,e)->onKeyListener.onKey(v,c,e)}"
+                    android:singleLine="true"
+                    />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                    <!-- memo -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_memo_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_title_memo"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_memo_title_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/guide_todo_memo"
+                        android:textSize="12sp"
+                        android:textColor="@color/black"
+                        android:layout_marginLeft="6dp"
+                        />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/et_memo_todo"
                     android:layout_width="match_parent"
@@ -161,86 +142,92 @@
                     android:hint="@string/hint_todo_memo"
                     android:includeFontPadding="false"
                     />
-            </ScrollView>
-            <!-- 기한 설정 -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_todo_limit_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:text="@string/txt_set_limit"
-                app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
-                app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
-                app:layout_constraintEnd_toStartOf="@id/sw_todo_limit"
-                android:layout_marginEnd="8dp"
-                />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/sw_todo_limit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sv_memo_todo"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="48dp"
-                android:checked="@{hasLimit}"
-                android:enabled="@{!isComplete}"
-                android:onClick="@{(v)->click.onViewClick(v)}"
-                />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <!-- 기한 설정 -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_todo_limit_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:text="@string/txt_set_limit"
+                        app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
+                        app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
+                        app:layout_constraintEnd_toStartOf="@id/sw_todo_limit"
+                        android:layout_marginEnd="8dp"
+                        />
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_todo_limit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="48dp"
+                        android:checked="@{hasLimit}"
+                        android:enabled="@{!isComplete}"
+                        android:onClick="@{(v)->click.onViewClick(v)}"
+                        />
+                    <!-- 마감기한 가이드 -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_todo_limit_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{limitDesc}"
+                        android:textColor="@color/mono700"
+                        android:textSize="11sp"
+                        app:layout_constraintEnd_toEndOf="@id/sw_todo_limit"
+                        app:layout_constraintTop_toBottomOf="@id/sw_todo_limit"
+                        tools:text="가이드 텍스트"
+                        />
 
-            <!-- 마감기한 가이드 -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_todo_limit_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{limitDesc}"
-                android:textColor="@color/mono700"
-                android:textSize="11sp"
-                app:layout_constraintEnd_toEndOf="@id/sw_todo_limit"
-                app:layout_constraintTop_toBottomOf="@id/sw_todo_limit"
-                tools:text="가이드 텍스트"
-                />
+                    <!-- 마감기한 선택 팝업 -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_limit_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_dead_line"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        app:layout_constraintEnd_toStartOf="@id/et_limit_input"
+                        app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
+                        app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
+                        android:layout_marginEnd="8dp"
+                        android:visibility="@{hasLimit?View.VISIBLE:View.GONE}"
+                        />
 
-            <!-- 마감기한 선택 팝업 -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_limit_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_dead_line"
-                android:textSize="14sp"
-                android:textColor="@color/black"
-                app:layout_constraintEnd_toStartOf="@id/et_limit_input"
-                app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
-                app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
-                android:layout_marginEnd="8dp"
-                android:visibility="@{hasLimit?View.VISIBLE:View.GONE}"
-                />
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/et_limit_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableRight="@drawable/ic_time"
+                        android:drawablePadding="4dp"
+                        android:ems="5"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:inputType="time"
+                        android:onClick="@{(v)->click.onViewClick(v)}"
+                        android:text="@{limitText}"
+                        android:textAlignment="center"
+                        android:textColor="@{!isComplete?@color/black:@color/mono600}"
+                        android:textColorHint="@color/mono100"
+                        android:textSize="14sp"
+                        android:enabled="@{!isComplete}"
+                        android:visibility="@{hasLimit?View.VISIBLE:View.GONE}"
+                        app:layout_constraintEnd_toStartOf="@id/tv_todo_limit_indicator"
+                        app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
+                        app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
+                        android:layout_marginEnd="12dp"
+                        tools:text="12:34" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/et_limit_input"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_time"
-                android:drawablePadding="4dp"
-                android:ems="5"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="time"
-                android:onClick="@{(v)->click.onViewClick(v)}"
-                android:text="@{limitText}"
-                android:textAlignment="center"
-                android:textColor="@{!isComplete?@color/black:@color/mono600}"
-                android:textColorHint="@color/mono100"
-                android:textSize="14sp"
-                android:enabled="@{!isComplete}"
-                android:visibility="@{hasLimit?View.VISIBLE:View.GONE}"
-                app:layout_constraintEnd_toStartOf="@id/tv_todo_limit_indicator"
-                app:layout_constraintTop_toTopOf="@id/sw_todo_limit"
-                app:layout_constraintBottom_toBottomOf="@id/sw_todo_limit"
-                android:layout_marginEnd="12dp"
-                tools:text="12:34" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 </layout>

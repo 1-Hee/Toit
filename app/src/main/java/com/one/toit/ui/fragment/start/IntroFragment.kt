@@ -44,7 +44,6 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
             }
         }
 
-        "기한을 설정하지 않은 목표는 달성 시간 통계에 반영 되지 않아요!"
         // 가상 키패드 엔터 이벤트 핸들링을 위한 리스너
         val textListener: TextView.OnEditorActionListener = TextView.OnEditorActionListener {
                 textView, keyCode, keyEvent ->
@@ -136,8 +135,8 @@ class IntroFragment : BaseFragment<FragmentIntroBinding>() {
     }
 
     private fun moveToMain(){
-        val startText = requireContext().getString(R.string.ts_greet)
-        AppUtil.toast(requireContext(), startText)
+//        val startText = requireContext().getString(R.string.ts_greet)
+//        AppUtil.toast(requireContext(), startText)
         val intent = Intent(requireActivity(), MainActivity::class.java)
         requireActivity().onBackPressedDispatcher.onBackPressed()
         launcher.launch(intent)

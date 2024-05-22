@@ -14,8 +14,8 @@
     <!-- 휴대폰 알림 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- 휴대폰 위치 정보 읽기를 위한 권한 설정 -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+<!--    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
     <!-- 휴대폰 카메라 -->
     <uses-feature
         android:name="android.hardware.camera"

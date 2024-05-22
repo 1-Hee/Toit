@@ -177,7 +177,7 @@ class BoardModifyFragment : BaseFragment<FragmentBoardModifyBinding>() {
                     }
                 }
                 // 현재 페이지 배경
-                R.id.cl_modify_content -> {
+                R.id.l_modify_board -> {
                     // 일단 포커즈 제거
                     AppUtil.UIManager.hideKeyPad(requireActivity())
                 }

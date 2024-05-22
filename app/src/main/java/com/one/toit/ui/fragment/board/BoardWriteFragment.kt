@@ -126,7 +126,7 @@ class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
                     activity.finish()
                 }
                 // 현재 페이지 배경
-                R.id.cl_write_content -> {
+                R.id.l_write_content -> {
                     // 일단 포커즈 제거
                     AppUtil.UIManager.hideKeyPad(requireActivity())
                 }
