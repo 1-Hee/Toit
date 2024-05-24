@@ -29,9 +29,9 @@ android {
         applicationId = "com.one.toit"
         minSdk = 24
         targetSdk = 33
-        versionCode = 6
-        versionName = "1.0.1"
-        versionName = "1.1.8"
+        versionCode = 7
+        versionName = "1.1.9"
+        versionName = "1.1.9"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
