@@ -188,7 +188,8 @@ class SettingActivity : BaseComposeActivity() {
             val intent = Intent(context, StartActivity::class.java)
             launcher.launch(intent)
             setResult(RESULT_CANCELED)
-            finish()
+            finishAffinity()
+            //finish()
         }
     }
 

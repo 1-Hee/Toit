@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
+import java.util.Random
 
 
 class BoardWriteFragment : BaseFragment<FragmentBoardWriteBinding>(){
